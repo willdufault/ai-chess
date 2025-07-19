@@ -1,4 +1,4 @@
-# Chess with Artificial Intelligence
+# Chess with AI
 
 (Created by Will Dufault and Mattheus Faria.)
 
