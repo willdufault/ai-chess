@@ -1,6 +1,12 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from enums import Color
+
+if TYPE_CHECKING:
+    from board import Board
 
 
 class MoveStrategy(ABC):
@@ -14,44 +20,20 @@ class MoveStrategy(ABC):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         pass
 
-    def __passes_basic_move_checks(
-        self,
-        color: Color,
-        from_row_index: int,
-        from_column_index: int,
-        to_row_index: int,
-        to_column_index: int,
-    ) -> bool:
-        """Return whether the move passes basic legality checks."""
-        #! board import error
-        # if not (
-        #     board.is_in_bounds(from_row_index, from_column_index)
-        #     and board.is_in_bounds(to_row_index, to_column_index)
-        # ):
-        #     return False
-
-        # from_piece = board.get_piece(from_row_index, from_column_index)
-        # if from_piece is None or from_piece.color != color:
-        #     return False
-
-        # to_piece = board.get_piece(to_row_index, to_column_index)
-        # if to_piece is not None and to_piece.color == color:
-        #     return False
-
-        return True
-
     # * some helper that takes in delta x + y and can be used to check blocking
     # * pieces along horiz, vert, diag, use in bishop, rook, queen
-    def __is_blocked(
+    def _is_blocked(
         self,
         color: Color,
         from_row_index: int,
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         raise NotImplementedError
 
@@ -66,26 +48,34 @@ class PawnMoveStrategy(MoveStrategy):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
-        if not self.__passes_basic_move_checks():
-            return False
-
         # TODO: en passant
 
-        #! board import error
-        # row_delta = 1 if color == Color.WHITE else -1
-        # if to_row_index != from_row_index + row_delta:
-        #     return False
+        if abs(from_column_index - to_column_index) > 1:
+            return False
 
-        # if abs(from_column_index - to_column_index) > 1:
-        #     return False
+        to_piece = board.get_piece(to_row_index, to_column_index)
+        if from_column_index == to_column_index and to_piece is not None:
+            return False
 
-        # to_piece = board.get_piece(to_row_index, to_column_index)
-        # if from_column_index == to_column_index and to_piece is not None:
-        #     return False
+        if from_column_index != to_column_index and to_piece is None:
+            return False
 
-        # if from_column_index != to_column_index and to_piece is None:
-        #     return False
+        # TODO: move 2 first move
+        row_delta = 1 if color == Color.WHITE else -1
+        if (
+            to_row_index == from_row_index + 2 * row_delta
+            and from_column_index == to_column_index
+        ):
+            from_piece = board.get_piece(from_row_index, from_column_index)
+            adjacent_piece = board.get_piece(
+                from_row_index + row_delta, from_column_index
+            )
+            if from_piece.has_moved or adjacent_piece is not None:
+                return False
+        elif to_row_index != from_row_index + row_delta:
+            return False
 
         return True
 
@@ -100,6 +90,7 @@ class KnightMoveStrategy(MoveStrategy):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         raise NotImplementedError
 
@@ -114,6 +105,7 @@ class BishopMoveStrategy(MoveStrategy):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         raise NotImplementedError
 
@@ -128,6 +120,7 @@ class RookMoveStrategy(MoveStrategy):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         raise NotImplementedError
 
@@ -142,6 +135,7 @@ class QueenMoveStrategy(MoveStrategy):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         raise NotImplementedError
 
@@ -156,5 +150,6 @@ class KingMoveStrategy(MoveStrategy):
         from_column_index: int,
         to_row_index: int,
         to_column_index: int,
+        board: Board,
     ) -> bool:
         raise NotImplementedError

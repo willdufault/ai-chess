@@ -8,8 +8,7 @@ class Board:
     """Represents a chessboard."""
 
     def __init__(self) -> None:
-
-        self.squares = [[None] * BOARD_SIZE for _ in range(BOARD_SIZE)]
+        self._squares = [[None] * BOARD_SIZE for _ in range(BOARD_SIZE)]
         self.__set_up_pieces()
 
     def __str__(self) -> str:
@@ -32,24 +31,23 @@ class Board:
         return "\n".join(rows)
 
     def get_piece(self, row_index: int, column_index: int) -> Piece | None:
-        """Return the piece at the coordinates."""
-        return self.squares[row_index][column_index]
+        """Get the piece at the coordinates."""
+        return self._squares[row_index][column_index]
 
-    def is_in_bounds(row_index: int, column_index: int) -> bool:
+    def set_piece(self, row_index: int, column_index: int, piece: Piece | None) -> None:
+        """Set the piece at the coordinates."""
+        self._squares[row_index][column_index] = piece
+
+    def is_in_bounds(self, row_index: int, column_index: int) -> bool:
         """Return whether the coordinates are in bounds."""
-        return (
-            row_index >= 0
-            and row_index < BOARD_SIZE
-            and column_index >= 0
-            and column_index < BOARD_SIZE
-        )
+        return 0 <= row_index < BOARD_SIZE and 0 <= column_index < BOARD_SIZE
 
     def __set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
         piece_order = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
         for column_index, piece_class in enumerate(piece_order):
-            self.squares[0][column_index] = piece_class(Color.WHITE)
-            self.squares[-1][column_index] = piece_class(Color.BLACK)
+            self._squares[0][column_index] = piece_class(Color.WHITE)
+            self._squares[-1][column_index] = piece_class(Color.BLACK)
 
-        self.squares[1] = [Pawn(Color.WHITE) for _ in range(BOARD_SIZE)]
-        self.squares[-2] = [Pawn(Color.BLACK) for _ in range(BOARD_SIZE)]
+        self._squares[1] = [Pawn(Color.WHITE) for _ in range(BOARD_SIZE)]
+        self._squares[-2] = [Pawn(Color.BLACK) for _ in range(BOARD_SIZE)]
