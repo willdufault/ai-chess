@@ -50,7 +50,9 @@ class PawnMoveStrategy(MoveStrategy):
         to_column_index: int,
         board: Board,
     ) -> bool:
-        # TODO: en passant
+        """Return whether the move is a legal Pawn move."""
+
+        # TODO: En Passant requires move history.
 
         if abs(from_column_index - to_column_index) > 1:
             return False
@@ -62,13 +64,12 @@ class PawnMoveStrategy(MoveStrategy):
         if from_column_index != to_column_index and to_piece is None:
             return False
 
-        # TODO: move 2 first move
+        from_piece = board.get_piece(from_row_index, from_column_index)
         row_delta = 1 if color == Color.WHITE else -1
         if (
             to_row_index == from_row_index + 2 * row_delta
             and from_column_index == to_column_index
         ):
-            from_piece = board.get_piece(from_row_index, from_column_index)
             adjacent_piece = board.get_piece(
                 from_row_index + row_delta, from_column_index
             )
@@ -77,6 +78,7 @@ class PawnMoveStrategy(MoveStrategy):
         elif to_row_index != from_row_index + row_delta:
             return False
 
+        from_piece.has_moved = True
         return True
 
 
