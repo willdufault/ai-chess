@@ -15,39 +15,39 @@ class Board:
         rows = ["  ┌───┬───┬───┬───┬───┬───┬───┬───┐"]
 
         # Reverse rows to align matrix coordinates with chess coordinates.
-        for row_index in reversed(range(BOARD_SIZE)):
-            current_row = [f"{row_index + 1} │"]
-            for column_index in range(BOARD_SIZE):
-                piece = self.get_piece(row_index, column_index)
+        for row_idx in reversed(range(BOARD_SIZE)):
+            current_row = [f"{row_idx + 1} │"]
+            for col_idx in range(BOARD_SIZE):
+                piece = self.get_piece(row_idx, col_idx)
                 symbol = " " if piece is None else piece.symbol
                 current_row.append(f" {symbol} │")
             rows.append("".join(current_row))
 
-            if row_index > 0:
+            if row_idx > 0:
                 rows.append("  ├───┼───┼───┼───┼───┼───┼───┼───┤")
 
         rows.append("  └───┴───┴───┴───┴───┴───┴───┴───┘")
         rows.append("    a   b   c   d   e   f   g   h")
         return "\n".join(rows)
 
-    def get_piece(self, row_index: int, column_index: int) -> Piece | None:
+    def get_piece(self, row_idx: int, col_idx: int) -> Piece | None:
         """Get the piece at the coordinates."""
-        return self._squares[row_index][column_index]
+        return self._squares[row_idx][col_idx]
 
-    def set_piece(self, row_index: int, column_index: int, piece: Piece | None) -> None:
+    def set_piece(self, row_idx: int, col_idx: int, piece: Piece | None) -> None:
         """Set the piece at the coordinates."""
-        self._squares[row_index][column_index] = piece
+        self._squares[row_idx][col_idx] = piece
 
-    def is_in_bounds(self, row_index: int, column_index: int) -> bool:
+    def is_in_bounds(self, row_idx: int, col_idx: int) -> bool:
         """Return whether the coordinates are in bounds."""
-        return 0 <= row_index < BOARD_SIZE and 0 <= column_index < BOARD_SIZE
+        return 0 <= row_idx < BOARD_SIZE and 0 <= col_idx < BOARD_SIZE
 
     def __set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
         piece_order = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
-        for column_index, piece_class in enumerate(piece_order):
-            self._squares[0][column_index] = piece_class(Color.WHITE)
-            self._squares[-1][column_index] = piece_class(Color.BLACK)
+        for col_idx, piece_class in enumerate(piece_order):
+            self._squares[0][col_idx] = piece_class(Color.WHITE)
+            self._squares[-1][col_idx] = piece_class(Color.BLACK)
 
         self._squares[1] = [Pawn(Color.WHITE) for _ in range(BOARD_SIZE)]
         self._squares[-2] = [Pawn(Color.BLACK) for _ in range(BOARD_SIZE)]
