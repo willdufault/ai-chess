@@ -1,10 +1,16 @@
 from unittest import TestCase, main
 
-from board import BOARD_SIZE, Board
+from board import Board
 from enums import Color
-from game import Game
-from move_strategies import KnightMoveStrategy, PawnMoveStrategy
-from piece import Pawn
+from move_strategies import (
+    BishopMoveStrategy,
+    KingMoveStrategy,
+    KnightMoveStrategy,
+    PawnMoveStrategy,
+    QueenMoveStrategy,
+    RookMoveStrategy,
+)
+from piece import Bishop, King, Knight, Pawn, Queen, Rook
 
 
 class TestIsBlocked(TestCase):
@@ -12,6 +18,10 @@ class TestIsBlocked(TestCase):
         self.board = Board()
         self.pawn_move_strategy = PawnMoveStrategy()
         self.knight_move_strategy = KnightMoveStrategy()
+        self.bishop_move_strategy = BishopMoveStrategy()
+        self.rook_move_strategy = RookMoveStrategy()
+        self.queen_move_strategy = QueenMoveStrategy()
+        self.king_move_strategy = KingMoveStrategy()
 
     def test_blocked_vertical(self) -> None:
         self.assertEqual(
@@ -100,6 +110,102 @@ class TestIsBlocked(TestCase):
                 Color.WHITE, 3, 4, 2, 6, self.board
             ),
             True,
+        )
+
+    def test_move_bishop(self) -> None:
+        self.board.set_piece(3, 3, Bishop(Color.WHITE))
+
+        self.assertEqual(
+            self.bishop_move_strategy.is_legal_move(
+                Color.WHITE, 3, 3, 3, 4, self.board
+            ),
+            False,
+        )
+        self.assertEqual(
+            self.bishop_move_strategy.is_legal_move(
+                Color.WHITE, 3, 3, 4, 4, self.board
+            ),
+            True,
+        )
+        self.assertEqual(
+            self.bishop_move_strategy.is_legal_move(
+                Color.WHITE, 4, 4, 5, 3, self.board
+            ),
+            True,
+        )
+        self.assertEqual(
+            self.bishop_move_strategy.is_legal_move(
+                Color.WHITE, 5, 3, 2, 1, self.board
+            ),
+            False,
+        )
+
+    def test_move_rook(self) -> None:
+        self.board.set_piece(3, 3, Rook(Color.WHITE))
+
+        self.assertEqual(
+            self.rook_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board),
+            False,
+        )
+        self.assertEqual(
+            self.rook_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 3, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.rook_move_strategy.is_legal_move(Color.WHITE, 4, 3, 4, 5, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.rook_move_strategy.is_legal_move(Color.WHITE, 4, 5, 2, 1, self.board),
+            False,
+        )
+
+    def test_move_queen(self) -> None:
+        self.board.set_piece(3, 3, Queen(Color.WHITE))
+
+        self.assertEqual(
+            self.queen_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.queen_move_strategy.is_legal_move(Color.WHITE, 4, 4, 4, 3, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.queen_move_strategy.is_legal_move(Color.WHITE, 4, 3, 4, 5, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.queen_move_strategy.is_legal_move(Color.WHITE, 4, 5, 2, 3, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.queen_move_strategy.is_legal_move(Color.WHITE, 2, 3, 4, 2, self.board),
+            False,
+        )
+
+    def test_move_king(self) -> None:
+        self.board.set_piece(3, 3, King(Color.WHITE))
+
+        self.assertEqual(
+            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.king_move_strategy.is_legal_move(Color.WHITE, 4, 4, 4, 3, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.king_move_strategy.is_legal_move(Color.WHITE, 4, 3, 3, 4, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 4, 2, 3, self.board),
+            True,
+        )
+        self.assertEqual(
+            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 4, 2, 1, self.board),
+            False,
         )
 
 

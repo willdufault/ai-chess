@@ -126,7 +126,16 @@ class BishopMoveStrategy(MoveStrategy):
         to_col_idx: int,
         board: Board,
     ) -> bool:
-        raise NotImplementedError
+        """Return whether the move is legal for a bishop."""
+        row_diff = abs(from_row_idx - to_row_idx)
+        col_diff = abs(from_col_idx - to_col_idx)
+        if row_diff != col_diff:
+            return False
+
+        if self._is_blocked(from_row_idx, from_col_idx, to_row_idx, to_col_idx, board):
+            return False
+
+        return True
 
 
 class RookMoveStrategy(MoveStrategy):
@@ -141,7 +150,16 @@ class RookMoveStrategy(MoveStrategy):
         to_col_idx: int,
         board: Board,
     ) -> bool:
-        raise NotImplementedError
+        """Return whether the move is legal for a rook."""
+        row_diff = abs(from_row_idx - to_row_idx)
+        col_diff = abs(from_col_idx - to_col_idx)
+        if row_diff != 0 and col_diff != 0:
+            return False
+
+        if self._is_blocked(from_row_idx, from_col_idx, to_row_idx, to_col_idx, board):
+            return False
+
+        return True
 
 
 class QueenMoveStrategy(MoveStrategy):
@@ -156,7 +174,16 @@ class QueenMoveStrategy(MoveStrategy):
         to_col_idx: int,
         board: Board,
     ) -> bool:
-        raise NotImplementedError
+        """Return whether the move is legal for a queen."""
+        row_diff = abs(from_row_idx - to_row_idx)
+        col_diff = abs(from_col_idx - to_col_idx)
+        if row_diff != col_diff and row_diff != 0 and col_diff != 0:
+            return False
+
+        if self._is_blocked(from_row_idx, from_col_idx, to_row_idx, to_col_idx, board):
+            return False
+
+        return True
 
 
 class KingMoveStrategy(MoveStrategy):
@@ -171,4 +198,6 @@ class KingMoveStrategy(MoveStrategy):
         to_col_idx: int,
         board: Board,
     ) -> bool:
-        raise NotImplementedError
+        row_diff = abs(from_row_idx - to_row_idx)
+        col_diff = abs(from_col_idx - to_col_idx)
+        return row_diff <= 1 and col_diff <= 1

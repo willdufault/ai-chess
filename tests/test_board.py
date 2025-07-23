@@ -1,8 +1,6 @@
 from unittest import TestCase, main
 
 from board import BOARD_SIZE, Board
-from enums import Color
-from piece import Pawn
 
 
 class TestMove(TestCase):
