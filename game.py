@@ -8,8 +8,8 @@ KING_COL_IDX = 4
 class Game:
     """Represents a chess game."""
 
-    def __init__(self) -> None:
-        self._board = Board()
+    def __init__(self, board: Board) -> None:
+        self._board = board
         self._white_king_pos = (0, KING_COL_IDX)
         self._black_king_pos = (BOARD_SIZE - 1, KING_COL_IDX)
 
