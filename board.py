@@ -1,7 +1,9 @@
+from constants import KNIGHT_MOVE_PATTERNS
 from enums import Color
-from piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
+from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 BOARD_SIZE = 8
+PAWN_ROW_IDX = 1
 
 
 class Board:
@@ -40,7 +42,8 @@ class Board:
 
     def set_piece(self, row_idx: int, col_idx: int, piece: Piece | None) -> None:
         """Set the piece at the coordinates."""
-        self._squares[row_idx][col_idx] = piece
+        if self.is_in_bounds(row_idx, col_idx):
+            self._squares[row_idx][col_idx] = piece
 
     def is_in_bounds(self, row_idx: int, col_idx: int) -> bool:
         """Return whether the coordinates are in bounds."""
@@ -61,8 +64,10 @@ class Board:
             self._squares[0][col_idx] = piece_class(Color.WHITE)
             self._squares[-1][col_idx] = piece_class(Color.BLACK)
 
-        self._squares[1] = [Pawn(Color.WHITE) for _ in range(BOARD_SIZE)]
-        self._squares[-2] = [Pawn(Color.BLACK) for _ in range(BOARD_SIZE)]
+        self._squares[PAWN_ROW_IDX] = [Pawn(Color.WHITE) for _ in range(BOARD_SIZE)]
+        self._squares[-1 - PAWN_ROW_IDX] = [
+            Pawn(Color.BLACK) for _ in range(BOARD_SIZE)
+        ]
 
     def _is_under_straight_attack(
         self, color: Color, row_idx: int, col_idx: int
@@ -116,17 +121,7 @@ class Board:
 
     def _is_under_knight_attack(self, color: Color, row_idx: int, col_idx: int) -> bool:
         """Return whether the coordinates are under attack by a knight of the color."""
-        directions = [
-            (1, 2),
-            (1, -2),
-            (-1, 2),
-            (-1, -2),
-            (2, 1),
-            (2, -1),
-            (-2, 1),
-            (-2, -1),
-        ]
-        for row_delta, col_delta in directions:
+        for row_delta, col_delta in KNIGHT_MOVE_PATTERNS:
             piece = self.get_piece(row_idx + row_delta, col_idx + col_delta)
             if piece is not None and piece.color == color and isinstance(piece, Knight):
                 return True

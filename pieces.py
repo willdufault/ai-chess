@@ -22,6 +22,7 @@ class Piece(ABC):
         self._value = value
         self._symbol = symbol
         self._move_strategy = move_strategy
+        self._tracks_first_move = False
 
     @property
     def color(self) -> Color:
@@ -43,6 +44,11 @@ class Piece(ABC):
         """Get the move strategy of the piece."""
         return self._move_strategy
 
+    @property
+    def tracks_first_move(self) -> Color:
+        """Get whether the piece tracks its first move."""
+        return self._tracks_first_move
+
 
 class FirstMovePiece(Piece, ABC):
     """Represents an abstract chess piece that tracks whether it has moved."""
@@ -51,7 +57,13 @@ class FirstMovePiece(Piece, ABC):
         self, color: Color, value: int, symbol: str, move_strategy: MoveStrategy
     ) -> None:
         super().__init__(color, value, symbol, move_strategy)
+        self._tracks_first_move = True
         self._has_moved = False
+
+    @property
+    def tracks_first_move(self) -> Color:
+        """Get whether the piece tracks its first move."""
+        return self._tracks_first_move
 
     @property
     def has_moved(self) -> bool:

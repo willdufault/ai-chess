@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from constants import KNIGHT_MOVE_PATTERNS
 from enums import Color
 
 if TYPE_CHECKING:
@@ -71,15 +72,21 @@ class PawnMoveStrategy(MoveStrategy):
             return False
 
         to_piece = board.get_piece(to_row_idx, to_col_idx)
-        if from_col_idx == to_col_idx and to_piece is not None:
+        is_capturing_vertically = from_col_idx == to_col_idx and to_piece is not None
+        if is_capturing_vertically:
             return False
 
-        if from_col_idx != to_col_idx and to_piece is None:
+        is_moving_diagonally = from_col_idx != to_col_idx and to_piece is None
+        if is_moving_diagonally:
             return False
 
         from_piece = board.get_piece(from_row_idx, from_col_idx)
+
         row_delta = 1 if color == Color.WHITE else -1
-        if to_row_idx == from_row_idx + 2 * row_delta and from_col_idx == to_col_idx:
+        is_moving_forward_two = (
+            to_row_idx == from_row_idx + 2 * row_delta and from_col_idx == to_col_idx
+        )
+        if is_moving_forward_two:
             if from_piece.has_moved or self._is_blocked(
                 from_row_idx, from_col_idx, to_row_idx, to_col_idx, board
             ):
@@ -87,7 +94,6 @@ class PawnMoveStrategy(MoveStrategy):
         elif to_row_idx != from_row_idx + row_delta:
             return False
 
-        from_piece.has_moved = True
         return True
 
 
@@ -104,10 +110,9 @@ class KnightMoveStrategy(MoveStrategy):
         board: Board,
     ) -> bool:
         """Return whether the move is legal for a knight."""
-        row_diff = abs(from_row_idx - to_row_idx)
-        col_diff = abs(from_col_idx - to_col_idx)
-        diffs = (row_diff, col_diff)
-        return 1 in diffs and 2 in diffs
+        row_delta = from_row_idx - to_row_idx
+        col_delta = from_col_idx - to_col_idx
+        return (row_delta, col_delta) in KNIGHT_MOVE_PATTERNS
 
 
 class BishopMoveStrategy(MoveStrategy):
@@ -125,7 +130,8 @@ class BishopMoveStrategy(MoveStrategy):
         """Return whether the move is legal for a bishop."""
         row_diff = abs(from_row_idx - to_row_idx)
         col_diff = abs(from_col_idx - to_col_idx)
-        if row_diff != col_diff:
+        is_not_diagonal = row_diff != col_diff
+        if is_not_diagonal:
             return False
 
         if self._is_blocked(from_row_idx, from_col_idx, to_row_idx, to_col_idx, board):
@@ -149,7 +155,8 @@ class RookMoveStrategy(MoveStrategy):
         """Return whether the move is legal for a rook."""
         row_diff = abs(from_row_idx - to_row_idx)
         col_diff = abs(from_col_idx - to_col_idx)
-        if row_diff != 0 and col_diff != 0:
+        is_not_straight = row_diff != 0 and col_diff != 0
+        if is_not_straight:
             return False
 
         if self._is_blocked(from_row_idx, from_col_idx, to_row_idx, to_col_idx, board):
@@ -173,7 +180,9 @@ class QueenMoveStrategy(MoveStrategy):
         """Return whether the move is legal for a queen."""
         row_diff = abs(from_row_idx - to_row_idx)
         col_diff = abs(from_col_idx - to_col_idx)
-        if row_diff != col_diff and row_diff != 0 and col_diff != 0:
+        is_not_diagonal = row_diff != col_diff
+        is_not_straight = row_diff != 0 and col_diff != 0
+        if is_not_diagonal and is_not_straight:
             return False
 
         if self._is_blocked(from_row_idx, from_col_idx, to_row_idx, to_col_idx, board):

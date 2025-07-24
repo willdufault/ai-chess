@@ -2,7 +2,7 @@ from unittest import TestCase, main
 
 from board import BOARD_SIZE, Board
 from enums import Color
-from piece import Bishop, Knight, Pawn, Queen, Rook
+from pieces import Bishop, Knight, Pawn, Queen, Rook
 
 
 class TestMove(TestCase):

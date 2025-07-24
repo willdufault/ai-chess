@@ -10,7 +10,7 @@ from move_strategies import (
     QueenMoveStrategy,
     RookMoveStrategy,
 )
-from piece import Pawn
+from pieces import Pawn
 
 
 class TestIsBlocked(TestCase):

@@ -2,7 +2,7 @@ from unittest import TestCase, main
 
 from enums import Color
 from game import Game
-from piece import Pawn
+from pieces import Pawn
 
 
 class TestMove(TestCase):

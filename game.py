@@ -1,5 +1,8 @@
-from board import Board
+from board import BOARD_SIZE, Board
 from enums import Color
+from pieces import King, Pawn, Piece, Rook
+
+KING_COL_IDX = 4
 
 
 class Game:
@@ -7,6 +10,8 @@ class Game:
 
     def __init__(self) -> None:
         self._board = Board()
+        self._white_king_pos = (0, KING_COL_IDX)
+        self._black_king_pos = (BOARD_SIZE - 1, KING_COL_IDX)
 
     def _move_passes_basic_checks(
         self,
@@ -17,18 +22,19 @@ class Game:
         to_col_idx: int,
     ) -> bool:
         """Return whether the move passes basic legality checks."""
-        if not (
-            self._board.is_in_bounds(from_row_idx, from_col_idx)
-            and self._board.is_in_bounds(to_row_idx, to_col_idx)
-        ):
+        is_from_in_bounds = self._board.is_in_bounds(from_row_idx, from_col_idx)
+        is_to_in_bounds = self._board.is_in_bounds(to_row_idx, to_col_idx)
+        if not (is_from_in_bounds and is_to_in_bounds):
             return False
 
         from_piece = self._board.get_piece(from_row_idx, from_col_idx)
-        if from_piece is None or from_piece.color != color:
+        is_moving_wrong_piece = from_piece is None or from_piece.color != color
+        if is_moving_wrong_piece:
             return False
 
         to_piece = self._board.get_piece(to_row_idx, to_col_idx)
-        if to_piece is not None and to_piece.color == color:
+        is_to_same_color = to_piece is not None and to_piece.color == color
+        if is_to_same_color:
             return False
 
         return True
@@ -58,13 +64,28 @@ class Game:
         ):
             return False
 
+        self._move_piece(from_row_idx, from_col_idx, to_row_idx, to_col_idx, from_piece)
+
+        if from_piece.tracks_first_move:
+            from_piece.has_moved = True
+
+        return True
+
+    def _move_piece(
+        self,
+        from_row_idx: int,
+        from_col_idx: int,
+        to_row_idx: int,
+        to_col_idx: int,
+        from_piece: Piece,
+    ) -> None:
+        """Move a piece. Assuming this is a legal move."""
         self._board.set_piece(from_row_idx, from_col_idx, None)
         self._board.set_piece(to_row_idx, to_col_idx, from_piece)
-        return True
 
 
 if __name__ == "__main__":
-    from piece import Pawn
+    from pieces import Pawn
 
     g = Game()
     g._board._squares[2][1] = Pawn(Color.BLACK)
