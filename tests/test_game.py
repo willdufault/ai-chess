@@ -1,5 +1,6 @@
 from unittest import TestCase, main
 
+from board import Board
 from enums import Color
 from game import Game
 from pieces import Pawn
@@ -7,7 +8,7 @@ from pieces import Pawn
 
 class TestMove(TestCase):
     def setUp(self) -> None:
-        self.game = Game()
+        self.game = Game(Board())
 
     def test_move_no_piece(self) -> None:
         self.assertFalse(self.game.move(Color.WHITE, 2, 0, 3, 0))
