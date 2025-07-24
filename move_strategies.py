@@ -25,8 +25,6 @@ class MoveStrategy(ABC):
         """Return whether the move is legal."""
         pass
 
-    # TODO: some helper that takes in delta x + y and can be used to check blocking
-    # TODO: pieces along horiz, vert, diag, use in bishop, rook, queen
     def _is_blocked(
         self,
         from_row_idx: int,
@@ -35,8 +33,8 @@ class MoveStrategy(ABC):
         to_col_idx: int,
         board: Board,
     ) -> bool:
-        """Return whether there is a piece between the from and to coordinates. Assumes horizontal,
-        vertical, or diagonal movement."""
+        """Return whether there is a piece between the from and to coordinates.
+        Assumes horizontal, vertical, or diagonal movement."""
         row_diff = to_row_idx - from_row_idx
         col_diff = to_col_idx - from_col_idx
         step_cnt = max(abs(row_diff), abs(col_diff))
@@ -68,9 +66,7 @@ class PawnMoveStrategy(MoveStrategy):
         board: Board,
     ) -> bool:
         """Return whether the move is a legal for a pawn."""
-
-        # TODO: En Passant requires move history.
-
+        # NOTE: I have no plans to implement En Passant.
         if abs(from_col_idx - to_col_idx) > 1:
             return False
 

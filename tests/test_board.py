@@ -8,10 +8,13 @@ class TestMove(TestCase):
         self.board = Board()
 
     def test_out_of_bounds(self) -> None:
-        self.assertEqual(self.board.is_in_bounds(0, 0), True)
-        self.assertEqual(self.board.is_in_bounds(BOARD_SIZE - 1, BOARD_SIZE - 1), True)
-        self.assertEqual(self.board.is_in_bounds(-1, 0), False)
-        self.assertEqual(self.board.is_in_bounds(0, BOARD_SIZE), False)
+        self.assertTrue(self.board.is_in_bounds(0, 0))
+        self.assertTrue(self.board.is_in_bounds(BOARD_SIZE - 1, BOARD_SIZE - 1))
+        self.assertFalse(self.board.is_in_bounds(-1, 0))
+        self.assertFalse(self.board.is_in_bounds(0, BOARD_SIZE))
+
+    # def test_is_under_attack(self) -> None:
+        
 
 
 if __name__ == "__main__":

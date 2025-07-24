@@ -67,10 +67,6 @@ if __name__ == "__main__":
     from piece import Pawn
 
     g = Game()
-
-    # TODO: PICK UP HERE
-    # testing pawn move strategy, need to figure out import error
-
     g._board._squares[2][1] = Pawn(Color.BLACK)
     print(g.move(Color.WHITE, 1, 0, 2, 0))
     cw = Color.WHITE
