@@ -23,25 +23,31 @@ class Board:
 
         self._set_up_pieces()
 
-    def __str__(self) -> str:
+    def draw(self, color: Color) -> None:
+        """Draw the board and rotate the perspective based on the color."""
         rows = ["  ┌───┬───┬───┬───┬───┬───┬───┬───┐"]
 
-        # Reverse rows to align matrix coordinates with chess coordinates.
-        for row_idx in reversed(range(BOARD_SIZE)):
-            current_row = [f"{row_idx + 1} │"]
+        if color is Color.WHITE:
+            row_idxs = tuple(reversed(range(BOARD_SIZE)))
+        else:
+            row_idxs = tuple(range(BOARD_SIZE))
+
+        for row_idx in row_idxs:
+            current_row = [f"{row_idx} │"]
             for col_idx in range(BOARD_SIZE):
                 piece = self.get_piece(row_idx, col_idx)
                 symbol = " " if piece is None else piece.symbol
                 current_row.append(f" {symbol} │")
+                # breakpoint()
             rows.append("".join(current_row))
 
-            if row_idx > 0:
+            if row_idx != row_idxs[-1]:
                 rows.append("  ├───┼───┼───┼───┼───┼───┼───┼───┤")
 
         # TODO: Change if chess notation added.
         rows.append("  └───┴───┴───┴───┴───┴───┴───┴───┘")
         rows.append("    0   1   2   3   4   5   6   7")
-        return "\n".join(rows)
+        print("\n".join(rows))
 
     def get_piece(self, row_idx: int, col_idx: int) -> Piece | None:
         """Get the piece at the coordinates."""
@@ -70,6 +76,17 @@ class Board:
             or self._is_under_diagonal_attack(row_idx, col_idx, color)
             or self._is_under_knight_attack(row_idx, col_idx, color)
         )
+
+    def is_king_under_attack(self, color: Color) -> bool:
+        """Return whether the king of the color is under attack."""
+        if color is Color.WHITE:
+            king_row_idx, king_col_idx = self._white_king_pos
+            other_color = Color.BLACK
+        else:
+            king_row_idx, king_col_idx = self._black_king_pos
+            other_color = Color.WHITE
+
+        return self.is_under_attack(king_row_idx, king_col_idx, other_color)
 
     def is_king_trapped(self, color: Color) -> bool:
         """Return whether the king of the color has no available moves."""

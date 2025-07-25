@@ -7,5 +7,5 @@ class Color(Enum):
 
 
 class GameMode(Enum):
-    TWO_PLAYER = 1
-    AI = 2
+    TWO_PLAYER = 0
+    AI = 1
