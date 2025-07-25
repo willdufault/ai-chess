@@ -1,8 +1,6 @@
-from board import BOARD_SIZE, Board
+from board import Board
 from enums import Color
-from pieces import King, Pawn, Piece, Rook
-
-KING_COL_IDX = 4
+from pieces import Pawn, Piece
 
 
 class Game:
@@ -10,8 +8,6 @@ class Game:
 
     def __init__(self, board: Board) -> None:
         self._board = board
-        self._white_king_pos = (0, KING_COL_IDX)
-        self._black_king_pos = (BOARD_SIZE - 1, KING_COL_IDX)
 
     def _move_passes_basic_checks(
         self,
@@ -87,10 +83,10 @@ class Game:
 if __name__ == "__main__":
     from pieces import Pawn
 
-    g = Game()
-    g._board._squares[2][1] = Pawn(Color.BLACK)
-    print(g.move(Color.WHITE, 1, 0, 2, 0))
+    g = Game(Board())
     cw = Color.WHITE
     cb = Color.BLACK
+
+    g._board.set_piece(1, 4, None)
     print(g._board)
     breakpoint()

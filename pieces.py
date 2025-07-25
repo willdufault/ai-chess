@@ -81,7 +81,7 @@ class Pawn(FirstMovePiece):
 
     def __init__(self, color: Color) -> None:
         value = 1
-        symbol = "♙" if color == Color.WHITE else "♟"
+        symbol = "♙" if color is Color.WHITE else "♟"
         super().__init__(color, value, symbol, PawnMoveStrategy())
 
 
@@ -90,7 +90,7 @@ class Knight(Piece):
 
     def __init__(self, color: Color) -> None:
         value = 3
-        symbol = "♘" if color == Color.WHITE else "♞"
+        symbol = "♘" if color is Color.WHITE else "♞"
         super().__init__(color, value, symbol, KnightMoveStrategy())
 
 
@@ -99,7 +99,7 @@ class Bishop(Piece):
 
     def __init__(self, color: Color) -> None:
         value = 3
-        symbol = "♗" if color == Color.WHITE else "♝"
+        symbol = "♗" if color is Color.WHITE else "♝"
         super().__init__(color, value, symbol, BishopMoveStrategy())
 
 
@@ -108,7 +108,7 @@ class Rook(FirstMovePiece):
 
     def __init__(self, color: Color) -> None:
         value = 5
-        symbol = "♖" if color == Color.WHITE else "♜"
+        symbol = "♖" if color is Color.WHITE else "♜"
         super().__init__(color, value, symbol, RookMoveStrategy())
 
 
@@ -117,7 +117,7 @@ class Queen(Piece):
 
     def __init__(self, color: Color) -> None:
         value = 9
-        symbol = "♕" if color == Color.WHITE else "♛"
+        symbol = "♕" if color is Color.WHITE else "♛"
         super().__init__(color, value, symbol, QueenMoveStrategy())
 
 
@@ -126,5 +126,5 @@ class King(FirstMovePiece):
 
     def __init__(self, color: Color) -> None:
         value = 99
-        symbol = "♔" if color == Color.WHITE else "♚"
+        symbol = "♔" if color is Color.WHITE else "♚"
         super().__init__(color, value, symbol, KingMoveStrategy())

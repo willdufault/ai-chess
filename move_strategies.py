@@ -82,7 +82,7 @@ class PawnMoveStrategy(MoveStrategy):
 
         from_piece = board.get_piece(from_row_idx, from_col_idx)
 
-        row_delta = 1 if color == Color.WHITE else -1
+        row_delta = 1 if color is Color.WHITE else -1
         is_moving_forward_two = (
             to_row_idx == from_row_idx + 2 * row_delta and from_col_idx == to_col_idx
         )
