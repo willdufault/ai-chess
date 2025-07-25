@@ -14,6 +14,13 @@ class Board:
         self._squares = [[None] * BOARD_SIZE for _ in range(BOARD_SIZE)]
         self._white_king_pos = (0, KING_COL_IDX)
         self._black_king_pos = (BOARD_SIZE - 1, KING_COL_IDX)
+
+        # TODO: for castling, false once castle or king/rook moved
+        self._can_white_short_castle = True
+        self._can_white_long_castle = True
+        self._can_black_short_castle = True
+        self._can_black_long_castle = True
+
         self._set_up_pieces()
 
     def __str__(self) -> str:
@@ -31,8 +38,9 @@ class Board:
             if row_idx > 0:
                 rows.append("  ├───┼───┼───┼───┼───┼───┼───┼───┤")
 
+        # TODO: Change if chess notation added.
         rows.append("  └───┴───┴───┴───┴───┴───┴───┴───┘")
-        rows.append("    a   b   c   d   e   f   g   h")
+        rows.append("    0   1   2   3   4   5   6   7")
         return "\n".join(rows)
 
     def get_piece(self, row_idx: int, col_idx: int) -> Piece | None:
