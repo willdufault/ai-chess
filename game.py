@@ -40,10 +40,6 @@ class Game:
             return False
 
         self._move_piece(from_row_idx, from_col_idx, to_row_idx, to_col_idx, from_piece)
-
-        if from_piece.tracks_first_move:
-            from_piece.has_moved = True
-
         return True
 
     def configure(self) -> None:
@@ -76,17 +72,23 @@ class Game:
     def play(self) -> None:
         """Play a game of chess."""
 
-        # TODO:
+        # TODO: Implement AI game loop.
         if self._game_mode is GameMode.AI:
             raise NotImplementedError
 
-        color_turn = Color.WHITE
-        other_color = Color.BLACK
+        color = Color.WHITE
+        winner = Color.WHITE
         while True:
-            self._board.draw(color_turn)
-            print(f"\nIt's {'white' if color_turn == Color.WHITE else 'black'}'s turn.")
+            self._board.draw(color)
 
-            if self._board.is_king_under_attack(color_turn):
+            is_in_check = self._board.is_in_check(color)
+            if is_in_check and self._board.is_king_trapped(color):
+                winner = Color.get_other_color(color)
+                break
+
+            print(f"\nIt's {'white' if color is Color.WHITE else 'black'}'s turn.")
+
+            if is_in_check:
                 print("You are in check.")
 
             # TODO: This can be cleaned up, weird structure break @ bottom
@@ -99,51 +101,32 @@ class Game:
                 from_row_idx, from_col_idx, to_row_idx, to_col_idx = self._parse_input(
                     move_coords
                 )
+                from_piece = self._board.get_piece(from_row_idx, from_col_idx)
                 to_piece = self._board.get_piece(to_row_idx, to_col_idx)
 
                 moved = self.move(
-                    color_turn, from_row_idx, from_col_idx, to_row_idx, to_col_idx
+                    color, from_row_idx, from_col_idx, to_row_idx, to_col_idx
                 )
                 if not moved:
                     print("Illegal move.\n")
                     continue
 
-                if self._board.is_king_under_attack(color_turn):
-                    self.move(
-                        color_turn, to_row_idx, to_col_idx, from_row_idx, from_col_idx
-                    )
+                if self._board.is_in_check(color):
+                    # ! could fail, if that piece was blocking check but is now gone
+                    self.move(color, to_row_idx, to_col_idx, from_row_idx, from_col_idx)
                     self._board.set_piece(to_row_idx, to_col_idx, to_piece)
 
                     print("Illegal move. Your king would be in check.\n")
                     continue
 
+                if hasattr(from_piece, "has_moved"):
+                    from_piece.has_moved = True
+
                 break
 
-            if self._board.is_king_under_attack(
-                other_color
-            ) and self._board.is_king_trapped(other_color):
-                break
+            color = Color.get_other_color(color)
 
-            color_turn, other_color = other_color, color_turn
-
-            # print board
-            # print if under check
-            # prompt coords
-            # check valid
-            # check legal move
-            # move piece
-            # if under check, move back
-            # check for mate
-
-        print(f"{'White' if color_turn is Color.WHITE else 'Black'} won by checkmate!")
-        """
-        color_turn = white
-        while true
-            color move
-            check win, exit
-            color = other color
-        return winner
-        """
+        print(f"{'White' if winner is Color.WHITE else 'Black'} won by checkmate!")
 
     def is_valid_input(self, move_coords: str) -> bool:
         """Return whether the input is valid."""
@@ -168,7 +151,7 @@ class Game:
         )
         return from_row_idx, from_col_idx, to_row_idx, to_col_idx
 
-    def _prompt_user(self, options: tuple[str], message: str) -> str:
+    def _prompt_user(self, options: list[str], message: str) -> str:
         """Prompt the user to choose from the options given a message."""
         choice = None
         while choice not in options:

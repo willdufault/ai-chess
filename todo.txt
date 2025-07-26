@@ -1,0 +1,3 @@
+- check + mate need to check if white can block/capture
+- pawn promotion
+- castling
