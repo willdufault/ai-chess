@@ -217,6 +217,7 @@ class Board:
             + self._get_diagonal_attacker_coords(row_idx, col_idx, color)
             + self._get_knight_attacker_coords(row_idx, col_idx, color)
             + self._get_pawn_attacker_coords(row_idx, col_idx, color)
+            + self._get_king_attacker_coords(row_idx, col_idx, color)
         )
 
     def _get_non_pawn_attacker_coords(
@@ -228,6 +229,7 @@ class Board:
             self._get_orthogonal_attacker_coords(row_idx, col_idx, color)
             + self._get_diagonal_attacker_coords(row_idx, col_idx, color)
             + self._get_knight_attacker_coords(row_idx, col_idx, color)
+            + self._get_king_attacker_coords(row_idx, col_idx, color)
         )
 
     def _get_orthogonal_attacker_coords(
@@ -315,6 +317,25 @@ class Board:
             piece = self.get_piece(curr_row_idx, curr_col_idx)
             if isinstance(piece, Pawn) and piece.color == color:
                 coords.append((curr_row_idx, curr_col_idx))
+        return coords
+
+    def _get_king_attacker_coords(
+        self, row_idx: int, col_idx: int, color: Color
+    ) -> list[tuple[int, int]]:
+        """Return a list of coordinates of all kings of the color attacking the
+        given coordinates."""
+        coords = []
+        for curr_row_idx in range(row_idx - 1, row_idx + 2):
+            for curr_col_idx in range(col_idx - 1, col_idx + 2):
+                if (curr_row_idx, curr_col_idx) == (row_idx, col_idx):
+                    continue
+
+                if not self.is_in_bounds(curr_row_idx, curr_col_idx):
+                    continue
+
+                piece = self.get_piece(curr_row_idx, curr_col_idx)
+                if isinstance(piece, King) and piece.color == color:
+                    coords.append((curr_row_idx, curr_col_idx))
         return coords
 
     def _get_king_coords(self, color: Color) -> tuple[int, int]:

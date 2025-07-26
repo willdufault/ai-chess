@@ -118,7 +118,7 @@ class TestMove(TestCase):
         self.board.set_piece(1, 4, Rook(Color.BLACK))
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board.set_piece(0, 3, None)
+        self.board.set_piece(3, 2, None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_is_in_checkmate_block(self) -> None:
@@ -149,7 +149,7 @@ class TestMove(TestCase):
         self.board.set_piece(1, 7, None)
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board.set_piece(0, 5, Knight(Color.WHITE))
+        self.board.set_piece(2, 0, Rook(Color.WHITE))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_is_in_checkmate_pin(self) -> None:
