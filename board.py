@@ -85,9 +85,9 @@ class Board:
     def is_in_check(self, color: Color) -> bool:
         """Return whether the color is in check."""
         king_row_idx, king_col_idx = self._get_king_coords(color)
-        other_color = Color.get_other_color(color)
+        opponent_color = Color.get_opposite_color(color)
 
-        return self.is_under_attack(king_row_idx, king_col_idx, other_color)
+        return self.is_under_attack(king_row_idx, king_col_idx, opponent_color)
 
     def is_in_checkmate(self, color: Color) -> bool:
         """Return whether the color is in checkmate."""
@@ -99,21 +99,56 @@ class Board:
             return False
 
         # get coordinates of attacking pieces
+        king_row_idx, king_col_idx = self._get_king_coords(color)
+        opponent_color = Color.get_opposite_color(color)
+        attacker_coords = self._get_attacker_coords(
+            king_row_idx, king_col_idx, opponent_color
+        )
 
         # if >1, can't block all, return true
+        if len(attacker_coords) > 1:
+            return True
+
+        attacker_row_idx, attacker_col_idx = attacker_coords[0]
+        attacker = self.get_piece(attacker_row_idx, attacker_col_idx)
 
         # second, if it can capture attacking piece
         # ...call is_under_attack on attacking piece
+        defender_coords = self._get_attacker_coords(
+            attacker_row_idx, attacker_col_idx, color
+        )
+        for defender_row_idx, defender_col_idx in defender_coords:
+            defender = self.get_piece(defender_row_idx, defender_col_idx)
+            self.set_piece(defender_row_idx, defender_col_idx, None)
+            self.set_piece(attacker_row_idx, attacker_col_idx, defender)
+            is_still_in_check = self.is_in_check(color)
+            self.set_piece(defender_row_idx, defender_col_idx, defender)
+            self.set_piece(attacker_row_idx, attacker_col_idx, attacker)
+            if not is_still_in_check:
+                return False
 
         # second, if can block attack, false
         # ... check if can move into any space along line
+        # TODO: taken from movestrat, refactor DRY
+        row_diff = attacker_row_idx - king_row_idx
+        col_diff = attacker_col_idx - king_col_idx
+        step_cnt = max(abs(row_diff), abs(col_diff))
+        row_delta = row_diff // step_cnt
+        col_delta = col_diff // step_cnt
+        for step in range(1, step_cnt):
+            row_idx = king_row_idx + step * row_delta
+            col_idx = king_col_idx + step * col_delta
+            if piece is not None:
+                return True
+
+        return False
 
         # else true
 
     def is_king_trapped(self, color: Color) -> bool:
         """Return whether the king of the color has no available moves."""
         king_row_idx, king_col_idx = self._get_king_coords(color)
-        other_color = Color.get_other_color(color)
+        opponent_color = Color.get_opposite_color(color)
 
         for row_idx in range(king_row_idx - 1, king_row_idx + 2):
             for col_idx in range(king_col_idx - 1, king_col_idx + 2):
@@ -123,11 +158,12 @@ class Board:
                 if not self.is_in_bounds(row_idx, col_idx):
                     continue
 
+                # TODO: what if this piece is opp team attacker, it can take?
                 piece = self.get_piece(row_idx, col_idx)
                 if piece is not None:
                     continue
 
-                if not self.is_under_attack(row_idx, col_idx, other_color):
+                if not self.is_under_attack(row_idx, col_idx, opponent_color):
                     return False
 
         return True
@@ -162,7 +198,7 @@ class Board:
             while 0 <= curr_row_idx < BOARD_SIZE and 0 <= curr_col_idx < BOARD_SIZE:
                 piece = self.get_piece(curr_row_idx, curr_col_idx)
                 if piece is not None:
-                    if piece.color == color and isinstance(piece, (Rook, Queen)):
+                    if isinstance(piece, (Rook, Queen)) and piece.color == color:
                         coords.append((curr_row_idx, curr_col_idx))
 
                     break
@@ -176,23 +212,17 @@ class Board:
     ) -> list[tuple[int, int]]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinates diagonally."""
+        # TODO: refactor to make one straight attacker fcn
         coords = []
         directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-        pawn_row_delta = 1 if color is Color.WHITE else -1
         for row_delta, col_delta in directions:
             curr_row_idx = row_idx + row_delta
             curr_col_idx = col_idx + col_delta
             while 0 <= curr_row_idx < BOARD_SIZE and 0 <= curr_col_idx < BOARD_SIZE:
                 piece = self.get_piece(curr_row_idx, curr_col_idx)
                 if piece is not None:
-                    if piece.color == color:
-                        is_under_pawn_attack = (
-                            isinstance(piece, Pawn)
-                            and row_idx == curr_row_idx + pawn_row_delta
-                            and abs(col_idx - curr_col_idx) == 1
-                        )
-                        if isinstance(piece, (Bishop, Queen)) or is_under_pawn_attack:
-                            coords.append((curr_row_idx, curr_col_idx))
+                    if isinstance(piece, (Bishop, Queen)) and piece.color == color:
+                        coords.append((curr_row_idx, curr_col_idx))
 
                     break
 
@@ -210,7 +240,26 @@ class Board:
             curr_row_idx = row_idx + row_delta
             curr_col_idx = col_idx + col_delta
             piece = self.get_piece(curr_row_idx, curr_col_idx)
-            if piece is not None and piece.color == color and isinstance(piece, Knight):
+            if isinstance(piece, Knight) and piece.color == color:
+                coords.append((curr_row_idx, curr_col_idx))
+        return coords
+
+    def _get_pawn_attacker_coords(
+        self, row_idx: int, col_idx: int, color: Color
+    ) -> list[tuple[int, int]]:
+        """Return a list of coordinates of all pawns of the color attacking the
+        given coordinates."""
+        coords = []
+        row_delta = 1 if color is Color.WHITE else -1
+        col_deltas = (-1, 1)
+        for col_delta in col_deltas:
+            curr_row_idx = row_idx - row_delta
+            curr_col_idx = col_idx + col_delta
+            if not self.is_in_bounds(curr_row_idx, curr_col_idx):
+                continue
+
+            piece = self.get_piece(curr_row_idx, curr_col_idx)
+            if isinstance(piece, Pawn) and piece.color == color:
                 coords.append((curr_row_idx, curr_col_idx))
         return coords
 

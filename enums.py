@@ -8,8 +8,8 @@ class Color(Enum):
     BLACK = False
 
     @staticmethod
-    def get_other_color(color: Color):
-        return Color.WHITE if color is Color.WHITE else Color.BLACK
+    def get_opposite_color(color: Color):
+        return Color.WHITE if color is Color.BLACK else Color.BLACK
 
 
 class GameMode(Enum):

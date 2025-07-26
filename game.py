@@ -83,7 +83,7 @@ class Game:
 
             is_in_check = self._board.is_in_check(color)
             if is_in_check and self._board.is_king_trapped(color):
-                winner = Color.get_other_color(color)
+                winner = Color.get_opposite_color(color)
                 break
 
             print(f"\nIt's {'white' if color is Color.WHITE else 'black'}'s turn.")
@@ -124,7 +124,7 @@ class Game:
 
                 break
 
-            color = Color.get_other_color(color)
+            color = Color.get_opposite_color(color)
 
         print(f"{'White' if winner is Color.WHITE else 'Black'} won by checkmate!")
 
