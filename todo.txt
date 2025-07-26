@@ -3,6 +3,7 @@
 - TODOs everywhere
 
 
-- check + mate need to check if white can block/capture
+- refactor
+
 - pawn promotion
 - castling

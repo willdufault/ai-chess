@@ -38,15 +38,18 @@ class MoveStrategy(ABC):
         row_diff = to_row_idx - from_row_idx
         col_diff = to_col_idx - from_col_idx
         step_cnt = max(abs(row_diff), abs(col_diff))
+
         if step_cnt == 0:
             return False
 
         row_delta = row_diff // step_cnt
         col_delta = col_diff // step_cnt
+
         for step in range(1, step_cnt):
             row_idx = from_row_idx + step * row_delta
             col_idx = from_col_idx + step * col_delta
             piece = board.get_piece(row_idx, col_idx)
+
             if piece is not None:
                 return True
 
@@ -66,31 +69,38 @@ class PawnMoveStrategy(MoveStrategy):
         board: Board,
     ) -> bool:
         """Return whether the move is a legal for a pawn."""
-        # NOTE: I have no plans to implement En Passant.
-        if abs(from_col_idx - to_col_idx) > 1:
+
+        # TODO: Implement En Passant.
+
+        is_moving_too_far_sideways = abs(from_col_idx - to_col_idx) > 1
+
+        if is_moving_too_far_sideways:
             return False
 
         to_piece = board.get_piece(to_row_idx, to_col_idx)
         is_capturing_vertically = from_col_idx == to_col_idx and to_piece is not None
+
         if is_capturing_vertically:
             return False
 
         is_moving_diagonally = from_col_idx != to_col_idx and to_piece is None
+
         if is_moving_diagonally:
             return False
 
         from_piece = board.get_piece(from_row_idx, from_col_idx)
-
-        row_delta = 1 if color is Color.WHITE else -1
+        row_delta = self.get_row_delta(color)
         is_moving_forward_two = (
             to_row_idx == from_row_idx + 2 * row_delta and from_col_idx == to_col_idx
         )
+        is_moving_forward_one = to_row_idx == from_row_idx + row_delta
+
         if is_moving_forward_two:
             if from_piece.has_moved or self._is_blocked(
                 from_row_idx, from_col_idx, to_row_idx, to_col_idx, board
             ):
                 return False
-        elif to_row_idx != from_row_idx + row_delta:
+        elif not is_moving_forward_one:
             return False
 
         return True
@@ -127,6 +137,7 @@ class KnightMoveStrategy(MoveStrategy):
         """Return whether the move is legal for a knight."""
         row_delta = from_row_idx - to_row_idx
         col_delta = from_col_idx - to_col_idx
+
         return (row_delta, col_delta) in self.move_patterns
 
 
@@ -146,6 +157,7 @@ class BishopMoveStrategy(MoveStrategy):
         row_diff = abs(from_row_idx - to_row_idx)
         col_diff = abs(from_col_idx - to_col_idx)
         is_not_diagonal = row_diff != col_diff
+
         if is_not_diagonal:
             return False
 
@@ -171,6 +183,7 @@ class RookMoveStrategy(MoveStrategy):
         row_diff = abs(from_row_idx - to_row_idx)
         col_diff = abs(from_col_idx - to_col_idx)
         is_not_straight = row_diff != 0 and col_diff != 0
+
         if is_not_straight:
             return False
 
@@ -197,6 +210,7 @@ class QueenMoveStrategy(MoveStrategy):
         col_diff = abs(from_col_idx - to_col_idx)
         is_not_diagonal = row_diff != col_diff
         is_not_straight = row_diff != 0 and col_diff != 0
+
         if is_not_diagonal and is_not_straight:
             return False
 
@@ -220,4 +234,5 @@ class KingMoveStrategy(MoveStrategy):
     ) -> bool:
         row_diff = abs(from_row_idx - to_row_idx)
         col_diff = abs(from_col_idx - to_col_idx)
+
         return row_diff <= 1 and col_diff <= 1

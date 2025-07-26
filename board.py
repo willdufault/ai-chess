@@ -306,7 +306,7 @@ class Board:
         """Return a list of coordinates of all pawns of the color attacking the
         given coordinates."""
         coords = []
-        row_delta = 1 if color is Color.WHITE else -1
+        row_delta = PawnMoveStrategy.get_row_delta(color)
         col_deltas = (-1, 1)
         for col_delta in col_deltas:
             curr_row_idx = row_idx - row_delta
