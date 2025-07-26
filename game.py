@@ -114,11 +114,12 @@ class Game:
                 if self._board.is_in_check(color):
                     # ! could fail, if that piece was blocking check but is now gone
                     self.move(color, to_row_idx, to_col_idx, from_row_idx, from_col_idx)
-                    self._board.set_piece(to_row_idx, to_col_idx, to_piece)
+                    self._board._set_piece(to_row_idx, to_col_idx, to_piece)
 
                     print("Illegal move. Your king would be in check.\n")
                     continue
 
+                # todo: MOVED INTO BOARD, REFACTOR
                 if hasattr(from_piece, "has_moved"):
                     from_piece.has_moved = True
 
@@ -128,39 +129,46 @@ class Game:
 
         print(f"{'White' if winner is Color.WHITE else 'Black'} won by checkmate!")
 
-    def is_valid_input(self, move_coords: str) -> bool:
-        """Return whether the input is valid."""
-        idx_cnt = 4
-        if len(move_coords) != idx_cnt:
+    # DONE
+    def is_valid_input(self, move_input: str) -> bool:
+        """Return whether the user input is valid."""
+        expected_len = 4
+
+        if len(move_input) != expected_len:
             return False
 
-        for char in move_coords:
+        for char in move_input:
             if not char.isdigit():
                 return False
 
-            idx = int(char)
-            if idx < 0 or BOARD_SIZE <= idx:
+            is_in_bounds = 0 <= int(char) < BOARD_SIZE
+
+            if not is_in_bounds:
                 return False
 
         return True
 
-    def _parse_input(self, move_coords: str) -> tuple[int, int, int, int]:
-        """Return the from and to coordinates from the input."""
-        from_row_idx, from_col_idx, to_row_idx, to_col_idx = tuple(
-            map(int, move_coords)
-        )
+    # DONE
+    def _parse_input(self, move_input: str) -> tuple[int, int, int, int]:
+        """Return the from and to coordinates from the input. Assumes the input
+        is valid."""
+        from_row_idx, from_col_idx, to_row_idx, to_col_idx = tuple(map(int, move_input))
         return from_row_idx, from_col_idx, to_row_idx, to_col_idx
 
+    # DONE
     def _prompt_user(self, options: list[str], message: str) -> str:
         """Prompt the user to choose from the options given a message."""
         choice = None
+
         while choice not in options:
             if choice is not None:
                 print("Invalid choice.\n")
 
             choice = input(f"{message} ")
+
         return choice
 
+    # DONE
     def _move_passes_basic_checks(
         self,
         color: Color,
@@ -170,23 +178,28 @@ class Game:
         to_col_idx: int,
     ) -> bool:
         """Return whether the move passes basic legality checks."""
-        is_from_in_bounds = self._board.is_in_bounds(from_row_idx, from_col_idx)
-        is_to_in_bounds = self._board.is_in_bounds(to_row_idx, to_col_idx)
-        if not (is_from_in_bounds and is_to_in_bounds):
+        are_coords_in_bounds = self._board.is_in_bounds(
+            from_row_idx, from_col_idx
+        ) and self._board.is_in_bounds(to_row_idx, to_col_idx)
+
+        if not are_coords_in_bounds:
             return False
 
         from_piece = self._board.get_piece(from_row_idx, from_col_idx)
         is_moving_wrong_piece = from_piece is None or from_piece.color != color
+
         if is_moving_wrong_piece:
             return False
 
         to_piece = self._board.get_piece(to_row_idx, to_col_idx)
         is_to_same_color = to_piece is not None and to_piece.color == color
+
         if is_to_same_color:
             return False
 
         return True
 
+    #! ENCAPSULATION?
     def _move_piece(
         self,
         from_row_idx: int,
@@ -196,15 +209,5 @@ class Game:
         from_piece: Piece,
     ) -> None:
         """Move a piece. Assuming this is a legal move."""
-        self._board.set_piece(from_row_idx, from_col_idx, None)
-        self._board.set_piece(to_row_idx, to_col_idx, from_piece)
-
-
-if __name__ == "__main__":
-    g = Game(Board())
-    cw = Color.WHITE
-    cb = Color.BLACK
-
-    g._board.draw(cw)
-    g._board.draw(cb)
-    breakpoint()
+        self._board._set_piece(from_row_idx, from_col_idx, None)
+        self._board._set_piece(to_row_idx, to_col_idx, from_piece)

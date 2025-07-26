@@ -23,25 +23,13 @@ class TestIsBlocked(TestCase):
         self.queen_move_strategy = QueenMoveStrategy()
         self.king_move_strategy = KingMoveStrategy()
 
-    def test_blocked_vertical(self) -> None:
-        self.assertFalse(self.pawn_move_strategy._is_blocked(0, 0, 1, 0, self.board))
-        self.assertTrue(self.pawn_move_strategy._is_blocked(0, 0, 2, 0, self.board))
-
-    def test_blocked_horizontal(self) -> None:
-        self.assertFalse(self.pawn_move_strategy._is_blocked(0, 0, 0, 1, self.board))
-        self.assertTrue(self.pawn_move_strategy._is_blocked(0, 0, 0, 2, self.board))
-
-    def test_blocked_diagonal(self) -> None:
-        self.assertFalse(self.pawn_move_strategy._is_blocked(0, 0, 1, 1, self.board))
-        self.assertTrue(self.pawn_move_strategy._is_blocked(0, 0, 2, 2, self.board))
-
     def test_move_pawn_forward_one(self) -> None:
         self.assertTrue(
             self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 2, 0, self.board)
         )
 
     def test_move_pawn_forward_one_on_top(self) -> None:
-        self.board.set_piece(2, 0, Pawn(Color.BLACK))
+        self.board._set_piece(2, 0, Pawn(Color.BLACK))
         self.assertFalse(
             self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 2, 0, self.board)
         )
@@ -58,13 +46,13 @@ class TestIsBlocked(TestCase):
         )
 
     def test_move_pawn_forward_two_on_top(self) -> None:
-        self.board.set_piece(2, 0, Pawn(Color.BLACK))
+        self.board._set_piece(2, 0, Pawn(Color.BLACK))
         self.assertFalse(
             self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 3, 0, self.board)
         )
 
     def test_move_pawn_forward_two_blocked(self) -> None:
-        self.board.set_piece(2, 0, Pawn(Color.WHITE))
+        self.board._set_piece(2, 0, Pawn(Color.WHITE))
         self.assertFalse(
             self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 3, 0, self.board)
         )

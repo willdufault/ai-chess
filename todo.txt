@@ -1,9 +1,15 @@
-- DRY, remove repeat code
-- refactor arg orders, consistent across all functions (color specifically)
+REFACTOR:
+- consistent whitespace
+- consistent var names + order
+- consistent usage of 4x int vs 2x coord
+- DRY
+
 - TODOs everywhere
 
 
-- refactor
-
 - pawn promotion
 - castling
+- mock testing
+- TODOs
+- return values for more info
+- error + exception handling
