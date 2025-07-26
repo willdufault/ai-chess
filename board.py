@@ -1,5 +1,5 @@
 from enums import Color
-from move_strategies import KnightMoveStrategy
+from move_strategies import KnightMoveStrategy, PawnMoveStrategy
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 BOARD_SIZE = 8
@@ -68,10 +68,7 @@ class Board:
         self._squares[row_idx][col_idx] = piece
 
         if isinstance(piece, King):
-            if piece.color is Color.WHITE:
-                self._white_king_coords = (row_idx, col_idx)
-            else:
-                self._black_king_coords = (row_idx, col_idx)
+            self._set_king_coords(piece.color, row_idx, col_idx)
 
     def is_in_bounds(self, row_idx: int, col_idx: int) -> bool:
         """Return whether the coordinates are in bounds."""
@@ -140,51 +137,51 @@ class Board:
         for step in range(1, step_cnt):
             row_idx = king_row_idx + step * row_delta
             col_idx = king_col_idx + step * col_delta
-            # if piece is not None:
-            #     return True
+            blocker_coords = self._get_blocker_coords(row_idx, col_idx, color)
+            for blocker_row_idx, blocker_col_idx in blocker_coords:
+                blocker = self.get_piece(blocker_row_idx, blocker_col_idx)
+                self.set_piece(blocker_row_idx, blocker_col_idx, None)
+                self.set_piece(row_idx, col_idx, blocker)
+                is_still_in_check = self.is_in_check(color)
+                self.set_piece(blocker_row_idx, blocker_col_idx, blocker)
+                self.set_piece(row_idx, col_idx, None)
+                if not is_still_in_check:
+                    return False
 
-        return False
+        return True
 
-        # else true
+    def _get_blocker_coords(
+        self, row_idx: int, col_idx: int, color: Color
+    ) -> list[tuple[int, int]]:
+        """Return the coordinates of all pieces of the color that can block an
+        attack by moving to the given coordinates. Assuming the square is empty."""
+        return self._get_non_pawn_attacker_coords(
+            row_idx, col_idx, color
+        ) + self._get_pawn_blocker_coords(row_idx, col_idx, color)
 
-    def _get_blocking_pieces(self, row_idx: int, col_idx: int, color: Color) -> bool:
-        """Return the coordinates of all pieces of the color that can move to
-        the given coordinates. Assuming the square is empty."""
-        coords = self._get_non_pawn_attacker_coords(row_idx, col_idx, color)
+    def _get_pawn_blocker_coords(
+        self, row_idx: int, col_idx: int, color: Color
+    ) -> list[tuple[int, int]]:
+        """Return the coordinates of a pawn of the color that can block an
+        attack by moving to the given coordinates. Assuming the square is empty."""
+        row_delta = PawnMoveStrategy.get_row_delta(color)
 
-        # never occupied,
+        one_down_piece = self.get_piece(row_idx - row_delta, col_idx)
+        if one_down_piece is not None:
+            if not (isinstance(one_down_piece, Pawn) and one_down_piece.color == color):
+                return []
 
-        # otherwise, check if pawn below or 2 below can move (through Movestrat)
+            return (row_idx - row_delta, col_idx)
 
-    def _can_pawn_block(self, row_idx: int, col_idx: int, color: Color) -> bool:
-        """Return whether a pawn of the color can block the coordinates."""
-        row_delta = 1 if color is Color.WHITE else -1
-        for distance in range(1, 3):
-            curr_row_idx = row_idx + distance * row_delta
-            piece = self.get_piece(curr_row_idx, col_idx)
-            is_legal_pawn_move = (
-                isinstance(piece, Pawn)
-                and piece.color == color
-                and piece.move_strategy.is_legal_move(
-                    color, curr_row_idx, col_idx, curr_row_idx, col_idx
-                )
-            )
-            if is_legal_pawn_move:
-                return True
+        two_down_piece = self.get_piece(row_idx - 2 * row_delta, col_idx)
+        if not (isinstance(two_down_piece, Pawn) and two_down_piece.color == color):
+            return []
 
-        return False
+        # TODO: should board know about this? abstraction/refactor needed?
+        if two_down_piece.has_moved:
+            return []
 
-        # for
-        one_below_row = row_idx - 1
-
-        one_below_piece = self.get_piece(one_below_row, col_idx)
-
-        if isinstance(
-            one_below_piece, Pawn
-        ) and one_below_piece.move_strategy.is_legal_move(
-            color, one_below_row, col_idx, row_idx, col_idx
-        ):
-            coords.append(one_below_row, col_idx)
+        return (row_idx - 2 * row_delta, col_idx)
 
     def is_king_trapped(self, color: Color) -> bool:
         """Return whether the king of the color has no available moves, not
@@ -209,12 +206,6 @@ class Board:
                     return False
 
         return True
-
-    def _get_king_coords(self, color: Color) -> tuple[int, int]:
-        """Return the coordinates of the king of the color."""
-        return (
-            self._white_king_coords if color is Color.WHITE else self._black_king_coords
-        )
 
     def _get_attacker_coords(
         self, row_idx: int, col_idx: int, color: Color
@@ -325,6 +316,19 @@ class Board:
             if isinstance(piece, Pawn) and piece.color == color:
                 coords.append((curr_row_idx, curr_col_idx))
         return coords
+
+    def _get_king_coords(self, color: Color) -> tuple[int, int]:
+        """Get the coordinates of the king of the color."""
+        return (
+            self._white_king_coords if color is Color.WHITE else self._black_king_coords
+        )
+
+    def _set_king_coords(self, color: Color, row_idx: int, col_idx: int) -> None:
+        """Set the coordinates of the king of the color."""
+        if color is Color.WHITE:
+            self._white_king_coords = (row_idx, col_idx)
+        else:
+            self._black_king_coords = (row_idx, col_idx)
 
     def _set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
