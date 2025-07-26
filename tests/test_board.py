@@ -23,22 +23,22 @@ class TestMove(TestCase):
     def test_is_under_attack_straight(self) -> None:
         self.board.set_piece(5, 3, Queen(Color.WHITE))
         self.assertEqual(
-            self.board._get_straight_attacker_coords(3, 3, Color.WHITE), [(5, 3)]
+            self.board._get_orthogonal_attacker_coords(3, 3, Color.WHITE), [(5, 3)]
         )
 
         self.board.set_piece(4, 3, Bishop(Color.WHITE))
         self.assertEqual(
-            self.board._get_straight_attacker_coords(3, 3, Color.WHITE), []
+            self.board._get_orthogonal_attacker_coords(3, 3, Color.WHITE), []
         )
 
         self.board.set_piece(3, 1, Rook(Color.WHITE))
         self.assertEqual(
-            self.board._get_straight_attacker_coords(3, 3, Color.WHITE), [(3, 1)]
+            self.board._get_orthogonal_attacker_coords(3, 3, Color.WHITE), [(3, 1)]
         )
 
         self.board.set_piece(3, 2, Bishop(Color.WHITE))
         self.assertEqual(
-            self.board._get_straight_attacker_coords(3, 3, Color.WHITE), []
+            self.board._get_orthogonal_attacker_coords(3, 3, Color.WHITE), []
         )
 
     def test_is_under_attack_diagonal(self) -> None:

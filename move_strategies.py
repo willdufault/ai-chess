@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from constants import KNIGHT_MOVE_PATTERNS
 from enums import Color
 
 if TYPE_CHECKING:
@@ -96,9 +95,25 @@ class PawnMoveStrategy(MoveStrategy):
 
         return True
 
+    @staticmethod
+    def get_row_delta(color: Color) -> int:
+        """Return the pawn row delta for the color."""
+        return 1 if color is Color.WHITE else -1
+
 
 class KnightMoveStrategy(MoveStrategy):
     """Represents the move strategy for a knight."""
+
+    move_patterns = [
+        (1, 2),
+        (1, -2),
+        (-1, 2),
+        (-1, -2),
+        (2, 1),
+        (2, -1),
+        (-2, 1),
+        (-2, -1),
+    ]
 
     def is_legal_move(
         self,
@@ -112,7 +127,7 @@ class KnightMoveStrategy(MoveStrategy):
         """Return whether the move is legal for a knight."""
         row_delta = from_row_idx - to_row_idx
         col_delta = from_col_idx - to_col_idx
-        return (row_delta, col_delta) in KNIGHT_MOVE_PATTERNS
+        return (row_delta, col_delta) in self.move_patterns
 
 
 class BishopMoveStrategy(MoveStrategy):

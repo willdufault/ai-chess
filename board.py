@@ -1,5 +1,5 @@
-from constants import KNIGHT_MOVE_PATTERNS
 from enums import Color
+from move_strategies import KnightMoveStrategy
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 BOARD_SIZE = 8
@@ -12,6 +12,8 @@ class Board:
 
     def __init__(self) -> None:
         self._squares = [[None] * BOARD_SIZE for _ in range(BOARD_SIZE)]
+
+        # TODO: only place i use tuple for coords, make rows/cols for consistency?
         self._white_king_coords = (0, KING_COL_IDX)
         self._black_king_coords = (BOARD_SIZE - 1, KING_COL_IDX)
 
@@ -138,15 +140,55 @@ class Board:
         for step in range(1, step_cnt):
             row_idx = king_row_idx + step * row_delta
             col_idx = king_col_idx + step * col_delta
-            if piece is not None:
-                return True
+            # if piece is not None:
+            #     return True
 
         return False
 
         # else true
 
+    def _get_blocking_pieces(self, row_idx: int, col_idx: int, color: Color) -> bool:
+        """Return the coordinates of all pieces of the color that can move to
+        the given coordinates. Assuming the square is empty."""
+        coords = self._get_non_pawn_attacker_coords(row_idx, col_idx, color)
+
+        # never occupied,
+
+        # otherwise, check if pawn below or 2 below can move (through Movestrat)
+
+    def _can_pawn_block(self, row_idx: int, col_idx: int, color: Color) -> bool:
+        """Return whether a pawn of the color can block the coordinates."""
+        row_delta = 1 if color is Color.WHITE else -1
+        for distance in range(1, 3):
+            curr_row_idx = row_idx + distance * row_delta
+            piece = self.get_piece(curr_row_idx, col_idx)
+            is_legal_pawn_move = (
+                isinstance(piece, Pawn)
+                and piece.color == color
+                and piece.move_strategy.is_legal_move(
+                    color, curr_row_idx, col_idx, curr_row_idx, col_idx
+                )
+            )
+            if is_legal_pawn_move:
+                return True
+
+        return False
+
+        # for
+        one_below_row = row_idx - 1
+
+        one_below_piece = self.get_piece(one_below_row, col_idx)
+
+        if isinstance(
+            one_below_piece, Pawn
+        ) and one_below_piece.move_strategy.is_legal_move(
+            color, one_below_row, col_idx, row_idx, col_idx
+        ):
+            coords.append(one_below_row, col_idx)
+
     def is_king_trapped(self, color: Color) -> bool:
-        """Return whether the king of the color has no available moves."""
+        """Return whether the king of the color has no available moves, not
+        including captures."""
         king_row_idx, king_col_idx = self._get_king_coords(color)
         opponent_color = Color.get_opposite_color(color)
 
@@ -180,48 +222,69 @@ class Board:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinates."""
         return (
-            self._get_straight_attacker_coords(row_idx, col_idx, color)
+            self._get_orthogonal_attacker_coords(row_idx, col_idx, color)
+            + self._get_diagonal_attacker_coords(row_idx, col_idx, color)
+            + self._get_knight_attacker_coords(row_idx, col_idx, color)
+            + self._get_pawn_attacker_coords(row_idx, col_idx, color)
+        )
+
+    def _get_non_pawn_attacker_coords(
+        self, row_idx: int, col_idx: int, color: Color
+    ) -> list[tuple[int, int]]:
+        """Return a list of coordinates of all non-pawn pieces of the color
+        attacking the given coordinates."""
+        return (
+            self._get_orthogonal_attacker_coords(row_idx, col_idx, color)
             + self._get_diagonal_attacker_coords(row_idx, col_idx, color)
             + self._get_knight_attacker_coords(row_idx, col_idx, color)
         )
 
-    def _get_straight_attacker_coords(
-        self, row_idx: int, col_idx: int, color: Color
+    def _get_orthogonal_attacker_coords(
+        self,
+        row_idx: int,
+        col_idx: int,
+        color: Color,
     ) -> list[tuple[int, int]]:
         """Return a list of coordinates of all pieces of the color attacking the
-        given coordinates horizontally or vertically."""
-        coords = []
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-        for row_delta, col_delta in directions:
-            curr_row_idx = row_idx + row_delta
-            curr_col_idx = col_idx + col_delta
-            while 0 <= curr_row_idx < BOARD_SIZE and 0 <= curr_col_idx < BOARD_SIZE:
-                piece = self.get_piece(curr_row_idx, curr_col_idx)
-                if piece is not None:
-                    if isinstance(piece, (Rook, Queen)) and piece.color == color:
-                        coords.append((curr_row_idx, curr_col_idx))
-
-                    break
-
-                curr_row_idx += row_delta
-                curr_col_idx += col_delta
-        return coords
+        given coordinates horizontally and vertically."""
+        directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        piece_types = (Rook, Queen)
+        return self._get_straight_attacker_coords(
+            row_idx, col_idx, color, directions, piece_types
+        )
 
     def _get_diagonal_attacker_coords(
-        self, row_idx: int, col_idx: int, color: Color
+        self,
+        row_idx: int,
+        col_idx: int,
+        color: Color,
     ) -> list[tuple[int, int]]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinates diagonally."""
-        # TODO: refactor to make one straight attacker fcn
-        coords = []
         directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+        piece_types = (Bishop, Queen)
+        return self._get_straight_attacker_coords(
+            row_idx, col_idx, color, directions, piece_types
+        )
+
+    def _get_straight_attacker_coords(
+        self,
+        row_idx: int,
+        col_idx: int,
+        color: Color,
+        directions: list[tuple[int, int]],
+        piece_types: tuple[type[Piece]],
+    ) -> list[tuple[int, int]]:
+        """Return a list of coordinates of all pieces of the color and types
+        attacking the given coordinates along a straight line in the directions."""
+        coords = []
         for row_delta, col_delta in directions:
             curr_row_idx = row_idx + row_delta
             curr_col_idx = col_idx + col_delta
             while 0 <= curr_row_idx < BOARD_SIZE and 0 <= curr_col_idx < BOARD_SIZE:
                 piece = self.get_piece(curr_row_idx, curr_col_idx)
                 if piece is not None:
-                    if isinstance(piece, (Bishop, Queen)) and piece.color == color:
+                    if isinstance(piece, piece_types) and piece.color == color:
                         coords.append((curr_row_idx, curr_col_idx))
 
                     break
@@ -236,7 +299,7 @@ class Board:
         """Return a list of coordinates of all knights of the color attacking
         the given coordinates."""
         coords = []
-        for row_delta, col_delta in KNIGHT_MOVE_PATTERNS:
+        for row_delta, col_delta in KnightMoveStrategy.move_patterns:
             curr_row_idx = row_idx + row_delta
             curr_col_idx = col_idx + col_delta
             piece = self.get_piece(curr_row_idx, curr_col_idx)
@@ -266,9 +329,9 @@ class Board:
     def _set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
         piece_order = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
-        for col_idx, piece_class in enumerate(piece_order):
-            self._squares[0][col_idx] = piece_class(Color.WHITE)
-            self._squares[-1][col_idx] = piece_class(Color.BLACK)
+        for col_idx, piece_type in enumerate(piece_order):
+            self._squares[0][col_idx] = piece_type(Color.WHITE)
+            self._squares[-1][col_idx] = piece_type(Color.BLACK)
 
         self._squares[PAWN_ROW_IDX] = [Pawn(Color.WHITE) for _ in range(BOARD_SIZE)]
         self._squares[-1 - PAWN_ROW_IDX] = [

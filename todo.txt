@@ -1,3 +1,8 @@
+- DRY, remove repeat code
+- refactor arg orders, consistent across all functions (color specifically)
+- TODOs everywhere
+
+
 - check + mate need to check if white can block/capture
 - pawn promotion
 - castling
