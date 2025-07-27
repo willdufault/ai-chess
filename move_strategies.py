@@ -29,11 +29,6 @@ class MoveStrategy(ABC):
 class PawnMoveStrategy(MoveStrategy):
     """Represents the move strategy for a pawn."""
 
-    # TODO: need move col deltas?
-    move_col_deltas = (0,)
-    attack_col_deltas = (-1, 1)
-    row_deltas = (1, 2)
-
     def is_legal_move(
         self,
         color: Color,
@@ -47,19 +42,55 @@ class PawnMoveStrategy(MoveStrategy):
 
         # TODO: Implement En Passant.
 
-        if not self._is_legal_col_delta(to_col_idx, from_col_idx):
-            return False
-        
         # TODO: PICK UP HERE, IMPLEMENT THIS FLOW + TEST
         # TODO: IN MIDDLE OF REFACTOR, NEED TO FINISH BOARD + GAME (THIS WAS EXTENSION OF BOARD)
 
+        row_direction = self.get_row_direction(color)
+        row_delta = to_row_idx - from_row_idx
+
+        if row_delta not in (row_direction, 2 * row_direction):
+            return False
+
+        col_delta = to_col_idx - from_col_idx
+
+        if abs(col_delta) > 1:
+            return False
+
+        is_adjacent_column = col_delta in (-1, 1)
+
+        if col_delta == 0:
+            is_piece_forward_one = board.is_occupied(
+                from_row_idx + row_direction, from_col_idx
+            )
+
+            if is_piece_forward_one:
+                return False
+
+            is_piece_forward_two = board.is_occupied(
+                from_row_idx + 2 * row_direction, from_col_idx
+            )
+            from_piece = board.get_piece(from_row_idx, from_col_idx)
+
+            if (
+                row_delta == 2 * row_direction
+                and from_piece.has_moved
+                or is_piece_forward_two
+            ):
+                return False
+        elif is_adjacent_column:
+            if row_delta > 1:
+                return False
+
+            to_piece = board.get_piece(to_row_idx, to_col_idx)
+
+            if to_piece is None or to_piece.color == color:
+                return False
+        else:
+            return False
+
+        return True
+
         """
-        if col delta not in -1, 0, 1
-            return false
-
-        if row delta not in 1, 2
-            return false
-
         if col delta is 0
             if piece at row + 1
                 return false
@@ -68,102 +99,52 @@ class PawnMoveStrategy(MoveStrategy):
                 return false
             
         elif col delta in 1, -1
-            if row delta not 1
+            if no piece at to or piece on same team
                 return false
-
-            if no piece at to
-                return false            
+        
+        else:
+            return false
         
         return true
         
         """
 
-        if self.is_vertical_capture(from_col_idx, to_row_idx, to_col_idx):
-            return False
-
-        if self.is_diagonal_move(from_col_idx, to_row_idx, to_col_idx):
-            return False
-
-        # row_delta = self.get_row_delta(color)
-        # is_moving_forward_two = (
-        #     to_row_idx == from_row_idx + 2 * row_delta and from_col_idx == to_col_idx
-        # )
-        # is_moving_forward_one = to_row_idx == from_row_idx + row_delta
-
-        # if is_moving_forward_two:
-        #     if not self._is_legal_move_forward_two(
-        #         from_row_idx, from_col_idx, to_row_idx, to_col_idx, board
-        #     ):
-        #         return False
-        # elif not is_moving_forward_one:
-        #     return False
-
         return True
 
     @staticmethod
-    def get_row_delta(color: Color) -> int:
+    def get_row_direction(color: Color) -> int:
         """Return the pawn row delta for the color."""
         return 1 if color is Color.WHITE else -1
 
-    def _is_legal_col_delta(self, from_col_idx: int, to_col_idx: int) -> bool:
-        """Return whether the column delta is legal."""
-        col_delta = to_col_idx - from_col_idx
-        legal_col_deltas = self.move_col_deltas + self.attack_col_deltas
-        return col_delta in legal_col_deltas
-
-    def _is_legal_row_delta(self, )
-
-    def is_vertical_capture(
+    def _is_valid_forward_move(
         self,
-        from_col_idx: int,
-        to_row_idx: int,
-        to_col_idx: int,
-        board: Board,
-    ) -> bool:
-        """Return whether the move attempts to capture a piece vertically."""
-        to_piece = board.get_piece(to_row_idx, to_col_idx)
-        return from_col_idx == to_col_idx and to_piece is not None
-
-    def is_diagonal_move(
-        self,
-        from_col_idx: int,
-        to_row_idx: int,
-        to_col_idx: int,
-        board: Board,
-    ) -> bool:
-        """Return whether the move attempts to move diagonally."""
-        to_piece = board.get_piece(to_row_idx, to_col_idx)
-        return from_col_idx != to_col_idx and to_piece is None
-
-    def _is_legal_forward_move(
-        self,
-        color: int,
+        color: Color,
         from_row_idx: int,
         from_col_idx: int,
         to_row_idx: int,
         to_col_idx: int,
-        board: Board,
     ) -> bool:
-        """Return whether the move is a legal forward move."""
-        row_delta = self.get_row_delta(color)
-        from_piece = board.get_piece(from_row_idx, from_col_idx)
-        is_forward_two_move = (
-            to_row_idx == from_row_idx + 2 * row_delta and from_col_idx == to_col_idx
-        )
-        can_move_forward_two = from_piece.has_moved and not board.is_blocked(
-            from_row_idx, from_col_idx, to_row_idx, to_col_idx
-        )
+        """Return whether the move is a valid forward move."""
+        row_delta = to_row_idx - from_row_idx
+        col_delta = to_col_idx - from_col_idx
+        row_direction = self.get_row_direction(color)
+        is_valid_row_delta = row_delta in (row_direction, 2 * row_direction)
+        return is_valid_row_delta and col_delta == 0
 
-        if is_forward_two_move:
-            if not can_move_forward_two:
-                return False
-
-        is_moving_forward_one = to_row_idx == from_row_idx + row_delta
-
-        if not is_moving_forward_one:
-            return False
-
-        return True
+    def _is_valid_diagonal_move(
+        self,
+        color: Color,
+        from_row_idx: int,
+        from_col_idx: int,
+        to_row_idx: int,
+        to_col_idx: int,
+    ) -> bool:
+        """Return whether the move is a valid diagonal move."""
+        row_delta = to_row_idx - from_row_idx
+        col_delta = to_col_idx - from_col_idx
+        row_direction = self.get_row_direction(color)
+        is_valid_col_delta = col_delta in (-1, 1)
+        return is_valid_col_delta and row_delta == row_direction
 
 
 class KnightMoveStrategy(MoveStrategy):

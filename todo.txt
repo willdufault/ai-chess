@@ -3,6 +3,8 @@ REFACTOR:
 - consistent var names + order
 - consistent usage of 4x int vs 2x coord
 - DRY
+- add helper to see if square is occupied? lots of if piece is (not) None
+- legal vs. valid clarity
 
 - TODOs everywhere
 

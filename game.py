@@ -73,6 +73,7 @@ class Game:
         """Play a game of chess."""
 
         # TODO: Implement AI game loop.
+        # TODO: Implement pawn promotion.
         if self._game_mode is GameMode.AI:
             raise NotImplementedError
 

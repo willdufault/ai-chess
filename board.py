@@ -80,6 +80,13 @@ class Board:
             else None
         )
 
+    def is_occupied(self, row_idx: int, col_idx: int) -> bool:
+        """Return whether the coordinate has a piece on it."""
+        if not Board.is_in_bounds(row_idx, col_idx):
+            return False
+
+        return self._squares[row_idx][col_idx] is not None
+
     # DONE
     def move(
         self, from_row_idx: int, from_col_idx: int, to_row_idx: int, to_col_idx: int
@@ -247,16 +254,16 @@ class Board:
     ) -> list[tuple[int, int]]:
         """Return the coordinates of a pawn of the color that can block an
         attack by moving to the given coordinate. Assuming the square is empty."""
-        row_delta = PawnMoveStrategy.get_row_delta(color)
+        row_direction = PawnMoveStrategy.get_row_direction(color)
 
-        one_down_piece = self.get_piece(row_idx - row_delta, col_idx)
+        one_down_piece = self.get_piece(row_idx - row_direction, col_idx)
         if one_down_piece is not None:
             if not (isinstance(one_down_piece, Pawn) and one_down_piece.color == color):
                 return []
 
-            return (row_idx - row_delta, col_idx)
+            return [(row_idx - row_direction, col_idx)]
 
-        two_down_piece = self.get_piece(row_idx - 2 * row_delta, col_idx)
+        two_down_piece = self.get_piece(row_idx - 2 * row_direction, col_idx)
         if not (isinstance(two_down_piece, Pawn) and two_down_piece.color == color):
             return []
 
@@ -264,7 +271,7 @@ class Board:
         if two_down_piece.has_moved:
             return []
 
-        return (row_idx - 2 * row_delta, col_idx)
+        return [(row_idx - 2 * row_direction, col_idx)]
 
     def is_king_trapped(self, color: Color) -> bool:
         """Return whether the king of the color has no available moves, not
@@ -312,7 +319,7 @@ class Board:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate horizontally and vertically."""
         directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        piece_types = (Rook, Queen)
+        piece_types = [Rook, Queen]
         return self._get_straight_attacker_coords(
             row_idx, col_idx, color, directions, piece_types
         )
@@ -326,7 +333,7 @@ class Board:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate diagonally."""
         directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-        piece_types = (Bishop, Queen)
+        piece_types = [Bishop, Queen]
         return self._get_straight_attacker_coords(
             row_idx, col_idx, color, directions, piece_types
         )
@@ -337,7 +344,7 @@ class Board:
         col_idx: int,
         color: Color,
         directions: list[tuple[int, int]],
-        piece_types: tuple[type[Piece]],
+        piece_types: list[type[Piece]],
     ) -> list[tuple[int, int]]:
         """Return a list of coordinates of all pieces of the color and types
         attacking the given coordinate in a straight line in the directions."""
@@ -348,7 +355,7 @@ class Board:
             while 0 <= curr_row_idx < BOARD_SIZE and 0 <= curr_col_idx < BOARD_SIZE:
                 piece = self.get_piece(curr_row_idx, curr_col_idx)
                 if piece is not None:
-                    if isinstance(piece, piece_types) and piece.color == color:
+                    if isinstance(piece, tuple(piece_types)) and piece.color == color:
                         coords.append((curr_row_idx, curr_col_idx))
 
                     break
@@ -400,11 +407,12 @@ class Board:
         """Return a list of coordinates of all pawns of the color attacking the
         given coordinate."""
         coords = []
-        row_delta = PawnMoveStrategy.get_row_delta(color)
+        row_direction = PawnMoveStrategy.get_row_direction(color)
 
         # TODO: what to do with col deltas?
-        for col_delta in PawnMoveStrategy.col_deltas:
-            curr_row_idx = row_idx - row_delta
+        # TODO: should this be in movestrat?
+        for col_delta in (-1, 1):
+            curr_row_idx = row_idx - row_direction
             curr_col_idx = col_idx + col_delta
 
             if not Board.is_in_bounds(curr_row_idx, curr_col_idx):
