@@ -25,112 +25,112 @@ class TestIsBlocked(TestCase):
 
     def test_move_pawn_forward_one(self) -> None:
         self.assertTrue(
-            self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 2, 0, self.board)
+            self.pawn_move_strategy.is_valid_move(Color.WHITE, 1, 0, 2, 0, self.board)
         )
 
     def test_move_pawn_forward_one_on_top(self) -> None:
         self.board._set_piece(2, 0, Pawn(Color.BLACK))
         self.assertFalse(
-            self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 2, 0, self.board)
+            self.pawn_move_strategy.is_valid_move(Color.WHITE, 1, 0, 2, 0, self.board)
         )
 
     def test_move_pawn_forward_two(self) -> None:
         self.assertTrue(
-            self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 3, 0, self.board)
+            self.pawn_move_strategy.is_valid_move(Color.WHITE, 1, 0, 3, 0, self.board)
         )
 
         piece = self.board.get_piece(1, 0)
         piece.has_moved = True
         self.assertFalse(
-            self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 3, 0, self.board)
+            self.pawn_move_strategy.is_valid_move(Color.WHITE, 1, 0, 3, 0, self.board)
         )
 
     def test_move_pawn_forward_two_on_top(self) -> None:
         self.board._set_piece(2, 0, Pawn(Color.BLACK))
         self.assertFalse(
-            self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 3, 0, self.board)
+            self.pawn_move_strategy.is_valid_move(Color.WHITE, 1, 0, 3, 0, self.board)
         )
 
     def test_move_pawn_forward_two_blocked(self) -> None:
         self.board._set_piece(2, 0, Pawn(Color.WHITE))
         self.assertFalse(
-            self.pawn_move_strategy.is_legal_move(Color.WHITE, 1, 0, 3, 0, self.board)
+            self.pawn_move_strategy.is_valid_move(Color.WHITE, 1, 0, 3, 0, self.board)
         )
 
     def test_move_knight(self) -> None:
         self.assertFalse(
-            self.knight_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 3, self.board)
+            self.knight_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 3, self.board)
         )
         self.assertTrue(
-            self.knight_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 4, self.board)
+            self.knight_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 4, self.board)
         )
         self.assertTrue(
-            self.knight_move_strategy.is_legal_move(Color.WHITE, 3, 3, 1, 2, self.board)
+            self.knight_move_strategy.is_valid_move(Color.WHITE, 3, 3, 1, 2, self.board)
         )
         self.assertTrue(
-            self.knight_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 2, self.board)
+            self.knight_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 2, self.board)
         )
 
     def test_move_bishop(self) -> None:
         self.assertFalse(
-            self.bishop_move_strategy.is_legal_move(Color.WHITE, 3, 3, 3, 4, self.board)
+            self.bishop_move_strategy.is_valid_move(Color.WHITE, 3, 3, 3, 4, self.board)
         )
         self.assertTrue(
-            self.bishop_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board)
+            self.bishop_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 4, self.board)
         )
         self.assertTrue(
-            self.bishop_move_strategy.is_legal_move(Color.WHITE, 3, 3, 1, 1, self.board)
+            self.bishop_move_strategy.is_valid_move(Color.WHITE, 3, 3, 1, 1, self.board)
         )
         self.assertFalse(
-            self.bishop_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 4, self.board)
+            self.bishop_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 4, self.board)
         )
 
     def test_move_rook(self) -> None:
         self.assertFalse(
-            self.rook_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board)
+            self.rook_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 4, self.board)
         )
         self.assertTrue(
-            self.rook_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 3, self.board)
+            self.rook_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 3, self.board)
         )
         self.assertTrue(
-            self.rook_move_strategy.is_legal_move(Color.WHITE, 3, 3, 3, 6, self.board)
+            self.rook_move_strategy.is_valid_move(Color.WHITE, 3, 3, 3, 6, self.board)
         )
         self.assertFalse(
-            self.rook_move_strategy.is_legal_move(Color.WHITE, 3, 3, 2, 1, self.board)
+            self.rook_move_strategy.is_valid_move(Color.WHITE, 3, 3, 2, 1, self.board)
         )
 
     def test_move_queen(self) -> None:
         self.assertTrue(
-            self.queen_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board)
+            self.queen_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 4, self.board)
         )
         self.assertTrue(
-            self.queen_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 3, self.board)
+            self.queen_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 3, self.board)
         )
         self.assertTrue(
-            self.queen_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 5, self.board)
+            self.queen_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 5, self.board)
         )
         self.assertTrue(
-            self.queen_move_strategy.is_legal_move(Color.WHITE, 3, 3, 2, 4, self.board)
+            self.queen_move_strategy.is_valid_move(Color.WHITE, 3, 3, 2, 4, self.board)
         )
         self.assertFalse(
-            self.queen_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 7, self.board)
+            self.queen_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 7, self.board)
         )
 
     def test_move_king(self) -> None:
         self.assertTrue(
-            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 4, self.board)
+            self.king_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 4, self.board)
         )
         self.assertTrue(
-            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 3, self.board)
+            self.king_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 3, self.board)
         )
         self.assertTrue(
-            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 3, 2, 3, self.board)
+            self.king_move_strategy.is_valid_move(Color.WHITE, 3, 3, 2, 3, self.board)
         )
         self.assertTrue(
-            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 3, 4, 2, self.board)
+            self.king_move_strategy.is_valid_move(Color.WHITE, 3, 3, 4, 2, self.board)
         )
         self.assertFalse(
-            self.king_move_strategy.is_legal_move(Color.WHITE, 3, 3, 5, 3, self.board)
+            self.king_move_strategy.is_valid_move(Color.WHITE, 3, 3, 5, 3, self.board)
         )
 
 

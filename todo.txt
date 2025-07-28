@@ -1,10 +1,11 @@
-REFACTOR:
 - consistent whitespace
-- consistent var names + order
-- consistent usage of 4x int vs 2x coord
+- consistent var/fcn names + arg order
+- self-documenting if conditions, "if not is_..." >> "if is_not_..."
 - DRY
-- add helper to see if square is occupied? lots of if piece is (not) None
-- legal vs. valid clarity
+- legal vs valid
+- attack vs capture
+- from/to piece -> "...piece", "target_piece"
+- straight vs orthogonal vs diagonal
 
 - TODOs everywhere
 

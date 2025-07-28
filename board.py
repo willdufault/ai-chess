@@ -370,7 +370,7 @@ class Board:
         """Return a list of coordinates of all knights of the color attacking
         the given coordinate."""
         coords = []
-        for row_delta, col_delta in KnightMoveStrategy.move_patterns:
+        for row_delta, col_delta in KnightMoveStrategy.MOVE_PATTERNS:
             curr_row_idx = row_idx + row_delta
             curr_col_idx = col_idx + col_delta
             piece = self.get_piece(curr_row_idx, curr_col_idx)
@@ -385,7 +385,7 @@ class Board:
         given coordinate."""
         coords = []
 
-        for row_delta, col_delta in KingMoveStrategy.move_patterns:
+        for row_delta, col_delta in KingMoveStrategy.MOVE_PATTERNS:
             curr_row_idx = row_idx + row_delta
             curr_col_idx = col_idx + col_delta
 

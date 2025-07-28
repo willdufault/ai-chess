@@ -29,7 +29,7 @@ class Game:
             return False
 
         from_piece = self._board.get_piece(from_row_idx, from_col_idx)
-        if not from_piece.move_strategy.is_legal_move(
+        if not from_piece.move_strategy.is_valid_move(
             color,
             from_row_idx,
             from_col_idx,
