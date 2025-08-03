@@ -1,7 +1,8 @@
 from enums import Color, GameMode
 
 from .board import BOARD_SIZE, Board
-from .pieces import Piece
+from .coordinate import Coordinate
+from .pieces import FirstMovePiece, Piece
 
 MAX_DEPTH = 10
 
@@ -15,35 +16,23 @@ class Game:
         self._user_color = Color.WHITE
         self._depth = 0
 
-
     # TODO: PICK UP HERE, COORD REFACTOR
 
-    def move(
-        self,
-        color: Color,
-        from_row_idx: int,
-        from_col_idx: int,
-        to_row_idx: int,
-        to_col_idx: int,
-    ) -> bool:
+    def move(self, color: Color, from_coord: Coordinate, to_coord: Coordinate) -> bool:
         """Return whether the move was successful."""
-        if not self._move_passes_basic_checks(
-            color, from_row_idx, from_col_idx, to_row_idx, to_col_idx
-        ):
+        if not self._move_passes_basic_checks(color, from_coord, to_coord):
             return False
 
-        from_piece = self._board.get_piece(from_row_idx, from_col_idx)
+        from_piece = self._board.get_piece(from_coord)
         if not from_piece.move_strategy.is_valid_move(
             color,
-            from_row_idx,
-            from_col_idx,
-            to_row_idx,
-            to_col_idx,
+            from_coord,
+            to_coord,
             self._board,
         ):
             return False
 
-        self._move_piece(from_row_idx, from_col_idx, to_row_idx, to_col_idx, from_piece)
+        self._move_piece(from_coord, to_coord, from_piece)
         return True
 
     def configure(self) -> None:
@@ -103,29 +92,25 @@ class Game:
                     print("Invalid input.\n")
                     continue
 
-                from_row_idx, from_col_idx, to_row_idx, to_col_idx = self._parse_input(
-                    move_coords
-                )
-                from_piece = self._board.get_piece(from_row_idx, from_col_idx)
-                to_piece = self._board.get_piece(to_row_idx, to_col_idx)
+                from_coord, to_coord = self._parse_input(move_coords)
+                from_piece = self._board.get_piece(from_coord)
+                to_piece = self._board.get_piece(to_coord)
 
-                moved = self.move(
-                    color, from_row_idx, from_col_idx, to_row_idx, to_col_idx
-                )
+                moved = self.move(color, from_coord, to_coord)
                 if not moved:
                     print("Illegal move.\n")
                     continue
 
                 if self._board.is_in_check(color):
                     # ! could fail, if that piece was blocking check but is now gone
-                    self.move(color, to_row_idx, to_col_idx, from_row_idx, from_col_idx)
-                    self._board._set_piece(to_row_idx, to_col_idx, to_piece)
+                    self.move(color, to_coord, from_coord)
+                    self._board._set_piece(to_coord, to_piece)
 
                     print("Illegal move. Your king would be in check.\n")
                     continue
 
                 # todo: MOVED INTO BOARD, REFACTOR
-                if hasattr(from_piece, "has_moved"):
+                if isinstance(from_piece, FirstMovePiece):
                     from_piece.has_moved = True
 
                 break
@@ -154,11 +139,13 @@ class Game:
         return True
 
     # DONE
-    def _parse_input(self, move_input: str) -> tuple[int, int, int, int]:
+    def _parse_input(self, move_input: str) -> tuple[Coordinate, Coordinate]:
         """Return the from and to coordinates from the input. Assumes the input
         is valid."""
         from_row_idx, from_col_idx, to_row_idx, to_col_idx = tuple(map(int, move_input))
-        return from_row_idx, from_col_idx, to_row_idx, to_col_idx
+        from_coord = Coordinate(from_row_idx, from_col_idx)
+        to_coord = Coordinate(to_row_idx, to_col_idx)
+        return from_coord, to_coord
 
     # DONE
     def _prompt_user(self, options: list[str], message: str) -> str:
@@ -175,28 +162,23 @@ class Game:
 
     # DONE
     def _move_passes_basic_checks(
-        self,
-        color: Color,
-        from_row_idx: int,
-        from_col_idx: int,
-        to_row_idx: int,
-        to_col_idx: int,
+        self, color: Color, from_coord: Coordinate, to_coord: Coordinate
     ) -> bool:
         """Return whether the move passes basic legality checks."""
         are_coords_in_bounds = self._board.is_in_bounds(
-            from_row_idx, from_col_idx
-        ) and self._board.is_in_bounds(to_row_idx, to_col_idx)
+            from_coord
+        ) and self._board.is_in_bounds(to_coord)
 
         if not are_coords_in_bounds:
             return False
 
-        from_piece = self._board.get_piece(from_row_idx, from_col_idx)
+        from_piece = self._board.get_piece(from_coord)
         is_moving_wrong_piece = from_piece is None or from_piece.color != color
 
         if is_moving_wrong_piece:
             return False
 
-        to_piece = self._board.get_piece(to_row_idx, to_col_idx)
+        to_piece = self._board.get_piece(to_coord)
         is_to_same_color = to_piece is not None and to_piece.color == color
 
         if is_to_same_color:
@@ -206,13 +188,8 @@ class Game:
 
     #! ENCAPSULATION?
     def _move_piece(
-        self,
-        from_row_idx: int,
-        from_col_idx: int,
-        to_row_idx: int,
-        to_col_idx: int,
-        from_piece: Piece,
+        self, from_coord: Coordinate, to_coord: Coordinate, from_piece: Piece
     ) -> None:
         """Move a piece. Assuming this is a legal move."""
-        self._board._set_piece(from_row_idx, from_col_idx, None)
-        self._board._set_piece(to_row_idx, to_col_idx, from_piece)
+        self._board._set_piece(from_coord, None)
+        self._board._set_piece(to_coord, from_piece)
