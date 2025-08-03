@@ -1,6 +1,7 @@
 from enums import Color
 
 from .coordinate import Coordinate
+from .direction import Direction
 from .move_strategies import KingMoveStrategy, KnightMoveStrategy, PawnMoveStrategy
 from .pieces import Bishop, FirstMovePiece, King, Knight, Pawn, Piece, Queen, Rook
 
@@ -13,7 +14,6 @@ BLACK_PAWN_ROW_IDX = BOARD_SIZE - 2
 class Board:
     """Represents a chessboard."""
 
-    # DONE
     def __init__(self) -> None:
         self._squares = [[None] * BOARD_SIZE for _ in range(BOARD_SIZE)]
 
@@ -28,7 +28,6 @@ class Board:
 
         self._set_up_pieces()
 
-    # DONE
     @staticmethod
     def is_in_bounds(coord: Coordinate) -> bool:
         """Return whether the coordinate is in bounds."""
@@ -36,7 +35,6 @@ class Board:
         is_col_in_bounds = 0 <= coord.col_idx < BOARD_SIZE
         return is_row_in_bounds and is_col_in_bounds
 
-    # DONE
     def draw(self, color: Color) -> None:
         """Draw the board from the perspective of the color."""
         top_border = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
@@ -71,14 +69,12 @@ class Board:
 
         print("\n".join(rows))
 
-    # DONE
     def get_piece(self, coord: Coordinate) -> Piece | None:
         """Get the piece at the coordinate."""
-        return (
-            self._squares[coord.row_idx][coord.col_idx]
-            if Board.is_in_bounds(coord)
-            else None
-        )
+        if not Board.is_in_bounds(coord):
+            return None
+
+        return self._squares[coord.row_idx][coord.col_idx]
 
     def is_occupied(self, coord: Coordinate) -> bool:
         """Return whether the coordinate has a piece on it."""
@@ -87,7 +83,6 @@ class Board:
 
         return self._squares[coord.row_idx][coord.col_idx] is not None
 
-    # DONE
     def move(self, from_coord: Coordinate, to_coord: Coordinate) -> Piece | None:
         """Move a piece and return the piece at the to coordinate."""
         are_coords_in_bounds = Board.is_in_bounds(from_coord) and Board.is_in_bounds(
@@ -108,12 +103,10 @@ class Board:
 
         return to_piece
 
-    # DONE
     def undo_move(
         self,
         from_coord: Coordinate,
         to_coord: Coordinate,
-        from_piece: Piece | None,
         to_piece: Piece | None,
         from_piece_has_moved: bool,
     ) -> Piece | None:
@@ -124,6 +117,8 @@ class Board:
 
         if not are_coords_in_bounds:
             return None
+
+        from_piece = self.get_piece(to_coord)
 
         self._set_piece(from_coord, from_piece)
         self._set_piece(to_coord, to_piece)
@@ -254,10 +249,10 @@ class Board:
     ) -> list[Coordinate]:
         """Return the coordinates of a pawn of the color that can block an
         attack by moving to the given coordinate. Assuming the square is empty."""
-        row_direction = PawnMoveStrategy.get_row_direction(color)
+        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         row_idx = coord.row_idx
         col_idx = coord.col_idx
-        one_back_coord = Coordinate(row_idx - row_direction, col_idx)
+        one_back_coord = Coordinate(row_idx - pawn_row_delta, col_idx)
         one_back_piece = self.get_piece(one_back_coord)
 
         if one_back_piece is not None:
@@ -270,7 +265,7 @@ class Board:
 
             return [one_back_coord]
 
-        two_back_coord = Coordinate(row_idx - 2 * row_direction, col_idx)
+        two_back_coord = Coordinate(row_idx - 2 * pawn_row_delta, col_idx)
         two_back_piece = self.get_piece(two_back_coord)
         is_two_back_same_color_pawn = (
             isinstance(two_back_piece, Pawn) and two_back_piece.color == color
@@ -326,7 +321,12 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate horizontally and vertically."""
-        directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        directions = [
+            Direction(1, 0),
+            Direction(0, 1),
+            Direction(-1, 0),
+            Direction(0, -1),
+        ]
         piece_types = [Rook, Queen]
         return self._get_straight_attacker_coords(color, coord, directions, piece_types)
 
@@ -335,7 +335,12 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate diagonally."""
-        directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+        directions = [
+            Direction(1, 1),
+            Direction(1, -1),
+            Direction(-1, 1),
+            Direction(-1, -1),
+        ]
         piece_types = [Bishop, Queen]
         return self._get_straight_attacker_coords(color, coord, directions, piece_types)
 
@@ -343,16 +348,16 @@ class Board:
         self,
         color: Color,
         coord: Coordinate,
-        directions: list[tuple[int, int]],
+        directions: list[Direction],
         piece_types: list[type[Piece]],
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color and types
         attacking the given coordinate in a straight line in the directions."""
         coords = []
 
-        for row_delta, col_delta in directions:
+        for direction in directions:
             curr_coord = Coordinate(
-                coord.row_idx + row_delta, coord.col_idx + col_delta
+                coord.row_idx + direction.row_delta, coord.col_idx + direction.col_delta
             )
 
             while Board.is_in_bounds(curr_coord):
@@ -369,7 +374,8 @@ class Board:
                     break
 
                 curr_coord = Coordinate(
-                    curr_coord.row_idx + row_delta, curr_coord.col_idx + col_delta
+                    curr_coord.row_idx + direction.row_delta,
+                    curr_coord.col_idx + direction.col_delta,
                 )
 
         return coords
@@ -422,14 +428,14 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pawns of the color attacking the
         given coordinate."""
-        row_direction = PawnMoveStrategy.get_row_direction(color)
+        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         coords = []
 
         # TODO: what to do with col deltas? should this be in movestrat?
 
         for col_delta in (-1, 1):
             curr_coord = Coordinate(
-                coord.row_idx - row_direction, coord.col_idx + col_delta
+                coord.row_idx - pawn_row_delta, coord.col_idx + col_delta
             )
             if not Board.is_in_bounds(curr_coord):
                 continue

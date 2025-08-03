@@ -6,12 +6,23 @@ from typing import TYPE_CHECKING
 from enums import Color
 
 from .coordinate import Coordinate
+from .direction import Direction
 
 if TYPE_CHECKING:
     from .board import Board
 
-ORTHOGONAL_DIRECTIONS = ((1, 0), (0, 1), (-1, 0), (0, -1))
-DIAGONAL_DIRECTIONS = ((1, 1), (-1, 1), (-1, -1), (1, -1))
+ORTHOGONAL_DIRECTIONS = (
+    Direction(1, 0),
+    Direction(0, 1),
+    Direction(-1, 0),
+    Direction(0, -1),
+)
+DIAGONAL_DIRECTIONS = (
+    Direction(1, 1),
+    Direction(-1, 1),
+    Direction(-1, -1),
+    Direction(1, -1),
+)
 
 
 class MoveStrategy(ABC):
@@ -53,7 +64,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
             row_delta /= abs(col_delta)
             col_delta /= abs(col_delta)
 
-        is_valid_direction = (row_delta, col_delta) in self._DIRECTIONS
+        is_valid_direction = Direction(row_delta, col_delta) in self._DIRECTIONS
 
         if not is_valid_direction:
             return False
@@ -71,7 +82,7 @@ class PawnMoveStrategy(MoveStrategy):
     _CAPTURE_COL_DELTAS = (-1, 1)
 
     @staticmethod
-    def get_row_direction(color: Color) -> int:
+    def get_row_delta(color: Color) -> int:
         """Return the pawn row delta for the color."""
         return 1 if color is Color.WHITE else -1
 
@@ -102,9 +113,9 @@ class PawnMoveStrategy(MoveStrategy):
         board: Board,
     ):
         """Return whether the forward move is valid."""
-        row_direction = PawnMoveStrategy.get_row_direction(color)
+        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         forward_one_coord = Coordinate(
-            from_coord.row_idx + row_direction, from_coord.col_idx
+            from_coord.row_idx + pawn_row_delta, from_coord.col_idx
         )
         is_forward_one_occupied = board.is_occupied(forward_one_coord)
 
@@ -112,8 +123,8 @@ class PawnMoveStrategy(MoveStrategy):
             return False
 
         row_delta = to_coord.row_idx - from_coord.row_idx
-        is_single_move = row_delta == row_direction
-        is_double_move = row_delta == self._DOUBLE_MOVE_ROW_DELTA * row_direction
+        is_single_move = row_delta == pawn_row_delta
+        is_double_move = row_delta == self._DOUBLE_MOVE_ROW_DELTA * pawn_row_delta
 
         if is_single_move:
             return True
@@ -127,14 +138,14 @@ class PawnMoveStrategy(MoveStrategy):
         self, color: Color, from_coord: Coordinate, board: Board
     ) -> bool:
         """Return whether the double move is valid."""
-        row_direction = self.get_row_direction(color)
+        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         from_piece = board.get_piece(from_coord)
 
         if from_piece.has_moved:
             return False
 
         forward_two_coord = Coordinate(
-            from_coord.row_idx + self._DOUBLE_MOVE_ROW_DELTA * row_direction,
+            from_coord.row_idx + self._DOUBLE_MOVE_ROW_DELTA * pawn_row_delta,
             from_coord.col_idx,
         )
         is_forward_two_empty = not board.is_occupied(forward_two_coord)
@@ -150,8 +161,8 @@ class PawnMoveStrategy(MoveStrategy):
     ):
         """Return whether the capture is valid."""
         row_delta = to_coord.row_idx - from_coord.row_idx
-        row_direction = PawnMoveStrategy.get_row_direction(color)
-        is_moving_forward_one = row_delta == row_direction
+        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
+        is_moving_forward_one = row_delta == pawn_row_delta
 
         if not is_moving_forward_one:
             return False
