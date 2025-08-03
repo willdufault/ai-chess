@@ -1,7 +1,8 @@
 from abc import ABC
 
 from enums import Color
-from move_strategies import (
+
+from .move_strategies import (
     BishopMoveStrategy,
     KingMoveStrategy,
     KnightMoveStrategy,
@@ -25,22 +26,18 @@ class Piece(ABC):
 
     @property
     def color(self) -> Color:
-        """Get the color of the piece."""
         return self._color
 
     @property
     def value(self) -> int:
-        """Get the value of the piece."""
         return self._value
 
     @property
     def symbol(self) -> str:
-        """Get the symbol of the piece."""
         return self._symbol
 
     @property
     def move_strategy(self) -> MoveStrategy:
-        """Get the move strategy of the piece."""
         return self._move_strategy
 
 

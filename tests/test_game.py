@@ -1,9 +1,9 @@
 from unittest import TestCase, main
 
-from board import Board
 from enums import Color
-from game import Game
-from pieces import Pawn
+from models.board import Board
+from models.game import Game
+from models.pieces import Pawn
 
 
 class TestMove(TestCase):

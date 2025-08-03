@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from enums import Color
 
 if TYPE_CHECKING:
-    from board import Board
+    from .board import Board
 
 ORTHOGONAL_DIRECTIONS = ((1, 0), (0, 1), (-1, 0), (0, -1))
 DIAGONAL_DIRECTIONS = ((1, 1), (-1, 1), (-1, -1), (1, -1))

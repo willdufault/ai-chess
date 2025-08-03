@@ -1,6 +1,7 @@
-from board import BOARD_SIZE, Board
 from enums import Color, GameMode
-from pieces import Piece
+
+from .board import BOARD_SIZE, Board
+from .pieces import Piece
 
 MAX_DEPTH = 10
 
@@ -13,6 +14,9 @@ class Game:
         self._game_mode = GameMode.TWO_PLAYER
         self._user_color = Color.WHITE
         self._depth = 0
+
+
+    # TODO: PICK UP HERE, COORD REFACTOR
 
     def move(
         self,

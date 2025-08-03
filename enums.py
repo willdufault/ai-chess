@@ -9,6 +9,7 @@ class Color(Enum):
 
     @staticmethod
     def get_opposite_color(color: Color):
+        """Return the opposite color than the one given."""
         return Color.WHITE if color is Color.BLACK else Color.BLACK
 
 
