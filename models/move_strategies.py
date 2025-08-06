@@ -74,6 +74,27 @@ class StraightMoveStrategy(MoveStrategy, ABC):
         return is_path_clear
 
 
+class PatternMoveStrategy(MoveStrategy, ABC):
+    """Represents an abstract move strategy for a chess piece that moves in a
+    specific pattern."""
+
+    MOVE_PATTERNS = ()
+
+    def is_valid_move(
+        self,
+        color: Color,
+        from_coord: Coordinate,
+        to_coord: Coordinate,
+        board: Board,
+    ) -> bool:
+        """Return whether the move is valid for a piece that moves in a specific pattern."""
+        row_delta = to_coord.row_idx - from_coord.row_idx
+        col_delta = to_coord.col_idx - from_coord.col_idx
+        move_pattern = Direction(row_delta, col_delta)
+        is_valid_move_pattern = move_pattern in self.MOVE_PATTERNS
+        return is_valid_move_pattern
+
+
 class PawnMoveStrategy(MoveStrategy):
     """Represents the move strategy for a pawn."""
 
@@ -166,32 +187,19 @@ class PawnMoveStrategy(MoveStrategy):
         return is_capturing_opponent
 
 
-class KnightMoveStrategy(MoveStrategy):
+class KnightMoveStrategy(PatternMoveStrategy):
     """Represents the move strategy for a knight."""
 
-    MOVE_PATTERNS = [
-        (1, 2),
-        (1, -2),
-        (2, 1),
-        (2, -1),
-        (-1, 2),
-        (-1, -2),
-        (-2, 1),
-        (-2, -1),
-    ]
-
-    def is_valid_move(
-        self,
-        color: Color,
-        from_coord: Coordinate,
-        to_coord: Coordinate,
-        board: Board,
-    ) -> bool:
-        """Return whether the move is valid for a knight."""
-        row_delta = to_coord.row_idx - from_coord.row_idx
-        col_delta = to_coord.col_idx - from_coord.col_idx
-        is_valid_move_pattern = (row_delta, col_delta) in self.MOVE_PATTERNS
-        return is_valid_move_pattern
+    MOVE_PATTERNS = (
+        Direction(1, 2),
+        Direction(1, -2),
+        Direction(2, 1),
+        Direction(2, -1),
+        Direction(-1, 2),
+        Direction(-1, -2),
+        Direction(-2, 1),
+        Direction(-2, -1),
+    )
 
 
 class BishopMoveStrategy(StraightMoveStrategy):
@@ -212,27 +220,16 @@ class QueenMoveStrategy(StraightMoveStrategy):
     DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
 
 
-class KingMoveStrategy(MoveStrategy):
+class KingMoveStrategy(PatternMoveStrategy):
     """Represents the move strategy for a king."""
 
-    MOVE_PATTERNS = [
-        (1, 0),
-        (1, 1),
-        (1, -1),
-        (0, 1),
-        (0, -1),
-        (-1, 0),
-        (-1, 1),
-        (-1, -1),
-    ]
-
-    def is_valid_move(
-        self,
-        color: Color,
-        from_coord: Coordinate,
-        to_coord: Coordinate,
-        board: Board,
-    ) -> bool:
-        row_delta = to_coord.row_idx - from_coord.row_idx
-        col_delta = to_coord.col_idx - from_coord.col_idx
-        return (row_delta, col_delta) in self.MOVE_PATTERNS
+    MOVE_PATTERNS = (
+        Direction(1, 0),
+        Direction(1, 1),
+        Direction(1, -1),
+        Direction(0, 1),
+        Direction(0, -1),
+        Direction(-1, 0),
+        Direction(-1, 1),
+        Direction(-1, -1),
+    )

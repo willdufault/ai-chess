@@ -6,6 +6,7 @@ from models.coordinate import Coordinate
 from models.pieces import Bishop, Knight, Pawn, Queen, Rook
 
 
+# TODO: this is not all testmove, fix for all test cases
 class TestMove(TestCase):
     def setUp(self) -> None:
         self.board = Board()
@@ -189,6 +190,7 @@ class TestMove(TestCase):
         self.board._set_piece(Coordinate(1, 5), None)
         self.board._set_piece(Coordinate(1, 6), None)
         self.board._set_piece(Coordinate(3, 7), Bishop(Color.BLACK))
+        breakpoint()
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
         self.board._set_piece(Coordinate(1, 4), Rook(Color.WHITE))

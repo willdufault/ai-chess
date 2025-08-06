@@ -7,6 +7,7 @@ from .move_strategies import (
     ORTHOGONAL_DIRECTIONS,
     KingMoveStrategy,
     KnightMoveStrategy,
+    PatternMoveStrategy,
     PawnMoveStrategy,
     StraightMoveStrategy,
 )
@@ -133,25 +134,23 @@ class Board:
         opponent_color = Color.get_opposite_color(color)
         return self.is_attacking(opponent_color, king_coord)
 
-    # TODO: after board refactor
+    # TODO: after board refactor, SRP
     def is_in_checkmate(self, color: Color) -> bool:
         """Return whether the color is in checkmate."""
         if not self.is_in_check(color):
             return False
 
-        # first, if can safely move away, false
         if not self.is_king_trapped(color):
             return False
 
-        # get coordinates of attacking pieces
+        opponent_color = Color.get_opposite_color(color)
         king_coord = self._get_king_coord(color)
         king_row_idx = king_coord.row_idx
         king_col_idx = king_coord.col_idx
-        opponent_color = Color.get_opposite_color(color)
         attacker_coords = self._get_attacker_coords(opponent_color, king_coord)
 
-        # if >1, can't block all, return true
-        if len(attacker_coords) > 1:
+        could_block_attack = len(attacker_coords) == 1
+        if not could_block_attack:
             return True
 
         attacker_coord = attacker_coords[0]
@@ -171,8 +170,6 @@ class Board:
             self._set_piece(attacker_coord, attacker)
             if not is_still_in_check:
                 return False
-
-        # TODO: PICK UP HERE, REFACTORING row,col -> coord AND reorder args so color is first
 
         # second, if can block attack, false
         # ... check if can move into any space along line
@@ -222,8 +219,6 @@ class Board:
 
         return False
 
-    # TODO: DO THESE MAKE SENSE IN BOARD? THIS LOGIC FEELS LIKE IT SHOULD BE IN MOVESTRAT INSTEAD
-
     def _get_blocker_coords(self, color: Color, coord: Coordinate) -> list[Coordinate]:
         """Return the coordinates of all pieces of the color that can block an
         attack by moving to the given coordinate. Assuming the square is empty."""
@@ -235,7 +230,6 @@ class Board:
             + self._get_pawn_blocker_coords(color, coord)
         )
 
-    # TODO: move to PawnMoveStrat
     def _get_pawn_blocker_coords(
         self, color: Color, coord: Coordinate
     ) -> list[Coordinate]:
@@ -246,12 +240,10 @@ class Board:
         col_idx = coord.col_idx
         one_back_coord = Coordinate(row_idx - pawn_row_delta, col_idx)
         one_back_piece = self.get_piece(one_back_coord)
-
         if one_back_piece is not None:
             is_one_back_same_color_pawn = (
                 isinstance(one_back_piece, Pawn) and one_back_piece.color == color
             )
-
             if not is_one_back_same_color_pawn:
                 return []
 
@@ -262,38 +254,29 @@ class Board:
         is_two_back_same_color_pawn = (
             isinstance(two_back_piece, Pawn) and two_back_piece.color == color
         )
-
-        # TODO: should board know about this? abstraction/refactor needed?
         if not is_two_back_same_color_pawn or two_back_piece.has_moved:
             return []
 
         return [two_back_coord]
 
     def is_king_trapped(self, color: Color) -> bool:
-        """Return whether the king of the color has no available moves, not
-        including captures."""
+        """Return whether the king of the color has no empty escape squares."""
         opponent_color = Color.get_opposite_color(color)
         king_coord = self._get_king_coord(color)
-        king_row_idx = king_coord.row_idx
-        king_col_idx = king_coord.col_idx
+        for direction in KingMoveStrategy.MOVE_PATTERNS:
+            curr_coord = Coordinate(
+                king_coord.row_idx + direction.row_delta,
+                king_coord.col_idx + direction.col_delta,
+            )
+            if not self.is_in_bounds(curr_coord):
+                continue
 
-        for curr_row_idx in range(king_row_idx - 1, king_row_idx + 2):
-            for curr_col_idx in range(king_col_idx - 1, king_col_idx + 2):
-                curr_coord = Coordinate(curr_row_idx, curr_col_idx)
+            piece = self.get_piece(curr_coord)
+            if piece is not None:
+                continue
 
-                if curr_coord == king_coord:
-                    continue
-
-                if not Board.is_in_bounds(curr_coord):
-                    continue
-
-                # TODO: what if this piece is opp team attacker, it can take?
-                piece = self.get_piece(curr_coord)
-                if piece is not None:
-                    continue
-
-                if not self.is_attacking(opponent_color, curr_coord):
-                    return False
+            if not self.is_attacking(opponent_color, curr_coord):
+                return False
 
         return True
 
@@ -358,33 +341,44 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all knights of the color attacking
         the given coordinate."""
-        coords = []
-        for row_delta, col_delta in KnightMoveStrategy.MOVE_PATTERNS:
-            curr_coord = Coordinate(
-                coord.row_idx + row_delta, coord.col_idx + col_delta
-            )
-            piece = self.get_piece(curr_coord)
-            is_same_color_knight = isinstance(piece, Knight) and piece.color == color
-            if is_same_color_knight:
-                coords.append(curr_coord)
-        return coords
+        res = self._get_pattern_piece_attacker_coords(
+            color, coord, KnightMoveStrategy.MOVE_PATTERNS
+        )
+        breakpoint()
+        return res
 
     def _get_king_attacker_coords(
         self, color: Color, coord: Coordinate
     ) -> list[Coordinate]:
         """Return a list of coordinates of all kings of the color attacking the
         given coordinate."""
+        return self._get_pattern_piece_attacker_coords(
+            color, coord, KingMoveStrategy.MOVE_PATTERNS
+        )
+
+    def _get_pattern_piece_attacker_coords(
+        self,
+        color: Color,
+        coord: Coordinate,
+        move_patterns: tuple[Direction],
+    ) -> list[Coordinate]:
+        """Return a list of coordinates of all pieces of the color that can
+        attack the given coordinate using any of the move patterns."""
         coords = []
-        for row_delta, col_delta in KingMoveStrategy.MOVE_PATTERNS:
+        for move_pattern in move_patterns:
             curr_coord = Coordinate(
-                coord.row_idx + row_delta, coord.col_idx + col_delta
+                coord.row_idx + move_pattern.row_delta,
+                coord.col_idx + move_pattern.col_delta,
             )
-            if not Board.is_in_bounds(curr_coord):
+            piece = self.get_piece(curr_coord)
+            if piece is None:
                 continue
 
-            piece = self.get_piece(curr_coord)
-            is_same_color_king = isinstance(piece, King) and piece.color == color
-            if is_same_color_king:
+            can_piece_attack_square = (
+                isinstance(piece.move_strategy, PatternMoveStrategy)
+                and move_pattern in move_patterns
+            )
+            if can_piece_attack_square and piece.color == color:
                 coords.append(curr_coord)
         return coords
 
@@ -399,9 +393,6 @@ class Board:
             curr_coord = Coordinate(
                 coord.row_idx - pawn_row_delta, coord.col_idx + col_delta
             )
-            if not Board.is_in_bounds(curr_coord):
-                continue
-
             piece = self.get_piece(curr_coord)
             is_same_color_pawn = isinstance(piece, Pawn) and piece.color == color
             if is_same_color_pawn:
