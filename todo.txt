@@ -1,19 +1,10 @@
-- consistent whitespace
-- consistent var/fcn names + arg order
-- self-documenting if conditions, "if not is_..." >> "if is_not_..."
-- DRY
-- legal vs valid
-- attack vs capture
-- from/to piece -> "...piece", "target_piece"
-- straight vs orthogonal vs diagonal
-- make Move class that has from to, states, both pieces
-
-- TODOs everywhere
-
-
-- pawn promotion
+FEATURES
+- pawn promo
 - castling
+- Move class
+
+REFACTORS
 - mock testing
-- general cleaner/more readable test cases
-- return values for more info
-- error + exception handling
+- testcase cleanup (readability)
+- more informative return values
+- error handling

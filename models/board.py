@@ -41,7 +41,6 @@ class Board:
         middle_border = "  ├───┼───┼───┼───┼───┼───┼───┼───┤"
         bottom_border = "  └───┴───┴───┴───┴───┴───┴───┴───┘"
         rows = [top_border]
-
         if color is Color.WHITE:
             row_idxs = tuple(reversed(range(BOARD_SIZE)))
             col_idxs = tuple(range(BOARD_SIZE))
@@ -51,14 +50,11 @@ class Board:
 
         for row_idx in row_idxs:
             curr_row = [f"{row_idx} │"]
-
             for col_idx in col_idxs:
                 coord = Coordinate(row_idx, col_idx)
                 piece = self.get_piece(coord)
                 symbol = " " if piece is None else piece.symbol
-
                 curr_row.append(f" {symbol} │")
-
             rows.append("".join(curr_row))
 
             if row_idx != row_idxs[-1]:
@@ -66,21 +62,18 @@ class Board:
 
         rows.append(bottom_border)
         rows.append(f"    {'   '.join(map(str, col_idxs))}")
-
         print("\n".join(rows))
 
     def get_piece(self, coord: Coordinate) -> Piece | None:
         """Get the piece at the coordinate."""
         if not Board.is_in_bounds(coord):
             return None
-
         return self._squares[coord.row_idx][coord.col_idx]
 
     def is_occupied(self, coord: Coordinate) -> bool:
         """Return whether the coordinate has a piece on it."""
         if not Board.is_in_bounds(coord):
             return False
-
         return self._squares[coord.row_idx][coord.col_idx] is not None
 
     def move(self, from_coord: Coordinate, to_coord: Coordinate) -> Piece | None:
@@ -88,13 +81,11 @@ class Board:
         are_coords_in_bounds = Board.is_in_bounds(from_coord) and Board.is_in_bounds(
             to_coord
         )
-
         if not are_coords_in_bounds:
             return None
 
         from_piece = self.get_piece(from_coord)
         to_piece = self.get_piece(to_coord)
-
         self._set_piece(from_coord, None)
         self._set_piece(to_coord, from_piece)
 
@@ -114,12 +105,10 @@ class Board:
         are_coords_in_bounds = Board.is_in_bounds(from_coord) and Board.is_in_bounds(
             to_coord
         )
-
         if not are_coords_in_bounds:
             return None
 
         from_piece = self.get_piece(to_coord)
-
         self._set_piece(from_coord, from_piece)
         self._set_piece(to_coord, to_piece)
 
@@ -130,7 +119,6 @@ class Board:
         """Return whether the color is attacking the coordinate."""
         if not Board.is_in_bounds(coord):
             return False
-
         return len(self._get_attacker_coords(color, coord)) > 0
 
     def is_in_check(self, color: Color) -> bool:
@@ -212,20 +200,17 @@ class Board:
         row_diff = to_coord.row_idx - from_coord.row_idx
         col_diff = to_coord.col_idx - from_coord.col_idx
         step_cnt = max(abs(row_diff), abs(col_diff))
-
         if step_cnt == 0:
             return False
 
         row_delta = row_diff // step_cnt
         col_delta = col_diff // step_cnt
-
         for step in range(1, step_cnt):
             curr_coord = Coordinate(
                 from_coord.row_idx + step * row_delta,
                 from_coord.col_idx + step * col_delta,
             )
             piece = self.get_piece(curr_coord)
-
             if piece is not None:
                 return True
 
@@ -321,13 +306,13 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate horizontally and vertically."""
-        directions = [
+        directions = (
             Direction(1, 0),
             Direction(0, 1),
             Direction(-1, 0),
             Direction(0, -1),
-        ]
-        piece_types = [Rook, Queen]
+        )
+        piece_types = (Rook, Queen)
         return self._get_straight_attacker_coords(color, coord, directions, piece_types)
 
     def _get_diagonal_attacker_coords(
@@ -335,21 +320,21 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate diagonally."""
-        directions = [
+        directions = (
             Direction(1, 1),
             Direction(1, -1),
             Direction(-1, 1),
             Direction(-1, -1),
-        ]
-        piece_types = [Bishop, Queen]
+        )
+        piece_types = (Bishop, Queen)
         return self._get_straight_attacker_coords(color, coord, directions, piece_types)
 
     def _get_straight_attacker_coords(
         self,
         color: Color,
         coord: Coordinate,
-        directions: list[Direction],
-        piece_types: list[type[Piece]],
+        directions: tuple[Direction],
+        piece_types: tuple[type[Piece]],
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color and types
         attacking the given coordinate in a straight line in the directions."""

@@ -95,11 +95,10 @@ class PawnMoveStrategy(MoveStrategy):
 
         col_delta = to_coord.col_idx - from_coord.col_idx
         is_same_col = col_delta == self._MOVE_COL_DELTA
-        is_adjacent_col = col_delta in self._CAPTURE_COL_DELTAS
-
         if is_same_col:
             return self._is_valid_forward_move(color, from_coord, to_coord, board)
 
+        is_adjacent_col = col_delta in self._CAPTURE_COL_DELTAS
         if is_adjacent_col:
             return self._is_valid_capture(color, from_coord, to_coord, board)
 
@@ -118,17 +117,15 @@ class PawnMoveStrategy(MoveStrategy):
             from_coord.row_idx + pawn_row_delta, from_coord.col_idx
         )
         is_forward_one_occupied = board.is_occupied(forward_one_coord)
-
         if is_forward_one_occupied:
             return False
 
         row_delta = to_coord.row_idx - from_coord.row_idx
         is_single_move = row_delta == pawn_row_delta
-        is_double_move = row_delta == self._DOUBLE_MOVE_ROW_DELTA * pawn_row_delta
-
         if is_single_move:
             return True
 
+        is_double_move = row_delta == self._DOUBLE_MOVE_ROW_DELTA * pawn_row_delta
         if is_double_move:
             return self._is_valid_double_move(color, from_coord, board)
 
@@ -140,7 +137,6 @@ class PawnMoveStrategy(MoveStrategy):
         """Return whether the double move is valid."""
         pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         from_piece = board.get_piece(from_coord)
-
         if from_piece.has_moved:
             return False
 
@@ -149,7 +145,6 @@ class PawnMoveStrategy(MoveStrategy):
             from_coord.col_idx,
         )
         is_forward_two_empty = not board.is_occupied(forward_two_coord)
-
         return is_forward_two_empty
 
     def _is_valid_capture(
@@ -163,13 +158,11 @@ class PawnMoveStrategy(MoveStrategy):
         row_delta = to_coord.row_idx - from_coord.row_idx
         pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         is_moving_forward_one = row_delta == pawn_row_delta
-
         if not is_moving_forward_one:
             return False
 
         to_piece = board.get_piece(to_coord.row_idx, to_coord.col_idx)
         is_capturing_opponent = to_piece is not None and to_piece.color != color
-
         return is_capturing_opponent
 
 
