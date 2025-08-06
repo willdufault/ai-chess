@@ -2,7 +2,14 @@ from enums import Color
 
 from .coordinate import Coordinate
 from .direction import Direction
-from .move_strategies import KingMoveStrategy, KnightMoveStrategy, PawnMoveStrategy
+from .move_strategies import (
+    DIAGONAL_DIRECTIONS,
+    ORTHOGONAL_DIRECTIONS,
+    KingMoveStrategy,
+    KnightMoveStrategy,
+    PawnMoveStrategy,
+    StraightMoveStrategy,
+)
 from .pieces import Bishop, FirstMovePiece, King, Knight, Pawn, Piece, Queen, Rook
 
 BOARD_SIZE = 8
@@ -20,7 +27,6 @@ class Board:
         self._white_king_coord = Coordinate(0, KING_COL_IDX)
         self._black_king_coord = Coordinate(BOARD_SIZE - 1, KING_COL_IDX)
 
-        # TODO: for castling, false once castle or king/rook moved
         self._can_white_short_castle = True
         self._can_white_long_castle = True
         self._can_black_short_castle = True
@@ -127,7 +133,7 @@ class Board:
         opponent_color = Color.get_opposite_color(color)
         return self.is_attacking(opponent_color, king_coord)
 
-    # TODO
+    # TODO: after board refactor
     def is_in_checkmate(self, color: Color) -> bool:
         """Return whether the color is in checkmate."""
         if not self.is_in_check(color):
@@ -229,6 +235,7 @@ class Board:
             + self._get_pawn_blocker_coords(color, coord)
         )
 
+    # TODO: move to PawnMoveStrat
     def _get_pawn_blocker_coords(
         self, color: Color, coord: Coordinate
     ) -> list[Coordinate]:
@@ -306,54 +313,36 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate horizontally and vertically."""
-        directions = (
-            Direction(1, 0),
-            Direction(0, 1),
-            Direction(-1, 0),
-            Direction(0, -1),
-        )
-        piece_types = (Rook, Queen)
-        return self._get_straight_attacker_coords(color, coord, directions, piece_types)
+        return self._get_straight_attacker_coords(color, coord, ORTHOGONAL_DIRECTIONS)
 
     def _get_diagonal_attacker_coords(
         self, color: Color, coord: Coordinate
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         given coordinate diagonally."""
-        directions = (
-            Direction(1, 1),
-            Direction(1, -1),
-            Direction(-1, 1),
-            Direction(-1, -1),
-        )
-        piece_types = (Bishop, Queen)
-        return self._get_straight_attacker_coords(color, coord, directions, piece_types)
+        return self._get_straight_attacker_coords(color, coord, DIAGONAL_DIRECTIONS)
 
     def _get_straight_attacker_coords(
         self,
         color: Color,
         coord: Coordinate,
         directions: tuple[Direction],
-        piece_types: tuple[type[Piece]],
     ) -> list[Coordinate]:
-        """Return a list of coordinates of all pieces of the color and types
-        attacking the given coordinate in a straight line in the directions."""
+        """Return a list of coordinates of all pieces of the color attacking the
+        given coordinate in a straight line in any of the given directions."""
         coords = []
-
         for direction in directions:
             curr_coord = Coordinate(
                 coord.row_idx + direction.row_delta, coord.col_idx + direction.col_delta
             )
-
             while Board.is_in_bounds(curr_coord):
                 piece = self.get_piece(curr_coord)
-
                 if piece is not None:
-                    is_same_color_correct_piece = (
-                        isinstance(piece, tuple(piece_types)) and piece.color == color
+                    can_piece_attack_square = (
+                        isinstance(piece.move_strategy, StraightMoveStrategy)
+                        and direction in piece.move_strategy.DIRECTIONS
                     )
-
-                    if is_same_color_correct_piece:
+                    if can_piece_attack_square and piece.color == color:
                         coords.append(curr_coord)
 
                     break
@@ -362,7 +351,6 @@ class Board:
                     curr_coord.row_idx + direction.row_delta,
                     curr_coord.col_idx + direction.col_delta,
                 )
-
         return coords
 
     def _get_knight_attacker_coords(
@@ -371,17 +359,14 @@ class Board:
         """Return a list of coordinates of all knights of the color attacking
         the given coordinate."""
         coords = []
-
         for row_delta, col_delta in KnightMoveStrategy.MOVE_PATTERNS:
             curr_coord = Coordinate(
                 coord.row_idx + row_delta, coord.col_idx + col_delta
             )
             piece = self.get_piece(curr_coord)
             is_same_color_knight = isinstance(piece, Knight) and piece.color == color
-
             if is_same_color_knight:
                 coords.append(curr_coord)
-
         return coords
 
     def _get_king_attacker_coords(
@@ -390,35 +375,27 @@ class Board:
         """Return a list of coordinates of all kings of the color attacking the
         given coordinate."""
         coords = []
-
         for row_delta, col_delta in KingMoveStrategy.MOVE_PATTERNS:
             curr_coord = Coordinate(
                 coord.row_idx + row_delta, coord.col_idx + col_delta
             )
-
             if not Board.is_in_bounds(curr_coord):
                 continue
 
             piece = self.get_piece(curr_coord)
             is_same_color_king = isinstance(piece, King) and piece.color == color
-
             if is_same_color_king:
                 coords.append(curr_coord)
-
         return coords
 
-    # TODO
     def _get_pawn_attacker_coords(
         self, color: Color, coord: Coordinate
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pawns of the color attacking the
         given coordinate."""
-        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
         coords = []
-
-        # TODO: what to do with col deltas? should this be in movestrat?
-
-        for col_delta in (-1, 1):
+        pawn_row_delta = PawnMoveStrategy.get_row_delta(color)
+        for col_delta in PawnMoveStrategy._CAPTURE_COL_DELTAS:
             curr_coord = Coordinate(
                 coord.row_idx - pawn_row_delta, coord.col_idx + col_delta
             )
@@ -427,20 +404,16 @@ class Board:
 
             piece = self.get_piece(curr_coord)
             is_same_color_pawn = isinstance(piece, Pawn) and piece.color == color
-
             if is_same_color_pawn:
                 coords.append(curr_coord)
-
         return coords
 
-    # DONE
     def _get_king_coord(self, color: Color) -> Coordinate:
         """Get the coordinate of the king of the color."""
         return (
             self._white_king_coord if color is Color.WHITE else self._black_king_coord
         )
 
-    # DONE
     def _set_king_coords(self, color: Color, coord: Coordinate) -> None:
         """Set the coordinate of the king of the color."""
         if color is Color.WHITE:
@@ -448,29 +421,23 @@ class Board:
         else:
             self._black_king_coord = coord
 
-    # DONE
     def _set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
         piece_order = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
-
         for col_idx, piece_type in enumerate(piece_order):
             white_piece_coord = Coordinate(0, col_idx)
             black_piece_coord = Coordinate(BOARD_SIZE - 1, col_idx)
             white_pawn_coord = Coordinate(WHITE_PAWN_ROW_IDX, col_idx)
             black_pawn_coord = Coordinate(BLACK_PAWN_ROW_IDX, col_idx)
-
             self._set_piece(white_piece_coord, piece_type(Color.WHITE))
             self._set_piece(black_piece_coord, piece_type(Color.BLACK))
             self._set_piece(white_pawn_coord, Pawn(Color.WHITE))
             self._set_piece(black_pawn_coord, Pawn(Color.BLACK))
 
-    # DONE
     def _set_piece(self, coord: Coordinate, piece: Piece | None) -> None:
         """Set the piece at the coordinate."""
         if not Board.is_in_bounds(coord):
             return
-
         self._squares[coord.row_idx][coord.col_idx] = piece
-
         if isinstance(piece, King):
             self._set_king_coords(piece.color, coord)

@@ -44,7 +44,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
     """Represents an abstract move strategy for a chess piece that moves in
     straight lines."""
 
-    _DIRECTIONS = ()
+    DIRECTIONS = ()
 
     def is_valid_move(
         self,
@@ -64,7 +64,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
             row_delta /= abs(col_delta)
             col_delta /= abs(col_delta)
 
-        is_valid_direction = Direction(row_delta, col_delta) in self._DIRECTIONS
+        is_valid_direction = Direction(row_delta, col_delta) in self.DIRECTIONS
 
         if not is_valid_direction:
             return False
@@ -197,19 +197,19 @@ class KnightMoveStrategy(MoveStrategy):
 class BishopMoveStrategy(StraightMoveStrategy):
     """Represents the move strategy for a bishop."""
 
-    _DIRECTIONS = DIAGONAL_DIRECTIONS
+    DIRECTIONS = DIAGONAL_DIRECTIONS
 
 
 class RookMoveStrategy(StraightMoveStrategy):
     """Represents the move strategy for a rook."""
 
-    _DIRECTIONS = ORTHOGONAL_DIRECTIONS
+    DIRECTIONS = ORTHOGONAL_DIRECTIONS
 
 
 class QueenMoveStrategy(StraightMoveStrategy):
     """Represents the move strategy for a queen."""
 
-    _DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
+    DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
 
 
 class KingMoveStrategy(MoveStrategy):
