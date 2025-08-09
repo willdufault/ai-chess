@@ -134,12 +134,13 @@ class TestKnightMoveStrategy(TestCase):
                         Color.WHITE,
                         Coordinate(4, 4),
                         Coordinate(4 + row_delta, 4 + col_delta),
+                        self.board,
                     ),
-                    self.board,
                 )
 
     def test_move_knight_invalid(self) -> None:
         to_coords = (
+            Coordinate(4, 2),
             Coordinate(4, 3),
             Coordinate(5, 3),
             Coordinate(4, 4),
@@ -175,8 +176,8 @@ class TestBishopMoveStrategy(TestCase):
                             Coordinate(
                                 4 + distance * row_delta, 4 + distance * col_delta
                             ),
+                            self.board,
                         ),
-                        self.board,
                     )
 
     def test_move_bishop_invalid(self) -> None:
@@ -216,8 +217,8 @@ class TestRookMoveStrategy(TestCase):
                             Coordinate(
                                 4 + distance * row_delta, 4 + distance * col_delta
                             ),
+                            self.board,
                         ),
-                        self.board,
                     )
 
     def test_move_rook_invalid(self) -> None:
@@ -257,8 +258,8 @@ class TestQueenMoveStrategy(TestCase):
                             Coordinate(
                                 4 + distance * row_delta, 4 + distance * col_delta
                             ),
+                            self.board,
                         ),
-                        self.board,
                     )
 
     def test_move_queen_invalid(self) -> None:
@@ -293,8 +294,8 @@ class TestKingMoveStrategy(TestCase):
                         Color.WHITE,
                         Coordinate(4, 4),
                         Coordinate(4 + row_delta, 4 + col_delta),
+                        self.board,
                     ),
-                    self.board,
                 )
 
     def test_move_king_invalid(self) -> None:

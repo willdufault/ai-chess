@@ -143,57 +143,40 @@ class Board:
         if not self.is_king_trapped(color):
             return False
 
-        opponent_color = Color.get_opposite_color(color)
+        opposite_color = Color.get_opposite_color(color)
         king_coord = self._get_king_coord(color)
-        king_row_idx = king_coord.row_idx
-        king_col_idx = king_coord.col_idx
-        attacker_coords = self._get_attacker_coords(opponent_color, king_coord)
-
-        could_block_attack = len(attacker_coords) == 1
-        if not could_block_attack:
+        attacker_coords = self._get_attacker_coords(opposite_color, king_coord)
+        is_defense_possible = len(attacker_coords) == 1
+        if not is_defense_possible:
             return True
 
         attacker_coord = attacker_coords[0]
-        attacker_row_idx = attacker_coord.row_idx
-        attacker_col_idx = attacker_coord.col_idx
-        attacker = self.get_piece(attacker_coord)
+        if self._can_capture_attack(color, attacker_coord):
+            return False
 
-        # second, if it can capture attacking piece
-        # ...call is_attacking on attacking piece
-        defender_coords = self._get_attacker_coords(color, attacker_coord)
-        for defender_coord in defender_coords:
-            defender = self.get_piece(defender_coord)
-            self._set_piece(defender_coord, None)
-            self._set_piece(attacker_coord, defender)
-            is_still_in_check = self.is_in_check(color)
-            self._set_piece(defender_coord, defender)
-            self._set_piece(attacker_coord, attacker)
-            if not is_still_in_check:
-                return False
+        if self._can_block_attack(color, attacker_coord):
+            return False
 
-        # second, if can block attack, false
-        # ... check if can move into any space along line
-        # TODO: taken from movestrat, refactor DRY
-        row_diff = attacker_row_idx - king_row_idx
-        col_diff = attacker_col_idx - king_col_idx
-        step_cnt = max(abs(row_diff), abs(col_diff))
-        row_delta = row_diff // step_cnt
-        col_delta = col_diff // step_cnt
-        for step in range(1, step_cnt):
+        return True
+
+    def is_king_trapped(self, color: Color) -> bool:
+        """Return whether the king of the color has no empty escape squares."""
+        opponent_color = Color.get_opposite_color(color)
+        king_coord = self._get_king_coord(color)
+        for direction in KingMoveStrategy.MOVE_PATTERNS:
             curr_coord = Coordinate(
-                king_row_idx + step * row_delta,
-                king_col_idx + step * col_delta,
+                king_coord.row_idx + direction.row_delta,
+                king_coord.col_idx + direction.col_delta,
             )
-            blocker_coords = self._get_blocker_coords(color, curr_coord)
-            for blocker_coord in blocker_coords:
-                blocker = self.get_piece(blocker_coord)
-                self._set_piece(blocker_coord, None)
-                self._set_piece(curr_coord, blocker)
-                is_still_in_check = self.is_in_check(color)
-                self._set_piece(blocker_coord, blocker)
-                self._set_piece(curr_coord, None)
-                if not is_still_in_check:
-                    return False
+            if not self.is_in_bounds(curr_coord):
+                continue
+
+            piece = self.get_piece(curr_coord)
+            if piece is not None:
+                continue
+
+            if not self.is_attacking(opponent_color, curr_coord):
+                return False
 
         return True
 
@@ -202,13 +185,13 @@ class Board:
         Assumes horizontal, vertical, or diagonal movement."""
         row_diff = to_coord.row_idx - from_coord.row_idx
         col_diff = to_coord.col_idx - from_coord.col_idx
-        step_cnt = max(abs(row_diff), abs(col_diff))
-        if step_cnt == 0:
+        step_count = max(abs(row_diff), abs(col_diff))
+        if step_count == 0:
             return False
 
-        row_delta = row_diff // step_cnt
-        col_delta = col_diff // step_cnt
-        for step in range(1, step_cnt):
+        row_delta = row_diff // step_count
+        col_delta = col_diff // step_count
+        for step in range(1, step_count):
             curr_coord = Coordinate(
                 from_coord.row_idx + step * row_delta,
                 from_coord.col_idx + step * col_delta,
@@ -218,6 +201,54 @@ class Board:
                 return True
 
         return False
+
+    def _simulate_defense(
+        self, color: Color, target_coord: Coordinate, piece_coords: Coordinate
+    ) -> bool:
+        """Return whether moving any of the pieces at the coordinates can move
+        to the target coordinate without putting the color in check."""
+        target_piece = self.get_piece(target_coord)
+        for piece_coord in piece_coords:
+            curr_piece = self.get_piece(piece_coord)
+            self._set_piece(piece_coord, None)
+            self._set_piece(target_coord, curr_piece)
+            is_still_in_check = self.is_in_check(color)
+            self._set_piece(piece_coord, curr_piece)
+            self._set_piece(target_coord, target_piece)
+            if not is_still_in_check:
+                return True
+        return False
+
+    def _can_block_attack(self, color: Color, attacker_coord: Coordinate):
+        """Return whether the color can block an attack from the coordinate."""
+        attacker = self.get_piece(attacker_coord)
+        if isinstance(attacker, Knight):
+            return False
+
+        king_coord = self._get_king_coord(color)
+        row_diff = attacker_coord.row_idx - king_coord.row_idx
+        col_diff = attacker_coord.col_idx - king_coord.col_idx
+        step_count = max(abs(row_diff), abs(col_diff))
+        row_delta = row_diff // step_count
+        col_delta = col_diff // step_count
+        for step in range(1, step_count):
+            curr_coord = Coordinate(
+                king_coord.row_idx + step * row_delta,
+                king_coord.col_idx + step * col_delta,
+            )
+            blocker_coords = self._get_blocker_coords(color, curr_coord)
+            can_block_curr_coord = self._simulate_defense(
+                color, curr_coord, blocker_coords
+            )
+            if can_block_curr_coord:
+                return True
+
+        return False
+
+    def _can_capture_attack(self, color: Color, attacker_coord: Coordinate) -> bool:
+        """Return whether the color can capture the attacker at the coordinate."""
+        defender_coords = self._get_attacker_coords(color, attacker_coord)
+        return self._simulate_defense(color, attacker_coord, defender_coords)
 
     def _get_blocker_coords(self, color: Color, coord: Coordinate) -> list[Coordinate]:
         """Return the coordinates of all pieces of the color that can block an
@@ -258,27 +289,6 @@ class Board:
             return []
 
         return [two_back_coord]
-
-    def is_king_trapped(self, color: Color) -> bool:
-        """Return whether the king of the color has no empty escape squares."""
-        opponent_color = Color.get_opposite_color(color)
-        king_coord = self._get_king_coord(color)
-        for direction in KingMoveStrategy.MOVE_PATTERNS:
-            curr_coord = Coordinate(
-                king_coord.row_idx + direction.row_delta,
-                king_coord.col_idx + direction.col_delta,
-            )
-            if not self.is_in_bounds(curr_coord):
-                continue
-
-            piece = self.get_piece(curr_coord)
-            if piece is not None:
-                continue
-
-            if not self.is_attacking(opponent_color, curr_coord):
-                return False
-
-        return True
 
     def _get_attacker_coords(self, color: Color, coord: Coordinate) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
@@ -341,10 +351,7 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all knights of the color attacking
         the given coordinate."""
-        res = self._get_pattern_piece_attacker_coords(
-            color, coord, KnightMoveStrategy.MOVE_PATTERNS
-        )
-        breakpoint()
+        res = self._get_pattern_piece_attacker_coords(color, coord, KnightMoveStrategy)
         return res
 
     def _get_king_attacker_coords(
@@ -352,20 +359,15 @@ class Board:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all kings of the color attacking the
         given coordinate."""
-        return self._get_pattern_piece_attacker_coords(
-            color, coord, KingMoveStrategy.MOVE_PATTERNS
-        )
+        return self._get_pattern_piece_attacker_coords(color, coord, KingMoveStrategy)
 
     def _get_pattern_piece_attacker_coords(
-        self,
-        color: Color,
-        coord: Coordinate,
-        move_patterns: tuple[Direction],
+        self, color: Color, coord: Coordinate, move_strategy: PatternMoveStrategy
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color that can
         attack the given coordinate using any of the move patterns."""
         coords = []
-        for move_pattern in move_patterns:
+        for move_pattern in move_strategy.MOVE_PATTERNS:
             curr_coord = Coordinate(
                 coord.row_idx + move_pattern.row_delta,
                 coord.col_idx + move_pattern.col_delta,
@@ -374,10 +376,7 @@ class Board:
             if piece is None:
                 continue
 
-            can_piece_attack_square = (
-                isinstance(piece.move_strategy, PatternMoveStrategy)
-                and move_pattern in move_patterns
-            )
+            can_piece_attack_square = isinstance(piece.move_strategy, move_strategy)
             if can_piece_attack_square and piece.color == color:
                 coords.append(curr_coord)
         return coords

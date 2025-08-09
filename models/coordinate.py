@@ -6,7 +6,6 @@ class Coordinate:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Coordinate):
             return False
-
         return self.row_idx == other.row_idx and self.col_idx == other.col_idx
 
     @property

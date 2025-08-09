@@ -190,7 +190,6 @@ class TestMove(TestCase):
         self.board._set_piece(Coordinate(1, 5), None)
         self.board._set_piece(Coordinate(1, 6), None)
         self.board._set_piece(Coordinate(3, 7), Bishop(Color.BLACK))
-        breakpoint()
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
         self.board._set_piece(Coordinate(1, 4), Rook(Color.WHITE))

@@ -12,16 +12,16 @@ if TYPE_CHECKING:
     from .board import Board
 
 ORTHOGONAL_DIRECTIONS = (
-    Direction(1, 0),
     Direction(0, 1),
-    Direction(-1, 0),
     Direction(0, -1),
+    Direction(1, 0),
+    Direction(-1, 0),
 )
 DIAGONAL_DIRECTIONS = (
     Direction(1, 1),
+    Direction(1, -1),
     Direction(-1, 1),
     Direction(-1, -1),
-    Direction(1, -1),
 )
 
 
@@ -182,7 +182,7 @@ class PawnMoveStrategy(MoveStrategy):
         if not is_moving_forward_one:
             return False
 
-        to_piece = board.get_piece(to_coord.row_idx, to_coord.col_idx)
+        to_piece = board.get_piece(Coordinate(to_coord.row_idx, to_coord.col_idx))
         is_capturing_opponent = to_piece is not None and to_piece.color != color
         return is_capturing_opponent
 
@@ -224,11 +224,11 @@ class KingMoveStrategy(PatternMoveStrategy):
     """Represents the move strategy for a king."""
 
     MOVE_PATTERNS = (
+        Direction(0, 1),
+        Direction(0, -1),
         Direction(1, 0),
         Direction(1, 1),
         Direction(1, -1),
-        Direction(0, 1),
-        Direction(0, -1),
         Direction(-1, 0),
         Direction(-1, 1),
         Direction(-1, -1),
