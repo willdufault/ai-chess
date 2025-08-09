@@ -4,6 +4,7 @@ FEATURES
 - Move class
 
 REFACTORS
+* testcase refacter (smaller, more classes)
 - mock testing
 - testcase cleanup (readability)
 - more informative return values
