@@ -1,3 +1,4 @@
+from textwrap import dedent
 from unittest import TestCase, main
 
 from enums import Color
@@ -7,7 +8,7 @@ from models.game import Game
 from models.pieces import Pawn
 
 
-class TestMove(TestCase):
+class TestGame(TestCase):
     def setUp(self) -> None:
         self.game = Game(Board())
 

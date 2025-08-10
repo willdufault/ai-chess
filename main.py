@@ -1,5 +1,5 @@
-from board import Board
-from game import Game
+from models.board import Board
+from models.game import Game
 
 
 def main() -> None:
