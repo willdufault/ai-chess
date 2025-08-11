@@ -18,7 +18,7 @@ class TestGame(TestCase):
         )
 
     def test_move_piece_on_top_same_color(self) -> None:
-        self.game._board._set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
+        self.game._board.set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
         self.assertFalse(
             self.game.move(Color.WHITE, Coordinate(1, 0), Coordinate(2, 0))
         )
@@ -29,15 +29,15 @@ class TestGame(TestCase):
         )
 
     def test_is_user_input_valid(self) -> None:
-        self.assertFalse(self.game.is_valid_input("00000"))
-        self.assertFalse(self.game.is_valid_input("0099"))
-        self.assertFalse(self.game.is_valid_input("abcd"))
-        self.assertFalse(self.game.is_valid_input("0000a"))
-        self.assertFalse(self.game.is_valid_input("007a"))
-        self.assertTrue(self.game.is_valid_input("0000"))
-        self.assertTrue(self.game.is_valid_input("0543"))
-        self.assertTrue(self.game.is_valid_input("7273"))
-        self.assertTrue(self.game.is_valid_input("0543"))
+        self.assertFalse(self.game._is_valid_input("00000"))
+        self.assertFalse(self.game._is_valid_input("0099"))
+        self.assertFalse(self.game._is_valid_input("abcd"))
+        self.assertFalse(self.game._is_valid_input("0000a"))
+        self.assertFalse(self.game._is_valid_input("007a"))
+        self.assertTrue(self.game._is_valid_input("0000"))
+        self.assertTrue(self.game._is_valid_input("0543"))
+        self.assertTrue(self.game._is_valid_input("7273"))
+        self.assertTrue(self.game._is_valid_input("0543"))
 
     def test_parse_user_input(self) -> None:
         self.assertEqual(

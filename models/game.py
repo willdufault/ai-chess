@@ -2,8 +2,9 @@ from enums import Color, GameMode
 
 from .board import BOARD_SIZE, Board
 from .coordinate import Coordinate
-from .pieces import FirstMovePiece, Piece
+from .pieces import Bishop, FirstMovePiece, Knight, Pawn, Piece, Queen, Rook
 
+MOVE_INPUT_LEN = 4
 MAX_DEPTH = 10
 
 
@@ -15,8 +16,6 @@ class Game:
         self._game_mode = GameMode.TWO_PLAYER
         self._user_color = Color.WHITE
         self._depth = 0
-
-    # TODO: PICK UP HERE, COORD REFACTOR
 
     def move(self, color: Color, from_coord: Coordinate, to_coord: Coordinate) -> bool:
         """Return whether the move was successful."""
@@ -32,7 +31,7 @@ class Game:
         ):
             return False
 
-        self._move_piece(from_coord, to_coord, from_piece)
+        self._board.move(from_coord, to_coord)
         return True
 
     def configure(self) -> None:
@@ -70,61 +69,94 @@ class Game:
         if self._game_mode is GameMode.AI:
             raise NotImplementedError
 
-        color = Color.WHITE
-        winner = Color.WHITE
-        while True:
-            self._board.draw(color)
+        turn_color = Color.WHITE
+        winner = None
+        while winner is None:
+            self._board.draw(turn_color)
 
-            is_in_check = self._board.is_in_check(color)
-            if is_in_check and self._board.is_king_trapped(color):
-                winner = Color.get_opposite_color(color)
-                break
+            print(f"\nIt's {str(turn_color).lower()}'s turn.")
+            if self._board.is_in_check(turn_color):
+                print(f"You are in check.")
 
-            print(f"\nIt's {'white' if color is Color.WHITE else 'black'}'s turn.")
+            to_coord = self._handle_move(turn_color)
+            self._handle_promotion(turn_color, to_coord)
 
-            if is_in_check:
-                print("You are in check.")
+            other_color = Color.get_other_color(turn_color)
+            if self._board.is_in_checkmate(other_color):
+                winner = turn_color
+            turn_color = other_color
 
-            # TODO: This can be cleaned up, weird structure break @ bottom
-            while True:
-                move_coords = input("Where would you like to move (rcrc)? ")
-                if not self.is_valid_input(move_coords):
-                    print("Invalid input.\n")
-                    continue
+        self._board.draw(winner)
+        print(f"{winner} won by checkmate!")
 
-                from_coord, to_coord = self._parse_input(move_coords)
-                from_piece = self._board.get_piece(from_coord)
-                to_piece = self._board.get_piece(to_coord)
+    def _handle_move(self, color: Color) -> Coordinate:
+        """Get the move from the user input, validate it, then make the move and
+        return the to coordinate."""
+        is_legal_move = False
+        while not is_legal_move:
+            move_coords = input("Where would you like to move (rcrc)? ")
+            if not self._is_valid_input(move_coords):
+                print("Invalid input.\n")
+                continue
 
-                moved = self.move(color, from_coord, to_coord)
-                if not moved:
-                    print("Illegal move.\n")
-                    continue
+            from_coord, to_coord = self._parse_input(move_coords)
+            from_piece = self._board.get_piece(from_coord)
+            from_piece_has_moved = (
+                from_piece.has_moved
+                if isinstance(from_piece, FirstMovePiece)
+                else False
+            )
+            to_piece = self._board.get_piece(to_coord)
+            is_legal_move = self.move(color, from_coord, to_coord)
+            if not is_legal_move:
+                print("Illegal move.\n")
+                continue
 
-                if self._board.is_in_check(color):
-                    # ! could fail, if that piece was blocking check but is now gone
-                    self.move(color, to_coord, from_coord)
-                    self._board._set_piece(to_coord, to_piece)
+            if self._board.is_in_check(color):
+                self._board.undo_move(
+                    from_coord, to_coord, to_piece, from_piece_has_moved
+                )
+                print("Illegal move. Your king would be in check.\n")
+                continue
 
-                    print("Illegal move. Your king would be in check.\n")
-                    continue
+            is_legal_move = True
+        return to_coord
 
-                # todo: MOVED INTO BOARD, REFACTOR
-                if isinstance(from_piece, FirstMovePiece):
-                    from_piece.has_moved = True
+    def _handle_promotion(self, color: Color, coord: Coordinate) -> None:
+        """Get the new piece from the user input and promote the pawn at the coordinate."""
+        last_row_idx = self._board.get_last_row(color)
+        piece = self._board.get_piece(coord)
+        is_promoting = coord.row_idx == last_row_idx and isinstance(piece, Pawn)
+        if not is_promoting:
+            return
 
-                break
+        self._board.draw(color)
+        print()
 
-            color = Color.get_opposite_color(color)
+        new_piece_options = ("k", "b", "r", "q")
+        new_piece_choice = self._prompt_user(
+            new_piece_options,
+            "What would you like to promote to? (k/b/r/q) ",
+        )
+        match new_piece_choice:
+            case "k":
+                new_piece = Knight(color)
+            case "b":
+                new_piece = Bishop(color)
+            case "r":
+                new_piece = Rook(color)
+            case "q":
+                new_piece = Queen(color)
 
-        print(f"{'White' if winner is Color.WHITE else 'Black'} won by checkmate!")
+        self._promote(coord, new_piece)
 
-    # DONE
-    def is_valid_input(self, move_input: str) -> bool:
+    def _promote(self, coord: Coordinate, piece: Piece) -> None:
+        """Place the piece at the coordinate."""
+        self._board.set_piece(coord, piece)
+
+    def _is_valid_input(self, move_input: str) -> bool:
         """Return whether the user input is valid."""
-        expected_len = 4
-
-        if len(move_input) != expected_len:
+        if len(move_input) != MOVE_INPUT_LEN:
             return False
 
         for char in move_input:
@@ -132,13 +164,11 @@ class Game:
                 return False
 
             is_in_bounds = 0 <= int(char) < BOARD_SIZE
-
             if not is_in_bounds:
                 return False
 
         return True
 
-    # DONE
     def _parse_input(self, move_input: str) -> tuple[Coordinate, Coordinate]:
         """Return the from and to coordinates from the input. Assumes the input
         is valid."""
@@ -147,8 +177,7 @@ class Game:
         to_coord = Coordinate(to_row_idx, to_col_idx)
         return from_coord, to_coord
 
-    # DONE
-    def _prompt_user(self, options: list[str], message: str) -> str:
+    def _prompt_user(self, options: tuple[str], message: str) -> str:
         """Prompt the user to choose from the options given a message."""
         choice = None
 
@@ -160,7 +189,6 @@ class Game:
 
         return choice
 
-    # DONE
     def _move_passes_basic_checks(
         self, color: Color, from_coord: Coordinate, to_coord: Coordinate
     ) -> bool:
@@ -168,28 +196,17 @@ class Game:
         are_coords_in_bounds = self._board.is_in_bounds(
             from_coord
         ) and self._board.is_in_bounds(to_coord)
-
         if not are_coords_in_bounds:
             return False
 
         from_piece = self._board.get_piece(from_coord)
         is_moving_wrong_piece = from_piece is None or from_piece.color != color
-
         if is_moving_wrong_piece:
             return False
 
         to_piece = self._board.get_piece(to_coord)
         is_to_same_color = to_piece is not None and to_piece.color == color
-
         if is_to_same_color:
             return False
 
         return True
-
-    #! ENCAPSULATION?
-    def _move_piece(
-        self, from_coord: Coordinate, to_coord: Coordinate, from_piece: Piece
-    ) -> None:
-        """Move a piece. Assuming this is a legal move."""
-        self._board._set_piece(from_coord, None)
-        self._board._set_piece(to_coord, from_piece)

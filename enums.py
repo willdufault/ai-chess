@@ -7,9 +7,12 @@ class Color(Enum):
     WHITE = True
     BLACK = False
 
+    def __str__(self) -> str:
+        return self.name.capitalize()
+
     @staticmethod
-    def get_opposite_color(color: Color):
-        """Return the opposite color than the one given."""
+    def get_other_color(color: Color):
+        """Return the other color than the one given."""
         return Color.WHITE if color is Color.BLACK else Color.BLACK
 
 

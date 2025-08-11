@@ -10,6 +10,10 @@ class TestBoard(TestCase):
     def setUp(self) -> None:
         self.board = Board()
 
+    def test_get_last_row(self) -> None:
+        self.assertEqual(self.board.get_last_row(Color.WHITE), BOARD_SIZE - 1)
+        self.assertEqual(self.board.get_last_row(Color.BLACK), 0)
+
     def test_is_occupied(self) -> None:
         self.assertTrue(self.board.is_occupied(Coordinate(0, 0)))
         self.assertFalse(self.board.is_occupied(Coordinate(4, 4)))
@@ -41,102 +45,102 @@ class TestBoard(TestCase):
     def test_is_king_trapped(self) -> None:
         self.assertTrue(self.board.is_king_trapped(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 4), None)
+        self.board.set_piece(Coordinate(1, 4), None)
         self.assertFalse(self.board.is_king_trapped(Color.WHITE))
 
-        self.board._set_piece(Coordinate(2, 3), Bishop(Color.BLACK))
+        self.board.set_piece(Coordinate(2, 3), Bishop(Color.BLACK))
         self.assertTrue(self.board.is_king_trapped(Color.WHITE))
 
     def test_is_in_check(self) -> None:
         self.assertFalse(self.board.is_in_check(Color.WHITE))
 
-        self.board._set_piece(Coordinate(3, 4), Queen(Color.BLACK))
+        self.board.set_piece(Coordinate(3, 4), Queen(Color.BLACK))
         self.assertFalse(self.board.is_in_check(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 4), None)
+        self.board.set_piece(Coordinate(1, 4), None)
         self.assertTrue(self.board.is_in_check(Color.WHITE))
 
     def test_is_in_checkmate(self) -> None:
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 4), Queen(Color.BLACK))
+        self.board.set_piece(Coordinate(1, 4), Queen(Color.BLACK))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(3, 2), Bishop(Color.BLACK))
+        self.board.set_piece(Coordinate(3, 2), Bishop(Color.BLACK))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 3), Rook(Color.WHITE))
+        self.board.set_piece(Coordinate(0, 3), Rook(Color.WHITE))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 5), Rook(Color.WHITE))
+        self.board.set_piece(Coordinate(0, 5), Rook(Color.WHITE))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 6), None)
+        self.board.set_piece(Coordinate(0, 6), None)
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 4), Rook(Color.BLACK))
+        self.board.set_piece(Coordinate(1, 4), Rook(Color.BLACK))
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(3, 2), None)
+        self.board.set_piece(Coordinate(3, 2), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_is_in_checkmate_block(self) -> None:
-        self.board._set_piece(Coordinate(1, 3), None)
-        self.board._set_piece(Coordinate(3, 1), Bishop(Color.BLACK))
+        self.board.set_piece(Coordinate(1, 3), None)
+        self.board.set_piece(Coordinate(3, 1), Bishop(Color.BLACK))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 2), None)
+        self.board.set_piece(Coordinate(1, 2), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 3), Bishop(Color.WHITE))
+        self.board.set_piece(Coordinate(0, 3), Bishop(Color.WHITE))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 2), None)
+        self.board.set_piece(Coordinate(0, 2), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 1), None)
+        self.board.set_piece(Coordinate(0, 1), None)
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 5), None)
+        self.board.set_piece(Coordinate(0, 5), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_is_in_checkmate_capture(self) -> None:
-        self.board._set_piece(Coordinate(1, 5), None)
-        self.board._set_piece(Coordinate(2, 6), Bishop(Color.BLACK))
+        self.board.set_piece(Coordinate(1, 5), None)
+        self.board.set_piece(Coordinate(2, 6), Bishop(Color.BLACK))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 7), None)
+        self.board.set_piece(Coordinate(1, 7), None)
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(2, 0), Rook(Color.WHITE))
+        self.board.set_piece(Coordinate(2, 0), Rook(Color.WHITE))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_is_in_checkmate_pin(self) -> None:
-        self.board._set_piece(Coordinate(1, 5), None)
-        self.board._set_piece(Coordinate(1, 6), None)
-        self.board._set_piece(Coordinate(3, 7), Bishop(Color.BLACK))
+        self.board.set_piece(Coordinate(1, 5), None)
+        self.board.set_piece(Coordinate(1, 6), None)
+        self.board.set_piece(Coordinate(3, 7), Bishop(Color.BLACK))
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(1, 4), Rook(Color.WHITE))
+        self.board.set_piece(Coordinate(1, 4), Rook(Color.WHITE))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(3, 4), Rook(Color.BLACK))
+        self.board.set_piece(Coordinate(3, 4), Rook(Color.BLACK))
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 3), None)
+        self.board.set_piece(Coordinate(0, 3), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_is_in_checkmate_double_check(self) -> None:
-        self.board._set_piece(Coordinate(1, 1), None)
-        self.board._set_piece(Coordinate(1, 3), None)
-        self.board._set_piece(Coordinate(1, 4), None)
-        self.board._set_piece(Coordinate(5, 4), Rook(Color.BLACK))
+        self.board.set_piece(Coordinate(1, 1), None)
+        self.board.set_piece(Coordinate(1, 3), None)
+        self.board.set_piece(Coordinate(1, 4), None)
+        self.board.set_piece(Coordinate(5, 4), Rook(Color.BLACK))
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(2, 2), Bishop(Color.BLACK))
+        self.board.set_piece(Coordinate(2, 2), Bishop(Color.BLACK))
         self.assertTrue(self.board.is_in_checkmate(Color.WHITE))
 
-        self.board._set_piece(Coordinate(0, 3), None)
+        self.board.set_piece(Coordinate(0, 3), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
     def test_move_undo_move(self) -> None:

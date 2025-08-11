@@ -42,6 +42,11 @@ class Board:
         is_col_in_bounds = 0 <= coord.col_idx < BOARD_SIZE
         return is_row_in_bounds and is_col_in_bounds
 
+    @staticmethod
+    def get_last_row(color: Color) -> int:
+        """Return the row index for the last for for the color."""
+        return BOARD_SIZE - 1 if color is Color.WHITE else 0
+
     def draw(self, color: Color) -> None:
         """Draw the board from the perspective of the color."""
         top_border = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
@@ -77,6 +82,14 @@ class Board:
             return None
         return self._squares[coord.row_idx][coord.col_idx]
 
+    def set_piece(self, coord: Coordinate, piece: Piece | None) -> None:
+        """Set the piece at the coordinate."""
+        if not Board.is_in_bounds(coord):
+            return
+        self._squares[coord.row_idx][coord.col_idx] = piece
+        if isinstance(piece, King):
+            self._set_king_coords(piece.color, coord)
+
     def is_occupied(self, coord: Coordinate) -> bool:
         """Return whether the coordinate has a piece on it."""
         if not Board.is_in_bounds(coord):
@@ -93,14 +106,15 @@ class Board:
 
         from_piece = self.get_piece(from_coord)
         to_piece = self.get_piece(to_coord)
-        self._set_piece(from_coord, None)
-        self._set_piece(to_coord, from_piece)
+        self.set_piece(from_coord, None)
+        self.set_piece(to_coord, from_piece)
 
         if isinstance(from_piece, FirstMovePiece):
             from_piece.has_moved = True
 
         return to_piece
 
+    # TODO: make private?
     def undo_move(
         self,
         from_coord: Coordinate,
@@ -109,15 +123,9 @@ class Board:
         from_piece_has_moved: bool,
     ) -> Piece | None:
         """Undo a move and restore the state of both pieces."""
-        are_coords_in_bounds = Board.is_in_bounds(from_coord) and Board.is_in_bounds(
-            to_coord
-        )
-        if not are_coords_in_bounds:
-            return None
-
         from_piece = self.get_piece(to_coord)
-        self._set_piece(from_coord, from_piece)
-        self._set_piece(to_coord, to_piece)
+        self.move(to_coord, from_coord)
+        self.set_piece(to_coord, to_piece)
 
         if isinstance(from_piece, FirstMovePiece):
             from_piece.has_moved = from_piece_has_moved
@@ -131,7 +139,7 @@ class Board:
     def is_in_check(self, color: Color) -> bool:
         """Return whether the color is in check."""
         king_coord = self._get_king_coord(color)
-        opponent_color = Color.get_opposite_color(color)
+        opponent_color = Color.get_other_color(color)
         return self.is_attacking(opponent_color, king_coord)
 
     # TODO: after board refactor, SRP
@@ -143,9 +151,9 @@ class Board:
         if not self.is_king_trapped(color):
             return False
 
-        opposite_color = Color.get_opposite_color(color)
+        other_color = Color.get_other_color(color)
         king_coord = self._get_king_coord(color)
-        attacker_coords = self._get_attacker_coords(opposite_color, king_coord)
+        attacker_coords = self._get_attacker_coords(other_color, king_coord)
         is_defense_possible = len(attacker_coords) == 1
         if not is_defense_possible:
             return True
@@ -161,7 +169,7 @@ class Board:
 
     def is_king_trapped(self, color: Color) -> bool:
         """Return whether the king of the color has no empty escape squares."""
-        opponent_color = Color.get_opposite_color(color)
+        opponent_color = Color.get_other_color(color)
         king_coord = self._get_king_coord(color)
         for direction in KingMoveStrategy.MOVE_PATTERNS:
             curr_coord = Coordinate(
@@ -210,11 +218,11 @@ class Board:
         target_piece = self.get_piece(target_coord)
         for piece_coord in piece_coords:
             curr_piece = self.get_piece(piece_coord)
-            self._set_piece(piece_coord, None)
-            self._set_piece(target_coord, curr_piece)
+            self.set_piece(piece_coord, None)
+            self.set_piece(target_coord, curr_piece)
             is_still_in_check = self.is_in_check(color)
-            self._set_piece(piece_coord, curr_piece)
-            self._set_piece(target_coord, target_piece)
+            self.set_piece(piece_coord, curr_piece)
+            self.set_piece(target_coord, target_piece)
             if not is_still_in_check:
                 return True
         return False
@@ -419,15 +427,7 @@ class Board:
             black_piece_coord = Coordinate(BOARD_SIZE - 1, col_idx)
             white_pawn_coord = Coordinate(WHITE_PAWN_ROW_IDX, col_idx)
             black_pawn_coord = Coordinate(BLACK_PAWN_ROW_IDX, col_idx)
-            self._set_piece(white_piece_coord, piece_type(Color.WHITE))
-            self._set_piece(black_piece_coord, piece_type(Color.BLACK))
-            self._set_piece(white_pawn_coord, Pawn(Color.WHITE))
-            self._set_piece(black_pawn_coord, Pawn(Color.BLACK))
-
-    def _set_piece(self, coord: Coordinate, piece: Piece | None) -> None:
-        """Set the piece at the coordinate."""
-        if not Board.is_in_bounds(coord):
-            return
-        self._squares[coord.row_idx][coord.col_idx] = piece
-        if isinstance(piece, King):
-            self._set_king_coords(piece.color, coord)
+            self.set_piece(white_piece_coord, piece_type(Color.WHITE))
+            self.set_piece(black_piece_coord, piece_type(Color.BLACK))
+            self.set_piece(white_pawn_coord, Pawn(Color.WHITE))
+            self.set_piece(black_pawn_coord, Pawn(Color.BLACK))

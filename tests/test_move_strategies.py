@@ -27,8 +27,8 @@ class TestPawnMoveStrategy(TestCase):
         )
 
     def test_move_pawn_forward_one_on_top(self) -> None:
-        self.board._set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
-        self.board._set_piece(Coordinate(2, 1), Pawn(Color.BLACK))
+        self.board.set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
+        self.board.set_piece(Coordinate(2, 1), Pawn(Color.BLACK))
         self.assertFalse(
             self.move_strategy.is_valid_move(
                 Color.WHITE, Coordinate(1, 0), Coordinate(2, 0), self.board
@@ -57,8 +57,8 @@ class TestPawnMoveStrategy(TestCase):
         )
 
     def test_move_pawn_forward_two_on_top(self) -> None:
-        self.board._set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
-        self.board._set_piece(Coordinate(2, 1), Pawn(Color.BLACK))
+        self.board.set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
+        self.board.set_piece(Coordinate(2, 1), Pawn(Color.BLACK))
         self.assertFalse(
             self.move_strategy.is_valid_move(
                 Color.WHITE, Coordinate(1, 0), Coordinate(3, 0), self.board
@@ -71,7 +71,7 @@ class TestPawnMoveStrategy(TestCase):
         )
 
     def test_move_pawn_forward_two_blocked(self) -> None:
-        self.board._set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
+        self.board.set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
         self.assertFalse(
             self.move_strategy.is_valid_move(
                 Color.WHITE, Coordinate(1, 0), Coordinate(3, 0), self.board
@@ -86,8 +86,8 @@ class TestPawnMoveStrategy(TestCase):
         )
 
     def test_pawn_capture(self) -> None:
-        self.board._set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
-        self.board._set_piece(Coordinate(2, 2), Pawn(Color.BLACK))
+        self.board.set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
+        self.board.set_piece(Coordinate(2, 2), Pawn(Color.BLACK))
         self.assertFalse(
             self.move_strategy.is_valid_move(
                 Color.WHITE, Coordinate(1, 1), Coordinate(2, 0), self.board
@@ -100,8 +100,8 @@ class TestPawnMoveStrategy(TestCase):
         )
 
     def test_pawn_capture_forward_two(self) -> None:
-        self.board._set_piece(Coordinate(3, 0), Pawn(Color.WHITE))
-        self.board._set_piece(Coordinate(3, 2), Pawn(Color.BLACK))
+        self.board.set_piece(Coordinate(3, 0), Pawn(Color.WHITE))
+        self.board.set_piece(Coordinate(3, 2), Pawn(Color.BLACK))
         self.assertFalse(
             self.move_strategy.is_valid_move(
                 Color.WHITE, Coordinate(1, 1), Coordinate(3, 0), self.board
