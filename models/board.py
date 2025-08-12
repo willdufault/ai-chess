@@ -20,6 +20,7 @@ WHITE_PAWN_ROW_IDX = 1
 BLACK_PAWN_ROW_IDX = BOARD_SIZE - 2
 
 
+# TODO: when generating legal moves, cache per board, make sure hash is efficient
 class Board:
     """Represents a chessboard."""
 

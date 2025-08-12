@@ -11,7 +11,7 @@ class Engine:
         piece position (matrixes for score for each piece)
         king safety
         mobility (# of legal moves)
-
+        cache evals based on depth
         """
         pass
 
@@ -21,4 +21,4 @@ class Engine:
         return 50
 
     def order_moves(moves: list[Move]) -> list[Move]:
-        pass
+        return NotImplementedError
