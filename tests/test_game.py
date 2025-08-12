@@ -14,18 +14,18 @@ class TestGame(TestCase):
 
     def test_move_no_piece(self) -> None:
         self.assertFalse(
-            self.game.move(Color.WHITE, Coordinate(2, 0), Coordinate(3, 0))
+            self.game.make_move(Color.WHITE, Coordinate(2, 0), Coordinate(3, 0))
         )
 
     def test_move_piece_on_top_same_color(self) -> None:
         self.game._board.set_piece(Coordinate(2, 0), Pawn(Color.WHITE))
         self.assertFalse(
-            self.game.move(Color.WHITE, Coordinate(1, 0), Coordinate(2, 0))
+            self.game.make_move(Color.WHITE, Coordinate(1, 0), Coordinate(2, 0))
         )
 
     def test_move_wrong_color_piece(self) -> None:
         self.assertFalse(
-            self.game.move(Color.BLACK, Coordinate(1, 0), Coordinate(2, 0))
+            self.game.make_move(Color.BLACK, Coordinate(1, 0), Coordinate(2, 0))
         )
 
     def test_is_user_input_valid(self) -> None:

@@ -2,6 +2,7 @@ from enums import Color
 
 from .coordinate import Coordinate
 from .direction import Direction
+from .move import Move
 from .move_strategies import (
     DIAGONAL_DIRECTIONS,
     ORTHOGONAL_DIRECTIONS,
@@ -44,7 +45,7 @@ class Board:
 
     @staticmethod
     def get_last_row(color: Color) -> int:
-        """Return the row index for the last for for the color."""
+        """Return the index of the last row for the color."""
         return BOARD_SIZE - 1 if color is Color.WHITE else 0
 
     def draw(self, color: Color) -> None:
@@ -96,16 +97,18 @@ class Board:
             return False
         return self._squares[coord.row_idx][coord.col_idx] is not None
 
-    def move(self, from_coord: Coordinate, to_coord: Coordinate) -> Piece | None:
-        """Move a piece and return the piece at the to coordinate."""
+    def make_move(self, move: Move) -> Piece | None:
+        """Make the move and return the piece at the to coordinate."""
+        from_coord = move.from_coord
+        to_coord = move.to_coord
+        from_piece = move._from_piece
+        to_piece = move._to_piece
         are_coords_in_bounds = Board.is_in_bounds(from_coord) and Board.is_in_bounds(
             to_coord
         )
         if not are_coords_in_bounds:
             return None
 
-        from_piece = self.get_piece(from_coord)
-        to_piece = self.get_piece(to_coord)
         self.set_piece(from_coord, None)
         self.set_piece(to_coord, from_piece)
 
@@ -115,16 +118,15 @@ class Board:
         return to_piece
 
     # TODO: make private?
-    def undo_move(
-        self,
-        from_coord: Coordinate,
-        to_coord: Coordinate,
-        to_piece: Piece | None,
-        from_piece_has_moved: bool,
-    ) -> Piece | None:
-        """Undo a move and restore the state of both pieces."""
-        from_piece = self.get_piece(to_coord)
-        self.move(to_coord, from_coord)
+    def undo_move(self, move: Move) -> Piece | None:
+        """Undo a move and restore the state of both the from and to pieces."""
+        from_coord = move.from_coord
+        to_coord = move.to_coord
+        from_piece = move.from_piece
+        from_piece_has_moved = move.from_piece_has_moved
+        to_piece = move.to_piece
+        reversed_move = Move(to_coord, from_coord, from_piece, None)
+        self.make_move(reversed_move)
         self.set_piece(to_coord, to_piece)
 
         if isinstance(from_piece, FirstMovePiece):

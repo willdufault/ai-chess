@@ -1,11 +1,12 @@
 from enums import Color, GameMode
 
+from .ai import AI, MAX_DEPTH
 from .board import BOARD_SIZE, Board
 from .coordinate import Coordinate
+from .move import Move
 from .pieces import Bishop, FirstMovePiece, Knight, Pawn, Piece, Queen, Rook
 
 MOVE_INPUT_LEN = 4
-MAX_DEPTH = 10
 
 
 class Game:
@@ -17,8 +18,10 @@ class Game:
         self._user_color = Color.WHITE
         self._depth = 0
 
-    def move(self, color: Color, from_coord: Coordinate, to_coord: Coordinate) -> bool:
-        """Return whether the move was successful."""
+    def make_move(
+        self, color: Color, from_coord: Coordinate, to_coord: Coordinate
+    ) -> bool:
+        """Make a move and return whether it was successful."""
         if not self._move_passes_basic_checks(color, from_coord, to_coord):
             return False
 
@@ -31,7 +34,9 @@ class Game:
         ):
             return False
 
-        self._board.move(from_coord, to_coord)
+        to_piece = self._board.get_piece(to_coord)
+        move = Move(from_coord, to_coord, from_piece, to_piece)
+        self._board.make_move(move)
         return True
 
     def configure(self) -> None:
@@ -107,7 +112,7 @@ class Game:
                 else False
             )
             to_piece = self._board.get_piece(to_coord)
-            is_legal_move = self.move(color, from_coord, to_coord)
+            is_legal_move = self.make_move(color, from_coord, to_coord)
             if not is_legal_move:
                 print("Illegal move.\n")
                 continue
@@ -136,7 +141,7 @@ class Game:
         new_piece_options = ("k", "b", "r", "q")
         new_piece_choice = self._prompt_user(
             new_piece_options,
-            "What would you like to promote to? (k/b/r/q) ",
+            "What would you like to promote to? (k/b/r/q)",
         )
         match new_piece_choice:
             case "k":

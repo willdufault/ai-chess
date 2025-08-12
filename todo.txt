@@ -1,7 +1,8 @@
 FEATURES
-- pawn promo
 - castling
-- Move class
+- Move class?
+- En passant?
+* AI
 
 REFACTORS
 - mock testing

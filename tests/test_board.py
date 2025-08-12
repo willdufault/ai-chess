@@ -3,6 +3,7 @@ from unittest import TestCase, main
 from enums import Color
 from models.board import BOARD_SIZE, Board
 from models.coordinate import Coordinate
+from models.move import Move
 from models.pieces import Bishop, Queen, Rook
 
 
@@ -143,18 +144,20 @@ class TestBoard(TestCase):
         self.board.set_piece(Coordinate(0, 3), None)
         self.assertFalse(self.board.is_in_checkmate(Color.WHITE))
 
-    def test_move_undo_move(self) -> None:
+    def test_make_and_undo_move(self) -> None:
         from_coord = Coordinate(1, 0)
         to_coord = Coordinate(2, 0)
         from_piece = self.board.get_piece(from_coord)
         to_piece = self.board.get_piece(to_coord)
-        has_moved = from_piece.has_moved
-        self.board.move(from_coord, to_coord)
+        move = Move(from_coord, to_coord, from_piece, to_piece)
+        self.board.make_move(move)
         self.assertEqual(self.board.get_piece(from_coord), None)
         self.assertEqual(self.board.get_piece(to_coord), from_piece)
-        self.board.undo_move(from_coord, to_coord, to_piece, has_moved)
+        self.assertTrue(from_piece.has_moved)
+        self.board.undo_move(move)
         self.assertEqual(self.board.get_piece(from_coord), from_piece)
         self.assertEqual(self.board.get_piece(to_coord), to_piece)
+        self.assertFalse(from_piece.has_moved)
 
 
 if __name__ == "__main__":
