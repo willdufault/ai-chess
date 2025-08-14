@@ -3,7 +3,7 @@ from unittest import TestCase, main
 from models.coordinate import Coordinate
 
 
-class TestMove(TestCase):
+class TestCoordinate(TestCase):
     def test_equals(self) -> None:
         coord1 = Coordinate(0, 0)
         coord2 = Coordinate(0, 1)

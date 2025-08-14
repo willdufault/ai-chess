@@ -18,8 +18,7 @@ class AI:
 
     def get_best_move(self, color: Color) -> Move:
         """Get the best move for the given color."""
-        moves = self._board.get_legal_moves()
-        # TODO: order moves here? special order in board?
+        moves = self._board.get_legal_moves()  # TODO: order moves
         scores = self._get_move_scores(moves)
         best_score = max(scores) if color is Color.WHITE else min(scores)
         best_score_index = scores.index(best_score)
@@ -29,9 +28,9 @@ class AI:
     def _get_move_scores(self, moves: list[Move]) -> list[int]:
         """Return a list of scores for each move."""
         scores = []
+        other_color = Color.get_other_color(self._color)
         for move in moves:
             self._board.make_move(move)
-            other_color = Color.get_other_color(self._color)
             scores.append(self._minimax(other_color, self._depth))
             self._board.undo_move(move)
         return scores
@@ -43,10 +42,11 @@ class AI:
         if depth = 0, eval
         a-b pruning
         cache in engine at depth >= cur_depth
+        !!! efficient board hashing !!! (test w/ diff strats?)
         """
 
         if depth == 0:
-            return self._engine.evaluate(self._board)
+            return self._engine.evaluate()
 
         best_score = -inf if color is Color.WHITE else inf
         other_color = Color.get_other_color(color)

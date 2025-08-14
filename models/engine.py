@@ -1,9 +1,12 @@
-from .board import Board
+from enums import Color
+
+from .board import BOARD_SIZE, Board
+from .coordinate import Coordinate
 from .move import Move
 
 
 class Engine:
-    def __init__(self) -> None:
+    def __init__(self, board: Board) -> None:
         """
         material
         board control (# of squares)
@@ -13,12 +16,28 @@ class Engine:
         mobility (# of legal moves)
         cache evals based on depth
         """
-        pass
+        self._board = board
 
-    def evaluate(board: Board) -> int:
-        """Evaluate the board and return a number 0-100 representing which color
+    def evaluate(self) -> int:
+        """Evaluate the board and return a number (TODO) 0-100 representing which color
         is winning (low = black, high = white)."""
-        return 50
+        return self._get_material_advantage()
 
-    def order_moves(moves: list[Move]) -> list[Move]:
-        return NotImplementedError
+    # TODO
+    def order_moves(self, moves: list[Move]) -> list[Move]:
+        print("engine.order_moves is not implemented")
+        return moves
+
+    # TODO: could make this an attr on board, could also cache for board hash
+    def _get_material_advantage(self) -> int:
+        """Return the sum of the values of all white pieces minus the sum of
+        values of all black pieces."""
+        total = 0
+        for row_idx in range(BOARD_SIZE):
+            for col_idx in range(BOARD_SIZE):
+                curr_coord = Coordinate(row_idx, col_idx)
+                piece = self._board.get_piece(curr_coord)
+                if piece is not None:
+                    value = piece.value if piece.color is Color.WHITE else -piece.value
+                    total += value
+        return total
