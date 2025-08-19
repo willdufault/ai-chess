@@ -1,10 +1,11 @@
 from enums import Color
 
-from .board import BOARD_SIZE, Board
-from .coordinate import Coordinate
-from .move import Move
+from ..models.board import BOARD_SIZE, Board
+from ..models.coordinate import Coordinate
+from ..models.move import Move
 
 
+# TODO: TBD WHICH FOLDER
 class Engine:
     def __init__(self, board: Board) -> None:
         """
@@ -33,9 +34,9 @@ class Engine:
         """Return the sum of the values of all white pieces minus the sum of
         values of all black pieces."""
         total = 0
-        for row_idx in range(BOARD_SIZE):
-            for col_idx in range(BOARD_SIZE):
-                curr_coord = Coordinate(row_idx, col_idx)
+        for row_index in range(BOARD_SIZE):
+            for column_index in range(BOARD_SIZE):
+                curr_coord = Coordinate(row_index, column_index)
                 piece = self._board.get_piece(curr_coord)
                 if piece is not None:
                     value = piece.value if piece.color is Color.WHITE else -piece.value
