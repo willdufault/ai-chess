@@ -1,19 +1,10 @@
-from unittest import TestCase, main
-
 from models.coordinate import Coordinate
 
 
-class TestCoordinate(TestCase):
-    def test_equals(self) -> None:
-        coord1 = Coordinate(0, 0)
-        coord2 = Coordinate(0, 1)
-        coord3 = Coordinate(1, 0)
-        coord4 = Coordinate(0, 0)
-        self.assertTrue(coord1 == coord1)
-        self.assertFalse(coord1 == coord2)
-        self.assertFalse(coord1 == coord3)
-        self.assertTrue(coord1 == coord4)
+def test_equal() -> None:
+    assert Coordinate(0, 0) == Coordinate(0, 0)
 
 
-if __name__ == "__main__":
-    main()
+def test_not_equal() -> None:
+    assert Coordinate(0, 0) != Coordinate(1, 0)
+    assert Coordinate(0, 0) != None
