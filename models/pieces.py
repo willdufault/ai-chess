@@ -1,6 +1,6 @@
 from abc import ABC
 
-from enums import Color
+from enums.color import Color
 
 from .move_strategies import (
     BishopMoveStrategy,
@@ -16,6 +16,7 @@ from .move_strategies import (
 class Piece(ABC):
     """Represents an abstract chess piece."""
 
+    # TODO: think about making some fields class-level consts. best way to do that?
     def __init__(
         self, color: Color, value: int, symbol: str, move_strategy: MoveStrategy
     ) -> None:
@@ -23,6 +24,11 @@ class Piece(ABC):
         self._value = value
         self._symbol = symbol
         self._move_strategy = move_strategy
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        return self.color == other.color
 
     @property
     def color(self) -> Color:
