@@ -7,20 +7,15 @@ FEATURES
 
 REFACTORS
 - mock testing
-- testcase cleanup (readability)
 - more informative return values
 - error handling (ex: board.set_piece)
-- movestrat: update is_valid_move to take single move arg
-- update all methods that have "move" to use Move (where it makes sense)
-- board.make_move/undo_move: bool return types
-- board.init: allow empty board creation? usecase?
-- redo tests with pytest instead
-- Color: static method -> prop
-* class refactor, MLO
 - movestrat: static methods?
 - spell out for all public-facing methods/params/fields/vars
 - look into potentially using yields for performance
-- make pyright happy
 - replace board_controller.board() with immutable board hash?
 - piece: make some fields class-level consts
 - be consistent with checking for piece type vs move strat type
+- make pyright happy, fix "# pyright:..." comments
+- XXXmovestrat.is_valid_move: use board.get_piece or just trust move.from_piece?
+- make global consts private in all files
+- board: make board.size property and update refs to BOARD_SIZE (if it makes sense)
