@@ -1,4 +1,5 @@
 from models.board import Board
+from utils.board_utils import is_index_in_bounds
 
 MOVE_INPUT_LEN = 4
 
@@ -17,7 +18,7 @@ class InputValidator:
                 return False
 
             index = int(digit)
-            is_in_bounds = Board.is_index_in_bounds(index)
+            is_in_bounds = is_index_in_bounds(index)
             if not is_in_bounds:
                 return False
 

@@ -1,18 +1,19 @@
+from constants.board_constants import BOARD_SIZE
 from enums.color import Color
 from models.coordinate import Coordinate
 from models.pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
-
-BOARD_SIZE = 8
-KING_COLUMN_INDEX = 4
-WHITE_PAWN_ROW_INDEX = 1
-BLACK_PAWN_ROW_INDEX = BOARD_SIZE - 2
 
 
 # TODO: when generating legal moves, cache per board, make sure hash is efficient
 class Board:
     """Represents a chessboard."""
 
+    _KING_COLUMN_INDEX = 4
+    _WHITE_PAWN_ROW_INDEX = 1
+    _BLACK_PAWN_ROW_INDEX = BOARD_SIZE - 2
+
     def __init__(self) -> None:
+        self.size = BOARD_SIZE
         self._squares: list[list[Piece | None]] = [
             [None] * BOARD_SIZE for _ in range(BOARD_SIZE)
         ]
@@ -23,38 +24,21 @@ class Board:
         # self._can_black_short_castle = True
         # self._can_black_long_castle = True
 
-    @staticmethod
-    def is_index_in_bounds(index: int) -> bool:
-        """Return whether the index is in bounds."""
-        return 0 <= index < BOARD_SIZE
-
-    @staticmethod
-    def is_coordinate_in_bounds(coordinate: Coordinate) -> bool:
-        """Return whether the coordinate is in bounds."""
-        return Board.is_index_in_bounds(
-            coordinate.row_index
-        ) and Board.is_index_in_bounds(coordinate.column_index)
-
-    @staticmethod
-    def get_last_row_index(color: Color) -> int:
-        """Return the index of the last row for the color."""
-        return BOARD_SIZE - 1 if color is Color.WHITE else 0
-
     def set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
         piece_type_order = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
         for column_index, piece_type in enumerate(piece_type_order):
             white_piece_coordinate = Coordinate(0, column_index)
             black_piece_coordinate = Coordinate(BOARD_SIZE - 1, column_index)
-            white_pawn_coordinate = Coordinate(WHITE_PAWN_ROW_INDEX, column_index)
-            black_pawn_coordinate = Coordinate(BLACK_PAWN_ROW_INDEX, column_index)
+            white_pawn_coordinate = Coordinate(self._WHITE_PAWN_ROW_INDEX, column_index)
+            black_pawn_coordinate = Coordinate(self._BLACK_PAWN_ROW_INDEX, column_index)
             self.set_piece(white_piece_coordinate, piece_type(Color.WHITE))
             self.set_piece(black_piece_coordinate, piece_type(Color.BLACK))
             self.set_piece(white_pawn_coordinate, Pawn(Color.WHITE))
             self.set_piece(black_pawn_coordinate, Pawn(Color.BLACK))
-        self._set_king_coordinate(Color.WHITE, Coordinate(0, KING_COLUMN_INDEX))
+        self._set_king_coordinate(Color.WHITE, Coordinate(0, self._KING_COLUMN_INDEX))
         self._set_king_coordinate(
-            Color.BLACK, Coordinate(BOARD_SIZE - 1, KING_COLUMN_INDEX)
+            Color.BLACK, Coordinate(BOARD_SIZE - 1, self._KING_COLUMN_INDEX)
         )
 
     def get_piece(self, coordinate: Coordinate) -> Piece | None:

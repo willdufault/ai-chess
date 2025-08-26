@@ -1,15 +1,17 @@
 from enums.color import Color
-
-from ..models.board import Board
-from ..models.coordinate import Coordinate
-from ..models.move import Move
-from ..models.move_strategies import (
+from models.board import Board
+from models.coordinate import Coordinate
+from models.move import Move
+from models.move_strategies import (
+    BishopMoveStrategy,
     KingMoveStrategy,
     KnightMoveStrategy,
     PawnMoveStrategy,
-    StraightMoveStrategy,
+    QueenMoveStrategy,
+    RookMoveStrategy,
 )
-from ..models.pieces import FirstMovePiece, Knight, Pawn, Piece
+from models.pieces import FirstMovePiece, Knight, Pawn, Piece
+from utils.board_utils import get_last_row_index, is_coordinate_in_bounds
 
 
 class BoardController:
@@ -46,7 +48,7 @@ class BoardController:
 
     def does_move_trigger_promotion(self, move: Move) -> bool:
         """Return whether the move meets the criteria for pawn promotion."""
-        last_row_index = self._board.get_last_row_index(move.color)
+        last_row_index = get_last_row_index(move.color)
         if move.to_coordinate != last_row_index:
             return False
         piece = self._board.get_piece(move.to_coordinate)
@@ -63,7 +65,7 @@ class BoardController:
 
     def is_attacking(self, color: Color, coordinate: Coordinate) -> bool:
         """Return whether the color is attacking the coordinate."""
-        if not Board.is_coordinate_in_bounds(coordinate):
+        if not is_coordinate_in_bounds(coordinate):
             return False
         return len(self._get_attacker_coordinates(color, coordinate)) > 0
 
@@ -135,7 +137,13 @@ class BoardController:
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color that can
         attack the target coordinate."""
-        straight_attacker_coordinates = StraightMoveStrategy.get_attacker_coordinates(
+        bishop_attacker_coordinates = BishopMoveStrategy.get_attacker_coordinates(
+            color, target_coordinate, self._board
+        )
+        rook_attacker_coordinates = RookMoveStrategy.get_attacker_coordinates(
+            color, target_coordinate, self._board
+        )
+        queen_attacker_coordinates = QueenMoveStrategy.get_attacker_coordinates(
             color, target_coordinate, self._board
         )
         knight_attacker_coordinates = KnightMoveStrategy.get_attacker_coordinates(
@@ -148,7 +156,9 @@ class BoardController:
             color, target_coordinate, self._board
         )
         return (
-            straight_attacker_coordinates
+            bishop_attacker_coordinates
+            + rook_attacker_coordinates
+            + queen_attacker_coordinates
             + knight_attacker_coordinates
             + king_attacker_coordinates
             + pawn_attacker_coordinates
@@ -159,7 +169,13 @@ class BoardController:
     ) -> list[Coordinate]:
         """Return the coordinates of all pieces of the color that can block an
         attack by moving to the empty target coordinate."""
-        straight_blocker_coordinates = StraightMoveStrategy.get_attacker_coordinates(
+        bishop_attacker_coordinates = BishopMoveStrategy.get_attacker_coordinates(
+            color, target_coordinate, self._board
+        )
+        rook_attacker_coordinates = RookMoveStrategy.get_attacker_coordinates(
+            color, target_coordinate, self._board
+        )
+        queen_attacker_coordinates = QueenMoveStrategy.get_attacker_coordinates(
             color, target_coordinate, self._board
         )
         knight_blocker_coordinates = KnightMoveStrategy.get_attacker_coordinates(
@@ -172,7 +188,9 @@ class BoardController:
             color, target_coordinate, self._board
         )
         return (
-            straight_blocker_coordinates
+            bishop_attacker_coordinates
+            + rook_attacker_coordinates
+            + queen_attacker_coordinates
             + knight_blocker_coordinates
             + king_blocker_coordinates
             + pawn_blocker_coordinate

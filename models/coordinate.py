@@ -1,7 +1,7 @@
 class Coordinate:
-    def __init__(self, row_index: int, col_index: int) -> None:
+    def __init__(self, row_index: int, column_index: int) -> None:
         self._row_index = row_index
-        self._col_index = col_index
+        self._column_index = column_index
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Coordinate):
@@ -14,4 +14,4 @@ class Coordinate:
 
     @property
     def column_index(self) -> int:
-        return self._col_index
+        return self._column_index

@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from enums.color import Color
 from models.coordinate import Coordinate
 from models.direction import Direction
+from utils.board_utils import is_coordinate_in_bounds
 
 if TYPE_CHECKING:
     from models.board import Board
@@ -31,7 +34,7 @@ class MoveStrategy(ABC):
     # TODO: this should probably take in a move instead of color + coords
     @classmethod
     @abstractmethod
-    def is_valid_move(
+    def is_move_valid(
         cls,
         move: Move,
         board: Board,
@@ -47,7 +50,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
     _DIRECTIONS = ()
 
     @classmethod
-    def is_valid_move(
+    def is_move_valid(
         cls,
         move: Move,
         board: Board,
@@ -77,9 +80,9 @@ class StraightMoveStrategy(MoveStrategy, ABC):
         is_path_clear = not board.is_blocked(move.from_coordinate, move.to_coordinate)
         return is_path_clear
 
-    @staticmethod
+    @classmethod
     def get_attacker_coordinates(
-        color: Color, target_coordinate: Coordinate, board: Board
+        cls, color: Color, target_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pieces of the color attacking the
         target coordinate in a straight line."""
@@ -89,13 +92,13 @@ class StraightMoveStrategy(MoveStrategy, ABC):
                 target_coordinate.row_index + direction.row_delta,
                 target_coordinate.column_index + direction.column_delta,
             )
-            while Board.is_coordinate_in_bounds(current_coordinate):
+            while is_coordinate_in_bounds(current_coordinate):
                 if board.is_occupied(current_coordinate):
                     current_piece = board.get_piece(current_coordinate)
                     assert current_piece is not None
                     can_current_piece_attack_target = (
-                        isinstance(current_piece.move_strategy, StraightMoveStrategy)
-                        and direction in current_piece.move_strategy._DIRECTIONS
+                        isinstance(current_piece.move_strategy, cls)
+                        and direction in cls._DIRECTIONS
                     )
                     if can_current_piece_attack_target and current_piece.color == color:
                         attacker_coordinates.append(current_coordinate)
@@ -116,7 +119,7 @@ class PatternMoveStrategy(MoveStrategy, ABC):
     _MOVE_PATTERNS = ()
 
     @classmethod
-    def is_valid_move(
+    def is_move_valid(
         cls,
         move: Move,
         board: Board,
@@ -163,17 +166,17 @@ class PawnMoveStrategy(MoveStrategy):
     _MOVE_COLUMN_DELTA = 0
     _CAPTURE_COLUMN_DELTAS = (-1, 1)
 
-    @staticmethod
-    def get_forward_row_delta(color: Color) -> int:
+    @classmethod
+    def get_forward_row_delta(cls, color: Color) -> int:
         """Return the forward row delta for pawns of the color."""
         return (
-            PawnMoveStrategy._SINGLE_MOVE_ROW_DELTA
+            cls._SINGLE_MOVE_ROW_DELTA
             if color is Color.WHITE
-            else -PawnMoveStrategy._SINGLE_MOVE_ROW_DELTA
+            else -cls._SINGLE_MOVE_ROW_DELTA
         )
 
-    @staticmethod
-    def is_valid_move(move: Move, board: Board) -> bool:
+    @classmethod
+    def is_move_valid(cls, move: Move, board: Board) -> bool:
         """Return whether the move is valid for a pawn."""
 
         # TODO: Implement En Passant.
@@ -181,25 +184,25 @@ class PawnMoveStrategy(MoveStrategy):
         column_delta = (
             move.to_coordinate.column_index - move.from_coordinate.column_index
         )
-        is_same_column = column_delta == PawnMoveStrategy._MOVE_COLUMN_DELTA
+        is_same_column = column_delta == cls._MOVE_COLUMN_DELTA
         if is_same_column:
-            return PawnMoveStrategy._is_valid_forward_move(move, board)
+            return cls._is_valid_forward_move(move, board)
 
-        is_adjacent_column = column_delta in PawnMoveStrategy._CAPTURE_COLUMN_DELTAS
+        is_adjacent_column = column_delta in cls._CAPTURE_COLUMN_DELTAS
         if is_adjacent_column:
-            return PawnMoveStrategy._is_valid_capture(move, board)
+            return cls._is_valid_capture(move)
 
         return False
 
-    @staticmethod
+    @classmethod
     def get_attacker_coordinates(
-        color: Color, target_coordinate: Coordinate, board: Board
+        cls, color: Color, target_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
         """Return a list of coordinates of all pawns of the color attacking the
         given coordinate."""
         attacker_coordinates = []
-        forward_row_delta = PawnMoveStrategy.get_forward_row_delta(color)
-        for column_delta in PawnMoveStrategy._CAPTURE_COLUMN_DELTAS:
+        forward_row_delta = cls.get_forward_row_delta(color)
+        for column_delta in cls._CAPTURE_COLUMN_DELTAS:
             current_coordinate = Coordinate(
                 target_coordinate.row_index - forward_row_delta,
                 target_coordinate.column_index + column_delta,
@@ -208,29 +211,29 @@ class PawnMoveStrategy(MoveStrategy):
                 current_piece = board.get_piece(current_coordinate)
                 assert current_piece is not None
                 is_current_piece_same_color_pawn = (
-                    isinstance(current_piece.move_strategy, PawnMoveStrategy)
+                    isinstance(current_piece.move_strategy, cls)
                     and current_piece.color == color
                 )
                 if is_current_piece_same_color_pawn:
                     attacker_coordinates.append(current_coordinate)
         return attacker_coordinates
 
-    @staticmethod
+    @classmethod
     def get_blocker_coordinate(
-        color: Color, target_coordinate: Coordinate, board: Board
+        cls, color: Color, target_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
         """Return the coordinate of the pawn of the color that can block the
         empty target coordinate.
 
         NOTE: Even though there can be at most one blocking pawn, this method
         returns a list for consistency with other similar methods."""
-        forward_row_delta = PawnMoveStrategy.get_forward_row_delta(color)
+        forward_row_delta = cls.get_forward_row_delta(color)
         one_back_coordinate = Coordinate(
             target_coordinate.row_index - forward_row_delta,
             target_coordinate.column_index,
         )
         if board.is_occupied(one_back_coordinate):
-            return PawnMoveStrategy._get_one_back_blocker_coordinate(
+            return cls._get_one_back_blocker_coordinate(
                 color, one_back_coordinate, board
             )
 
@@ -239,22 +242,22 @@ class PawnMoveStrategy(MoveStrategy):
             target_coordinate.column_index,
         )
         if board.is_occupied(two_back_coordinate):
-            return PawnMoveStrategy._get_two_back_blocker_coordinate(
+            return cls._get_two_back_blocker_coordinate(
                 color, two_back_coordinate, board
             )
 
         return []
 
-    @staticmethod
+    @classmethod
     def _get_one_back_blocker_coordinate(
-        color: Color, one_back_coordinate: Coordinate, board: Board
+        cls, color: Color, one_back_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
         """Return the coordinate of the pawn of the color that can block the
         empty target coordinate one square forward."""
         one_back_piece = board.get_piece(one_back_coordinate)
         assert one_back_piece is not None
         is_one_back_piece_same_color_pawn = (
-            isinstance(one_back_piece.move_strategy, PawnMoveStrategy)
+            isinstance(one_back_piece.move_strategy, cls)
             and one_back_piece.color == color
         )
         if not is_one_back_piece_same_color_pawn:
@@ -262,16 +265,16 @@ class PawnMoveStrategy(MoveStrategy):
 
         return [one_back_coordinate]
 
-    @staticmethod
+    @classmethod
     def _get_two_back_blocker_coordinate(
-        color: Color, two_back_coordinate: Coordinate, board: Board
+        cls, color: Color, two_back_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
         """Return the coordinate of the pawn of the color that can block the
         empty target coordinate two squares forward."""
         two_back_piece = board.get_piece(two_back_coordinate)
         assert two_back_piece is not None
         is_two_back_piece_same_color_pawn = (
-            isinstance(two_back_piece.move_strategy, PawnMoveStrategy)
+            isinstance(two_back_piece.move_strategy, cls)
             and two_back_piece.color == color
         )
         assert isinstance(two_back_piece, Pawn)
@@ -280,10 +283,10 @@ class PawnMoveStrategy(MoveStrategy):
 
         return [two_back_coordinate]
 
-    @staticmethod
-    def _is_valid_forward_move(move: Move, board: Board):
+    @classmethod
+    def _is_valid_forward_move(cls, move: Move, board: Board):
         """Return whether the forward move is valid."""
-        forward_row_delta = PawnMoveStrategy.get_forward_row_delta(move.color)
+        forward_row_delta = cls.get_forward_row_delta(move.color)
         forward_one_coordinate = Coordinate(
             move.from_coordinate.row_index + forward_row_delta,
             move.from_coordinate.column_index,
@@ -297,51 +300,33 @@ class PawnMoveStrategy(MoveStrategy):
         if is_single_move:
             return True
 
-        is_double_move = (
-            row_delta == PawnMoveStrategy._DOUBLE_MOVE_ROW_DELTA * forward_row_delta
-        )
+        is_double_move = row_delta == cls._DOUBLE_MOVE_ROW_DELTA * forward_row_delta
         if is_double_move:
-            return PawnMoveStrategy._is_valid_double_move(move, board)
+            return cls._is_valid_double_move(move)
 
         return False
 
     @staticmethod
-    def _is_valid_double_move(move: Move, board: Board) -> bool:
+    def _is_valid_double_move(move: Move) -> bool:
         """Return whether the double move is valid."""
-        if not board.is_occupied(move.from_coordinate):
+        assert move.from_piece is not None
+        # TODO: fix pyright attribute warning
+        if move.from_piece.has_moved:  # pyright: ignore[reportAttributeAccessIssue]
             return False
+        return move.to_piece is None
 
-        from_piece = board.get_piece(move.from_coordinate)
-        assert from_piece is not None
-        if not isinstance(from_piece.move_strategy, PawnMoveStrategy):
-            return False
-
-        assert isinstance(from_piece, Pawn)
-        if from_piece.has_moved:
-            return False
-
-        forward_row_delta = PawnMoveStrategy.get_forward_row_delta(move.color)
-        forward_two_coord = Coordinate(
-            move.from_coordinate.row_index
-            + PawnMoveStrategy._DOUBLE_MOVE_ROW_DELTA * forward_row_delta,
-            move.from_coordinate.column_index,
-        )
-        is_forward_two_empty = not board.is_occupied(forward_two_coord)
-        return is_forward_two_empty
-
-    @staticmethod
-    def _is_valid_capture(move: Move, board: Board):
+    @classmethod
+    def _is_valid_capture(cls, move: Move):
         """Return whether the capture is valid."""
         row_delta = move.to_coordinate.row_index - move.from_coordinate.row_index
-        forward_row_delta = PawnMoveStrategy.get_forward_row_delta(move.color)
+        forward_row_delta = cls.get_forward_row_delta(move.color)
         is_moving_forward_one = row_delta == forward_row_delta
         if not is_moving_forward_one:
             return False
 
-        to_piece = board.get_piece(
-            Coordinate(move.to_coordinate.row_index, move.to_coordinate.column_index)
+        is_capturing_opponent = (
+            move.to_piece is not None and move.to_piece.color != move.color
         )
-        is_capturing_opponent = to_piece is not None and to_piece.color != move.color
         return is_capturing_opponent
 
 
@@ -393,9 +378,9 @@ class KingMoveStrategy(PatternMoveStrategy):
     )
 
     # TODO: rename to get_valid_moves?
-    @staticmethod
+    @classmethod
     def get_potential_escape_coordinates(
-        king_coordinate: Coordinate, board: Board
+        cls, king_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
         """Return a list of all coordinates adjacent to the king coordinate that
         are either empty or occupied by a piece of the opposite color."""
@@ -403,12 +388,12 @@ class KingMoveStrategy(PatternMoveStrategy):
         king_piece = board.get_piece(king_coordinate)
         assert king_piece is not None
         king_color = king_piece.color
-        for move_pattern in KingMoveStrategy._MOVE_PATTERNS:
+        for move_pattern in cls._MOVE_PATTERNS:
             current_coordinate = Coordinate(
                 king_coordinate.row_index + move_pattern.row_delta,
                 king_coordinate.column_index + move_pattern.column_delta,
             )
-            if not Board.is_coordinate_in_bounds(current_coordinate):
+            if not is_coordinate_in_bounds(current_coordinate):
                 continue
 
             if board.is_occupied(current_coordinate):

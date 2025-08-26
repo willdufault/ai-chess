@@ -11,27 +11,6 @@ def board() -> Board:
     return Board()
 
 
-def test_is_index_in_bounds() -> None:
-    assert Board.is_index_in_bounds(0) is True
-    assert Board.is_index_in_bounds(4) is True
-    assert Board.is_index_in_bounds(7) is True
-    assert Board.is_index_in_bounds(-1) is False
-    assert Board.is_index_in_bounds(8) is False
-
-
-def test_is_coordinate_in_bounds() -> None:
-    assert Board.is_coordinate_in_bounds(Coordinate(0, 0)) is True
-    assert Board.is_coordinate_in_bounds(Coordinate(4, 0)) is True
-    assert Board.is_coordinate_in_bounds(Coordinate(0, 7)) is True
-    assert Board.is_coordinate_in_bounds(Coordinate(-1, 0)) is False
-    assert Board.is_coordinate_in_bounds(Coordinate(0, 8)) is False
-
-
-def test_get_last_row_index() -> None:
-    assert Board.get_last_row_index(Color.WHITE) == 7
-    assert Board.get_last_row_index(Color.BLACK) == 0
-
-
 def test_get_set_piece(board: Board) -> None:
     assert board.get_piece(Coordinate(0, 0)) is None
     board.set_piece(Coordinate(0, 0), Pawn(Color.WHITE))

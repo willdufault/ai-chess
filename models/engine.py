@@ -1,5 +1,6 @@
+from constants.board_constants import BOARD_SIZE
 from enums.color import Color
-from models.board import BOARD_SIZE, Board
+from models.board import Board
 from models.coordinate import Coordinate
 from models.move import Move
 from models.pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
