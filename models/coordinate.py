@@ -6,7 +6,15 @@ class Coordinate:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Coordinate):
             return False
-        return self.row_index == other.row_index and self.column_index == other.column_index
+        return (
+            self.row_index == other.row_index
+            and self.column_index == other.column_index
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"Coordinate({self.row_index}, {self.column_index})"
+        )
 
     @property
     def row_index(self) -> int:

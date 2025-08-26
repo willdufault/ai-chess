@@ -118,12 +118,14 @@ def test_pawn_is_valid_capture(board: Board) -> None:
     assert PawnMoveStrategy.is_move_valid(Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, Pawn(Color.BLACK)), board) is True
     assert PawnMoveStrategy.is_move_valid(Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, Pawn(Color.BLACK)), board) is True
 
-# TODO: pick up here
-# def test_bishop_get_attacker_coordinates(board: Board) -> None:
-#     assert StraightMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
-#     board.set_piece(Coordinate(5,2), Bishop(Color.WHITE))
-#     board.set_piece(Coordinate(5,4), Rook(Color.WHITE))
-#     board.set_piece(Coordinate(3,2), Bishop(Color.BLACK))
-#     board.set_piece(Coordinate(3,4), Rook(Color.BLACK))
-#     assert StraightMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(5,2)]
-#     assert StraightMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(3,2)]
+def test_bishop_get_attacker_coordinates(board: Board) -> None:
+    assert BishopMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(3,4), Bishop(Color.WHITE))
+    board.set_piece(Coordinate(2,5), Rook(Color.WHITE))
+    assert BishopMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(4,2), Bishop(Color.WHITE))
+    board.set_piece(Coordinate(4,4), Rook(Color.WHITE))
+    assert BishopMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(4,2)]
+    board.set_piece(Coordinate(2,2), Bishop(Color.BLACK))
+    board.set_piece(Coordinate(2,4), Rook(Color.BLACK))
+    assert BishopMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(2,2)]
