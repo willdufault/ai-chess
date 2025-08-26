@@ -6,10 +6,10 @@ FEATURES
 * AI
 
 REFACTORS
+* tests: clean up per clean code book recs
 - mock testing
-- more informative return values
+- more informative return values?
 - error handling (ex: board.set_piece)
-- movestrat: static methods?
 - spell out for all public-facing methods/params/fields/vars
 - look into potentially using yields for performance
 - replace board_controller.board() with immutable board hash?

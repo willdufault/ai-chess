@@ -11,7 +11,6 @@ from models.move_strategies import (
     PawnMoveStrategy,
     QueenMoveStrategy,
     RookMoveStrategy,
-    StraightMoveStrategy,
 )
 from models.pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
@@ -121,11 +120,101 @@ def test_pawn_is_valid_capture(board: Board) -> None:
 def test_bishop_get_attacker_coordinates(board: Board) -> None:
     assert BishopMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
     board.set_piece(Coordinate(3,4), Bishop(Color.WHITE))
-    board.set_piece(Coordinate(2,5), Rook(Color.WHITE))
+    board.set_piece(Coordinate(2,5), Bishop(Color.WHITE))
     assert BishopMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
     board.set_piece(Coordinate(4,2), Bishop(Color.WHITE))
-    board.set_piece(Coordinate(4,4), Rook(Color.WHITE))
+    board.set_piece(Coordinate(4,4), Pawn(Color.WHITE))
     assert BishopMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(4,2)]
     board.set_piece(Coordinate(2,2), Bishop(Color.BLACK))
-    board.set_piece(Coordinate(2,4), Rook(Color.BLACK))
+    board.set_piece(Coordinate(2,4), Pawn(Color.BLACK))
     assert BishopMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(2,2)]
+
+def test_rook_get_attacker_coordinates(board: Board) -> None:
+    assert RookMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(2,4), Rook(Color.WHITE))
+    board.set_piece(Coordinate(2,5), Rook(Color.WHITE))
+    assert RookMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(4,3), Rook(Color.WHITE))
+    board.set_piece(Coordinate(3,4), Pawn(Color.WHITE))
+    assert RookMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(4,3)]
+    board.set_piece(Coordinate(3,2), Rook(Color.BLACK))
+    board.set_piece(Coordinate(2,3), Pawn(Color.BLACK))
+    assert RookMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(3,2)]
+
+def test_queen_get_attacker_coordinates(board: Board) -> None:
+    assert QueenMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(2,5), Queen(Color.WHITE))
+    assert QueenMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(3,4), Queen(Color.WHITE))
+    board.set_piece(Coordinate(4,3), Queen(Color.WHITE))
+    assert QueenMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(3, 4),Coordinate(4,3)]
+    board.set_piece(Coordinate(2,3), Queen(Color.BLACK))
+    board.set_piece(Coordinate(3,2), Queen(Color.BLACK))
+    assert QueenMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(3,2),Coordinate(2,3)]
+
+def test_king_get_attacker_coordinates(board: Board) -> None:
+    assert KingMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(2,5), King(Color.WHITE))
+    assert KingMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(3,4), King(Color.WHITE))
+    board.set_piece(Coordinate(2,4), King(Color.WHITE))
+    board.set_piece(Coordinate(2,3), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2,2), Pawn(Color.WHITE))
+    assert KingMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(3, 4),Coordinate(2,4)]
+    board.set_piece(Coordinate(3,2), King(Color.BLACK))
+    board.set_piece(Coordinate(4,2), King(Color.BLACK))
+    board.set_piece(Coordinate(4,3), Pawn(Color.BLACK))
+    board.set_piece(Coordinate(4,4), Pawn(Color.BLACK))
+    assert KingMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(3,2),Coordinate(4,2)]
+
+def test_knight_get_attacker_coordinates(board: Board) -> None:
+    assert KnightMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(4,2), Knight(Color.WHITE))
+    board.set_piece(Coordinate(4,3), Knight(Color.WHITE))
+    board.set_piece(Coordinate(4,4), Knight(Color.WHITE))
+    board.set_piece(Coordinate(3,4), Knight(Color.WHITE))
+    board.set_piece(Coordinate(2,4), Knight(Color.WHITE))
+    board.set_piece(Coordinate(2,3), Knight(Color.WHITE))
+    board.set_piece(Coordinate(2,2), Knight(Color.WHITE))
+    board.set_piece(Coordinate(3,2), Knight(Color.WHITE))
+    assert KnightMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(5,4), Knight(Color.WHITE))
+    board.set_piece(Coordinate(4,5), Knight(Color.WHITE))
+    assert KnightMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(4,5),Coordinate(5,4)]
+    board.set_piece(Coordinate(5,2), Knight(Color.BLACK))
+    board.set_piece(Coordinate(4,1), Knight(Color.BLACK))
+    assert KnightMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(4,1),Coordinate(5,2)]
+
+def test_pawn_get_attacker_coordinates(board: Board) -> None:
+    assert PawnMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(2,5), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(1,5), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(3,4), Pawn(Color.WHITE))
+    assert PawnMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(2,2), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2,3), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2,4), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(1,3), Pawn(Color.WHITE))
+    assert PawnMoveStrategy.get_attacker_coordinates(Color.WHITE,Coordinate(3,3), board) == [Coordinate(2,2),Coordinate(2,4)]
+    board.set_piece(Coordinate(4,2), Pawn(Color.BLACK))
+    board.set_piece(Coordinate(4,3), Pawn(Color.BLACK))
+    board.set_piece(Coordinate(4,4), Pawn(Color.BLACK))
+    board.set_piece(Coordinate(5,3), Pawn(Color.BLACK))
+    assert PawnMoveStrategy.get_attacker_coordinates(Color.BLACK,Coordinate(3,3), board) == [Coordinate(4,2),Coordinate(4,4)]
+
+def test_pawn_get_blocker_coordinates(board: Board) -> None:
+    assert PawnMoveStrategy.get_blocker_coordinate(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(2,5), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(1,5), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(3,4), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2,2), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2,4), Pawn(Color.WHITE))
+    assert PawnMoveStrategy.get_blocker_coordinate(Color.WHITE,Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(1,3), Pawn(Color.WHITE))
+    assert PawnMoveStrategy.get_blocker_coordinate(Color.WHITE,Coordinate(3,3), board) == [Coordinate(1,3)]
+    board.set_piece(Coordinate(2,3), Pawn(Color.WHITE))
+    assert PawnMoveStrategy.get_blocker_coordinate(Color.WHITE,Coordinate(3,3), board) == [Coordinate(2,3)]
+    board.set_piece(Coordinate(5,3), Pawn(Color.BLACK))
+    assert PawnMoveStrategy.get_blocker_coordinate(Color.BLACK,Coordinate(3,3), board) == [Coordinate(5,3)]
+    board.set_piece(Coordinate(4,3), Pawn(Color.BLACK))
+    assert PawnMoveStrategy.get_blocker_coordinate(Color.BLACK,Coordinate(3,3), board) == [Coordinate(4,3)]

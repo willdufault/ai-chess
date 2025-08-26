@@ -277,8 +277,11 @@ class PawnMoveStrategy(MoveStrategy):
             isinstance(two_back_piece.move_strategy, cls)
             and two_back_piece.color == color
         )
-        assert isinstance(two_back_piece, Pawn)
-        if not is_two_back_piece_same_color_pawn or two_back_piece.has_moved:
+        # TODO: fix pyright warning
+        if (
+            not is_two_back_piece_same_color_pawn
+            or two_back_piece.has_moved  # pyright: ignore[reportAttributeAccessIssue]
+        ):
             return []
 
         return [two_back_coordinate]
