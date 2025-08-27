@@ -25,10 +25,6 @@ class BoardController:
     def board(self) -> Board:
         return self._board
 
-    def get_piece(self, coordinate: Coordinate) -> Piece | None:
-        """Get the piece at the coordinate."""
-        return self._board.get_piece(coordinate)
-
     def make_move(self, move: Move) -> None:
         """Make the move on the board and update the state of the from piece."""
         self._board.set_piece(move.from_coordinate, None)
@@ -49,19 +45,9 @@ class BoardController:
     def does_move_trigger_promotion(self, move: Move) -> bool:
         """Return whether the move meets the criteria for pawn promotion."""
         last_row_index = get_last_row_index(move.color)
-        if move.to_coordinate != last_row_index:
+        if move.to_coordinate.row_index != last_row_index:
             return False
-        piece = self._board.get_piece(move.to_coordinate)
-        return isinstance(piece, Pawn)
-
-    def promote(self, coordinate: Coordinate, piece: Piece) -> None:
-        """Promote the piece at the coordinate to the piece."""
-        self._board.set_piece(coordinate, piece)
-
-    def get_legal_moves(self, color: Color) -> list[Move]:
-        """Return a list of all legal moves for the color."""
-        # TODO
-        raise NotImplementedError
+        return isinstance(move.from_piece, Pawn)
 
     def is_attacking(self, color: Color, coordinate: Coordinate) -> bool:
         """Return whether the color is attacking the coordinate."""
@@ -71,8 +57,8 @@ class BoardController:
 
     def is_in_check(self, color: Color) -> bool:
         """Return whether the color is in check."""
-        king_coord = self._board.get_king_coordinate(color)
-        return self.is_attacking(color.opposite, king_coord)
+        king_coordinate = self._board.get_king_coordinate(color)
+        return self.is_attacking(color.opposite, king_coordinate)
 
     def is_in_checkmate(self, color: Color) -> bool:
         """Return whether the color is in checkmate."""
@@ -100,6 +86,11 @@ class BoardController:
 
         return True
 
+    def get_legal_moves(self, color: Color) -> list[Move]:
+        """Return a list of all legal moves for the color."""
+        # TODO
+        raise NotImplementedError
+
     def _simulate_defense(
         self,
         color: Color,
@@ -108,9 +99,9 @@ class BoardController:
     ) -> bool:
         """Return whether moving any of the pieces at the from coordinates can
         move to the to coordinate without revealing a discovered check."""
-        to_piece = self.get_piece(to_coordinate)
+        to_piece = self._board.get_piece(to_coordinate)
         for from_coordinate in from_coordinates:
-            from_piece = self.get_piece(from_coordinate)
+            from_piece = self._board.get_piece(from_coordinate)
             move = Move(color, from_coordinate, to_coordinate, from_piece, to_piece)
             self.make_move(move)
             is_still_in_check = self.is_in_check(color)
@@ -207,7 +198,7 @@ class BoardController:
 
     def _can_block_attacker(self, color: Color, attacker_coordinate: Coordinate):
         """Return whether the color can block an attack from the coordinate."""
-        attacker = self.get_piece(attacker_coordinate)
+        attacker = self._board.get_piece(attacker_coordinate)
         if isinstance(attacker, Knight):
             return False
 

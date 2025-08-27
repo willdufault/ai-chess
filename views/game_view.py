@@ -1,8 +1,7 @@
 from enums.color import Color
 from enums.game_mode import GameMode
-
-from ..models.ai import MAX_DEPTH
-from ..models.pieces import Bishop, Knight, Queen, Rook
+from models.ai import MAX_DEPTH
+from models.pieces import Bishop, Knight, Queen, Rook
 
 
 class GameView:
@@ -41,7 +40,7 @@ class GameView:
         return ai_depth
 
     @staticmethod
-    def prompt_move_coords() -> str:
+    def prompt_move_coordinates() -> str:
         """Prompt the user for from and to coordinates for a move."""
         move_coords = input("Where would you like to move (rcrc)? ")
         return move_coords

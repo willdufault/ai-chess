@@ -145,6 +145,9 @@ class PatternMoveStrategy(MoveStrategy, ABC):
                 target_coordinate.row_index + move_pattern.row_delta,
                 target_coordinate.column_index + move_pattern.column_delta,
             )
+            if not is_coordinate_in_bounds(current_coordinate):
+                continue
+
             if not board.is_occupied(current_coordinate):
                 continue
 
@@ -207,15 +210,20 @@ class PawnMoveStrategy(MoveStrategy):
                 target_coordinate.row_index - forward_row_delta,
                 target_coordinate.column_index + column_delta,
             )
-            if board.is_occupied(current_coordinate):
-                current_piece = board.get_piece(current_coordinate)
-                assert current_piece is not None
-                is_current_piece_same_color_pawn = (
-                    isinstance(current_piece.move_strategy, cls)
-                    and current_piece.color == color
-                )
-                if is_current_piece_same_color_pawn:
-                    attacker_coordinates.append(current_coordinate)
+            if not is_coordinate_in_bounds(current_coordinate):
+                continue
+
+            if not board.is_occupied(current_coordinate):
+                continue
+
+            current_piece = board.get_piece(current_coordinate)
+            assert current_piece is not None
+            is_current_piece_same_color_pawn = (
+                isinstance(current_piece.move_strategy, cls)
+                and current_piece.color == color
+            )
+            if is_current_piece_same_color_pawn:
+                attacker_coordinates.append(current_coordinate)
         return attacker_coordinates
 
     @classmethod
@@ -232,6 +240,9 @@ class PawnMoveStrategy(MoveStrategy):
             target_coordinate.row_index - forward_row_delta,
             target_coordinate.column_index,
         )
+        if not is_coordinate_in_bounds(one_back_coordinate):
+            return []
+
         if board.is_occupied(one_back_coordinate):
             return cls._get_one_back_blocker_coordinate(
                 color, one_back_coordinate, board
@@ -241,6 +252,9 @@ class PawnMoveStrategy(MoveStrategy):
             target_coordinate.row_index - 2 * forward_row_delta,
             target_coordinate.column_index,
         )
+        if not is_coordinate_in_bounds(two_back_coordinate):
+            return []
+
         if board.is_occupied(two_back_coordinate):
             return cls._get_two_back_blocker_coordinate(
                 color, two_back_coordinate, board

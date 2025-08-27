@@ -1,12 +1,11 @@
 from enums.color import Color
-
-from ..models.board import BOARD_SIZE, Board
-from ..models.coordinate import Coordinate
+from models.board import BOARD_SIZE, Board
+from models.coordinate import Coordinate
 
 TOP_BORDER = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
 MIDDLE_BORDER = "  ├───┼───┼───┼───┼───┼───┼───┼───┤"
 BOTTOM_BORDER = "  └───┴───┴───┴───┴───┴───┴───┴───┘"
-column_LABELS = "    0   1   2   3   4   5   6   7"
+COLUMN_LABELS = "    0   1   2   3   4   5   6   7"
 
 
 class BoardView:
@@ -23,25 +22,19 @@ class BoardView:
             row_indexes = tuple(range(BOARD_SIZE))
             column_indexes = tuple(reversed(range(BOARD_SIZE)))
 
-        for row_indes in row_indexes:
-            row = BoardView._get_row(row_indes, column_indexes, board)
-            rows.append(row)
-            if row_indes != row_indexes[-1]:
+        for row_index in row_indexes:
+            row = [f"{row_index} │"]
+            for column_index in column_indexes:
+                coordinate = Coordinate(row_index, column_index)
+                piece = board.get_piece(coordinate)
+                symbol = " " if piece is None else piece.symbol
+                row.append(f" {symbol} │")
+            row_str = "".join(row)
+            rows.append(row_str)
+            if row_index != row_indexes[-1]:
                 rows.append(MIDDLE_BORDER)
 
         rows.append(BOTTOM_BORDER)
-        rows.append(column_LABELS)
+        rows.append(COLUMN_LABELS)
         board_str = "\n".join(rows)
         print(board_str)
-
-    @staticmethod
-    def _get_row(row_indes: int, column_indexes: tuple[int, ...], board: Board) -> str:
-        """Return the string representation of the row."""
-        row = [f"{row_indes} │"]
-        for column_indes in column_indexes:
-            coord = Coordinate(row_indes, column_indes)
-            piece = board.get_piece(coord)
-            symbol = " " if piece is None else piece.symbol
-            row.append(f" {symbol} │")
-        row_str = "".join(row)
-        return row_str

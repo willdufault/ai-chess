@@ -1,13 +1,12 @@
 from controllers.board_controller import BoardController
 from enums.color import Color
 from enums.game_mode import GameMode
+from models.input_parser import InputParser
+from models.input_validator import InputValidator
+from models.move import Move
+from models.move_validator import MoveValidator
 from views.board_view import BoardView
 from views.game_view import GameView
-
-from ..models.input_parser import InputParser
-from ..models.input_validator import InputValidator
-from ..models.move import Move
-from ..models.move_validator import MoveValidator
 
 
 class Game:
@@ -67,15 +66,15 @@ class Game:
         """Prompt the user for a valid move, then make the move and return the move."""
         is_legal_move = False
         while not is_legal_move:
-            move_coords = GameView.prompt_move_coords()
-            if not InputValidator.is_valid_move_input(move_coords):
+            move_coordinates = GameView.prompt_move_coordinates()
+            if not InputValidator.is_valid_move_input(move_coordinates):
                 GameView.show_invalid_input()
                 continue
 
-            from_coord, to_coord = InputParser.parse_input(move_coords)
-            from_piece = self._board_controller.get_piece(from_coord)
-            to_piece = self._board_controller.get_piece(to_coord)
-            move = Move(color, from_coord, to_coord, from_piece, to_piece)
+            from_coordinate, to_coordinate = InputParser.parse_input(move_coordinates)
+            from_piece = self._board_controller.board.get_piece(from_coordinate)
+            to_piece = self._board_controller.board.get_piece(to_coordinate)
+            move = Move(color, from_coordinate, to_coordinate, from_piece, to_piece)
             if not MoveValidator.is_move_valid(move, self._board_controller.board):
                 GameView.show_illegal_move()
                 continue
@@ -99,4 +98,4 @@ class Game:
         BoardView.draw(move.color, self._board_controller.board)
         new_piece_type = GameView.prompt_promotion()
         new_piece = new_piece_type(move.color)
-        self._board_controller.promote(move.to_coordinate, new_piece)
+        self._board_controller.board.set_piece(move.to_coordinate, new_piece)
