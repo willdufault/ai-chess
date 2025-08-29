@@ -1,9 +1,8 @@
 FEATURES
-- castling
-- Move class?
-- En passant?
-- Stalemate
 * AI
+- castling
+- Stalemate
+- En passant?
 
 REFACTORS
 - tests: clean up per clean code book recs
@@ -12,7 +11,5 @@ REFACTORS
 - error handling (ex: board.set_piece)
 - look into potentially using yields for performance
 - replace board_controller.board() with immutable board hash?
-- be consistent with checking for piece type vs move strat type
 - make pyright happy, fix "# pyright:..." comments
-- board: make board.size property and update refs to BOARD_SIZE (if it makes sense)
-- engine: get eval bar score [-10, 10]
+- engine: get eval bar score

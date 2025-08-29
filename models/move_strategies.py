@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING
 from enums.color import Color
 from models.coordinate import Coordinate
 from models.direction import Direction
+from models.move import Move
 from utils.board_utils import is_coordinate_in_bounds
 
 if TYPE_CHECKING:
     from models.board import Board
-    from models.move import Move
 
 _ORTHOGONAL_DIRECTIONS = (
     Direction(0, 1),
@@ -24,7 +24,6 @@ _DIAGONAL_DIRECTIONS = (
     Direction(-1, 1),
     Direction(-1, -1),
 )
-_STRAIGHT_DIRECTIONS = _ORTHOGONAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
 
 
 class MoveStrategy(ABC):
@@ -39,13 +38,34 @@ class MoveStrategy(ABC):
         """Return whether the move is valid."""
         pass
 
+    @classmethod
+    @abstractmethod
+    def get_attacker_coordinates(
+        cls, color: Color, target_coordinate: Coordinate, board: Board
+    ) -> list[Coordinate]:
+        """Return a list of coordinates of all pieces of the color attacking the
+        target coordinate."""
+        pass
+
+    @classmethod
+    @abstractmethod
+    def get_candidate_moves(
+        cls,
+        color: Color,
+        from_coordinate: Coordinate,
+        board: Board,
+    ) -> bool:
+        """Return a list of candidate moves from the from coordinate without
+        accounting for discovered check."""
+        pass
+
 
 class StraightMoveStrategy(MoveStrategy, ABC):
     """Represents an abstract move strategy for a chess piece that moves in
     straight lines."""
 
     # TODO: cleaner way to do this? same below for _MOVE_PATTERNS
-    _DIRECTIONS = ()
+    _DIRECTIONS: tuple[Direction, ...] = ()
 
     @classmethod
     def is_move_valid(
@@ -85,7 +105,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
         """Return a list of coordinates of all pieces of the color attacking the
         target coordinate in a straight line."""
         attacker_coordinates = []
-        for direction in _STRAIGHT_DIRECTIONS:
+        for direction in cls._DIRECTIONS:
             current_coordinate = Coordinate(
                 target_coordinate.row_index + direction.row_delta,
                 target_coordinate.column_index + direction.column_delta,
@@ -109,12 +129,48 @@ class StraightMoveStrategy(MoveStrategy, ABC):
                 )
         return attacker_coordinates
 
+    @classmethod
+    def get_candidate_moves(
+        cls, color: Color, from_coordinate: Coordinate, board: Board
+    ) -> list[Move]:
+        """Return a list of candidate moves from the from coordinate moving in a
+        straight line without accounting for discovered check."""
+        if not is_coordinate_in_bounds(from_coordinate):
+            return []
+
+        candidate_moves = []
+        from_piece = board.get_piece(from_coordinate)
+        for direction in cls._DIRECTIONS:
+            row_delta = direction.row_delta
+            column_delta = direction.column_delta
+            to_coordinate = Coordinate(
+                from_coordinate.row_index + row_delta,
+                from_coordinate.column_index + column_delta,
+            )
+            while is_coordinate_in_bounds(to_coordinate):
+                to_piece = board.get_piece(to_coordinate)
+                current_move = Move(
+                    color, from_coordinate, to_coordinate, from_piece, to_piece
+                )
+                if board.is_occupied(to_coordinate):
+                    assert to_piece is not None
+                    if to_piece.color != color:
+                        candidate_moves.append(current_move)
+                    break
+
+                candidate_moves.append(current_move)
+                to_coordinate = Coordinate(
+                    to_coordinate.row_index + row_delta,
+                    to_coordinate.column_index + column_delta,
+                )
+        return candidate_moves
+
 
 class PatternMoveStrategy(MoveStrategy, ABC):
     """Represents an abstract move strategy for a chess piece that moves in a
     specific pattern."""
 
-    _MOVE_PATTERNS = ()
+    _MOVE_PATTERNS: tuple[Direction, ...] = ()
 
     @classmethod
     def is_move_valid(
@@ -158,6 +214,39 @@ class PatternMoveStrategy(MoveStrategy, ABC):
                 attacker_coordinates.append(current_coordinate)
         return attacker_coordinates
 
+    @classmethod
+    def get_candidate_moves(
+        cls, color: Color, from_coordinate: Coordinate, board: Board
+    ) -> list[Move]:
+        """Return a list of candidate moves from the from coordinate moving in a
+        specific pattern without accounting for discovered check."""
+        if not is_coordinate_in_bounds(from_coordinate):
+            return []
+
+        candidate_moves = []
+        from_piece = board.get_piece(from_coordinate)
+        for direction in cls._MOVE_PATTERNS:
+            row_delta = direction.row_delta
+            column_delta = direction.column_delta
+            to_coordinate = Coordinate(
+                from_coordinate.row_index + row_delta,
+                from_coordinate.column_index + column_delta,
+            )
+            if not is_coordinate_in_bounds(to_coordinate):
+                continue
+
+            to_piece = board.get_piece(to_coordinate)
+            if board.is_occupied(to_coordinate):
+                assert to_piece is not None
+                if to_piece.color == color:
+                    continue
+
+            current_move = Move(
+                color, from_coordinate, to_coordinate, from_piece, to_piece
+            )
+            candidate_moves.append(current_move)
+        return candidate_moves
+
 
 class PawnMoveStrategy(MoveStrategy):
     _SINGLE_MOVE_ROW_DELTA = 1
@@ -185,11 +274,11 @@ class PawnMoveStrategy(MoveStrategy):
         )
         is_same_column = column_delta == cls._MOVE_COLUMN_DELTA
         if is_same_column:
-            return cls._is_valid_forward_move(move, board)
+            return cls._is_forward_move_valid(move, board)
 
         is_adjacent_column = column_delta in cls._CAPTURE_COLUMN_DELTAS
         if is_adjacent_column:
-            return cls._is_valid_capture(move)
+            return cls._is_capture_valid(move)
 
         return False
 
@@ -259,6 +348,90 @@ class PawnMoveStrategy(MoveStrategy):
         return []
 
     @classmethod
+    def get_candidate_moves(
+        cls, color: Color, from_coordinate: Coordinate, board: Board
+    ) -> list[Move]:
+        """Return a list of candidate moves for a pawn at the from coordinate
+        without accounting for discovered check."""
+        if not is_coordinate_in_bounds(from_coordinate):
+            return []
+
+        # TODO: test each of these, then do get_legal_moves
+        candidate_forward_moves = cls._get_candidate_forward_moves(
+            color, from_coordinate, board
+        )
+        candidate_captures = cls._get_candidate_captures(color, from_coordinate, board)
+        candidate_moves = candidate_forward_moves + candidate_captures
+        return candidate_moves
+
+    @classmethod
+    def _get_candidate_forward_moves(
+        cls, color: Color, from_coordinate: Coordinate, board: Board
+    ) -> list[Move]:
+        """Return a list of candidate forward moves for a pawn at the from
+        coordinate without accounting for discovered check."""
+        candidate_forward_moves = []
+        from_piece = board.get_piece(from_coordinate)
+        forward_row_delta = cls.get_forward_row_delta(color)
+        for move_row_delta in (cls._SINGLE_MOVE_ROW_DELTA, cls._DOUBLE_MOVE_ROW_DELTA):
+            forward_coordinate = Coordinate(
+                from_coordinate.row_index + move_row_delta * forward_row_delta,
+                from_coordinate.column_index,
+            )
+            if not is_coordinate_in_bounds(forward_coordinate):
+                break
+
+            if board.is_occupied(forward_coordinate):
+                break
+
+            forward_piece = board.get_piece(forward_coordinate)
+            forward_move = Move(
+                color,
+                from_coordinate,
+                forward_coordinate,
+                from_piece,
+                forward_piece,
+            )
+            candidate_forward_moves.append(forward_move)
+        return candidate_forward_moves
+
+    @classmethod
+    def _get_candidate_captures(
+        cls, color: Color, from_coordinate: Coordinate, board: Board
+    ) -> list[Move]:
+        """Return a list of candidate captures for a pawn at the from coordinate
+        without accounting for discovered check."""
+        candidate_captures = []
+        from_piece = board.get_piece(from_coordinate)
+        forward_row_delta = cls.get_forward_row_delta(color)
+        for column_delta in cls._CAPTURE_COLUMN_DELTAS:
+            capture_coordinate = Coordinate(
+                from_coordinate.row_index + forward_row_delta,
+                from_coordinate.column_index + column_delta,
+            )
+            if not is_coordinate_in_bounds(capture_coordinate):
+                continue
+
+            if not board.is_occupied(capture_coordinate):
+                continue
+
+            capture_piece = board.get_piece(capture_coordinate)
+            assert capture_piece is not None
+            is_capturing_same_color = capture_piece.color == color
+            if is_capturing_same_color:
+                continue
+
+            capture_move = Move(
+                color,
+                from_coordinate,
+                capture_coordinate,
+                from_piece,
+                capture_piece,
+            )
+            candidate_captures.append(capture_move)
+        return candidate_captures
+
+    @classmethod
     def _get_one_back_blocker_coordinate(
         cls, color: Color, one_back_coordinate: Coordinate, board: Board
     ) -> list[Coordinate]:
@@ -297,7 +470,7 @@ class PawnMoveStrategy(MoveStrategy):
         return [two_back_coordinate]
 
     @classmethod
-    def _is_valid_forward_move(cls, move: Move, board: Board):
+    def _is_forward_move_valid(cls, move: Move, board: Board):
         """Return whether the forward move is valid."""
         forward_row_delta = cls.get_forward_row_delta(move.color)
         forward_one_coordinate = Coordinate(
@@ -315,12 +488,12 @@ class PawnMoveStrategy(MoveStrategy):
 
         is_double_move = row_delta == cls._DOUBLE_MOVE_ROW_DELTA * forward_row_delta
         if is_double_move:
-            return cls._is_valid_double_move(move)
+            return cls._is_double_move_valid(move)
 
         return False
 
     @staticmethod
-    def _is_valid_double_move(move: Move) -> bool:
+    def _is_double_move_valid(move: Move) -> bool:
         """Return whether the double move is valid."""
         assert move.from_piece is not None
         # TODO: fix pyright attribute warning
@@ -329,7 +502,7 @@ class PawnMoveStrategy(MoveStrategy):
         return move.to_piece is None
 
     @classmethod
-    def _is_valid_capture(cls, move: Move):
+    def _is_capture_valid(cls, move: Move):
         """Return whether the capture is valid."""
         row_delta = move.to_coordinate.row_index - move.from_coordinate.row_index
         forward_row_delta = cls.get_forward_row_delta(move.color)

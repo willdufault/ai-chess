@@ -218,3 +218,198 @@ def test_pawn_get_blocker_coordinates(board: Board) -> None:
     assert PawnMoveStrategy.get_blocker_coordinate(Color.BLACK,Coordinate(3,3), board) == [Coordinate(5,3)]
     board.set_piece(Coordinate(4,3), Pawn(Color.BLACK))
     assert PawnMoveStrategy.get_blocker_coordinate(Color.BLACK,Coordinate(3,3), board) == [Coordinate(4,3)]
+
+def test_pawn_get_candidate_moves(board: Board) -> None:
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,3), None, None),
+    ]
+    board.set_piece(Coordinate(5,3), Pawn(Color.WHITE))
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+    ]
+    board.set_piece(Coordinate(4,3), Pawn(Color.BLACK))
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == []
+    board.set_piece(Coordinate(5,3), None)
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == []
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(6,0), board) == [
+        Move(Color.WHITE, Coordinate(6,0), Coordinate(7,0), None, None)
+    ]
+    board.set_piece(Coordinate(4,2), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(4,4), Pawn(Color.BLACK))
+    assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, Pawn(Color.BLACK))
+    ]
+    
+def test_knight_get_candidate_moves(board: Board) -> None:
+    assert KnightMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
+    assert KnightMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,2), None, None),
+    ]
+    board.set_piece(Coordinate(4,5), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(4,1), Pawn(Color.BLACK))
+    assert KnightMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,1), None, Pawn(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,2), None, None),
+    ]
+    assert KnightMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(0,0), board) == [
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(1,2), None, None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(2,1), None, None)
+    ]
+
+def test_king_get_candidate_moves(board: Board) -> None:
+    assert KingMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
+    assert KingMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,2), None, None),
+    ]
+    board.set_piece(Coordinate(3,4), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(3,2), Pawn(Color.BLACK))
+    assert KingMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,2), None, Pawn(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,2), None, None),
+    ]
+    assert KingMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(0,0), board) == [
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(0,1), None, None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(1,0), None, None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(1,1), None, None),
+    ]
+
+def test_bishop_get_candidate_moves(board: Board) -> None:
+    assert BishopMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
+    assert BishopMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(7,7), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,0), None, None),
+    ]
+    board.set_piece(Coordinate(4,4), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2,4), Pawn(Color.BLACK))
+    assert BishopMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,4), None, Pawn(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,0), None, None),
+    ]
+
+def test_rook_get_candidate_moves(board: Board) -> None:
+    assert RookMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
+    assert RookMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,7), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(7,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,3), None, None),
+    ]
+    board.set_piece(Coordinate(4,3), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(3,4), Pawn(Color.BLACK))
+    assert RookMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,4), None, Pawn(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,3), None, None),
+    ]
+
+def test_queen_get_candidate_moves(board: Board) -> None:
+    assert QueenMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
+    assert QueenMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,7), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(7,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(7,7), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,0), None, None),
+    ]
+    board.set_piece(Coordinate(3,4), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(4,4), Pawn(Color.BLACK))
+    assert QueenMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(3,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(7,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,3), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), None, Pawn(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(6,0), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,4), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,5), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,6), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(2,2), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(1,1), None, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(0,0), None, None),
+    ]
