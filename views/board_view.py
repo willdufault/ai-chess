@@ -1,5 +1,5 @@
 from enums.color import Color
-from models.board import BOARD_SIZE, Board
+from models.board import Board
 from models.coordinate import Coordinate
 
 TOP_BORDER = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
@@ -15,11 +15,11 @@ class BoardView:
         """Draw the board from the perspective of the color."""
         rows = [TOP_BORDER]
         if color is Color.WHITE:
-            row_indexes = tuple(reversed(range(BOARD_SIZE)))
-            column_indexes = tuple(range(BOARD_SIZE))
+            row_indexes = tuple(reversed(range(board.size)))
+            column_indexes = tuple(range(board.size))
         else:
-            row_indexes = tuple(range(BOARD_SIZE))
-            column_indexes = tuple(reversed(range(BOARD_SIZE)))
+            row_indexes = tuple(range(board.size))
+            column_indexes = tuple(reversed(range(board.size)))
 
         for row_index in row_indexes:
             row = [f"{row_index} │"]

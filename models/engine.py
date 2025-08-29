@@ -1,4 +1,3 @@
-from constants.board_constants import BOARD_SIZE
 from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
@@ -164,8 +163,8 @@ class Engine:
         """Return the sum of the values of all white pieces minus the sum of
         values of all black pieces."""
         material_score = 0
-        for row_index in range(BOARD_SIZE):
-            for column_index in range(BOARD_SIZE):
+        for row_index in range(board.size):
+            for column_index in range(board.size):
                 current_coordinate = Coordinate(row_index, column_index)
                 if not board.is_occupied(current_coordinate):
                     continue
@@ -186,8 +185,8 @@ class Engine:
         sum of the placement scores of all black pieces."""
         positional_score = 0
         is_in_endgame = Engine._is_in_endgame(board)
-        for row_index in range(BOARD_SIZE):
-            for column_index in range(BOARD_SIZE):
+        for row_index in range(board.size):
+            for column_index in range(board.size):
                 current_coordinate = Coordinate(row_index, column_index)
                 if not board.is_occupied(current_coordinate):
                     continue
@@ -234,8 +233,8 @@ class Engine:
     def _is_in_endgame(board: Board) -> bool:
         """Return whether there are no queens left on the board."""
         # TODO: test different endgame criteria
-        for row_index in range(BOARD_SIZE):
-            for column_index in range(BOARD_SIZE):
+        for row_index in range(board.size):
+            for column_index in range(board.size):
                 current_coordinate = Coordinate(row_index, column_index)
                 if not board.is_occupied(current_coordinate):
                     continue

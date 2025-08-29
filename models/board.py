@@ -15,7 +15,7 @@ class Board:
     def __init__(self) -> None:
         self.size = BOARD_SIZE
         self._squares: list[list[Piece | None]] = [
-            [None] * BOARD_SIZE for _ in range(BOARD_SIZE)
+            [None] * self.size for _ in range(self.size)
         ]
         self._white_king_coordinate = Coordinate(-1, -1)
         self._black_king_coordinate = Coordinate(-1, -1)
@@ -29,7 +29,7 @@ class Board:
         piece_type_order = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
         for column_index, piece_type in enumerate(piece_type_order):
             white_piece_coordinate = Coordinate(0, column_index)
-            black_piece_coordinate = Coordinate(BOARD_SIZE - 1, column_index)
+            black_piece_coordinate = Coordinate(self.size - 1, column_index)
             white_pawn_coordinate = Coordinate(self._WHITE_PAWN_ROW_INDEX, column_index)
             black_pawn_coordinate = Coordinate(self._BLACK_PAWN_ROW_INDEX, column_index)
             self.set_piece(white_piece_coordinate, piece_type(Color.WHITE))
@@ -38,7 +38,7 @@ class Board:
             self.set_piece(black_pawn_coordinate, Pawn(Color.BLACK))
         self._set_king_coordinate(Color.WHITE, Coordinate(0, self._KING_COLUMN_INDEX))
         self._set_king_coordinate(
-            Color.BLACK, Coordinate(BOARD_SIZE - 1, self._KING_COLUMN_INDEX)
+            Color.BLACK, Coordinate(self.size - 1, self._KING_COLUMN_INDEX)
         )
 
     def get_piece(self, coordinate: Coordinate) -> Piece | None:
