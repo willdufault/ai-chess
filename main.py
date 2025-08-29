@@ -1,7 +1,6 @@
 from controllers.board_controller import BoardController
 from game import Game
-
-from ..models.board import Board
+from models.board import Board
 
 
 def main() -> None:

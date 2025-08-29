@@ -5,7 +5,6 @@ from models.coordinate import Coordinate
 TOP_BORDER = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
 MIDDLE_BORDER = "  ├───┼───┼───┼───┼───┼───┼───┼───┤"
 BOTTOM_BORDER = "  └───┴───┴───┴───┴───┴───┴───┴───┘"
-COLUMN_LABELS = "    0   1   2   3   4   5   6   7"
 
 
 class BoardView:
@@ -35,6 +34,7 @@ class BoardView:
                 rows.append(MIDDLE_BORDER)
 
         rows.append(BOTTOM_BORDER)
-        rows.append(COLUMN_LABELS)
+        column_labels = f"    {'   '.join(map(str, column_indexes))}"
+        rows.append(column_labels)
         board_str = "\n".join(rows)
         print(board_str)

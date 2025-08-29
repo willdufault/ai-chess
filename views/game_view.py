@@ -7,32 +7,32 @@ from models.pieces import Bishop, Knight, Queen, Rook
 class GameView:
     """Handles prompting the user for game-related inputs."""
 
-    @staticmethod
-    def prompt_game_mode() -> GameMode:
+    @classmethod
+    def prompt_game_mode(cls) -> GameMode:
         """Prompt the user for the game mode and return it."""
         game_mode_options = ("2p", "ai")
-        game_mode_choice = GameView._prompt_choice(
+        game_mode_choice = cls._prompt_choice(
             game_mode_options,
             "Would you like to play 2-player or against our AI? (2p/ai)",
         )
         game_mode = GameMode.TWO_PLAYER if game_mode_choice == "2p" else GameMode.AI
         return game_mode
 
-    @staticmethod
-    def prompt_player_color() -> Color:
+    @classmethod
+    def prompt_player_color(cls) -> Color:
         """Prompt the user for the player color and return it."""
         player_color_options = ("w", "b")
-        player_color_choice = GameView._prompt_choice(
+        player_color_choice = cls._prompt_choice(
             player_color_options, "Would you like to play as white or black? (w/b)"
         )
         player_color = Color.WHITE if player_color_choice == "w" else Color.BLACK
         return player_color
 
-    @staticmethod
-    def prompt_ai_depth() -> int:
+    @classmethod
+    def prompt_ai_depth(cls) -> int:
         """Prompt the user for the AI depth and return it."""
         ai_depth_options = tuple(map(str, range(MAX_DEPTH + 1)))
-        ai_depth_choice = GameView._prompt_choice(
+        ai_depth_choice = cls._prompt_choice(
             ai_depth_options,
             f"What would you like the AI depth to be? (0-{MAX_DEPTH}, higher is smarter but slower)",
         )
@@ -45,11 +45,11 @@ class GameView:
         move_coords = input("Where would you like to move (rcrc)? ")
         return move_coords
 
-    @staticmethod
-    def prompt_promotion() -> type[Knight | Bishop | Rook | Queen]:
+    @classmethod
+    def prompt_promotion(cls) -> type[Knight | Bishop | Rook | Queen]:
         """Prompt the user for the piece type to promote their pawn to."""
         new_piece_options = ("k", "b", "r", "q")
-        new_piece_choice = GameView._prompt_choice(
+        new_piece_choice = cls._prompt_choice(
             new_piece_options,
             "What would you like to promote to? (k/b/r/q)",
         )
