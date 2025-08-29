@@ -11,21 +11,20 @@ from utils.board_utils import is_coordinate_in_bounds
 if TYPE_CHECKING:
     from models.board import Board
     from models.move import Move
-    from models.pieces import Pawn
 
-ORTHOGONAL_DIRECTIONS = (
+_ORTHOGONAL_DIRECTIONS = (
     Direction(0, 1),
     Direction(0, -1),
     Direction(1, 0),
     Direction(-1, 0),
 )
-DIAGONAL_DIRECTIONS = (
+_DIAGONAL_DIRECTIONS = (
     Direction(1, 1),
     Direction(1, -1),
     Direction(-1, 1),
     Direction(-1, -1),
 )
-STRAIGHT_DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
+_STRAIGHT_DIRECTIONS = _ORTHOGONAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
 
 
 class MoveStrategy(ABC):
@@ -45,6 +44,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
     """Represents an abstract move strategy for a chess piece that moves in
     straight lines."""
 
+    # TODO: cleaner way to do this? same below for _MOVE_PATTERNS
     _DIRECTIONS = ()
 
     @classmethod
@@ -85,7 +85,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
         """Return a list of coordinates of all pieces of the color attacking the
         target coordinate in a straight line."""
         attacker_coordinates = []
-        for direction in STRAIGHT_DIRECTIONS:
+        for direction in _STRAIGHT_DIRECTIONS:
             current_coordinate = Coordinate(
                 target_coordinate.row_index + direction.row_delta,
                 target_coordinate.column_index + direction.column_delta,
@@ -357,15 +357,15 @@ class KnightMoveStrategy(PatternMoveStrategy):
 
 
 class BishopMoveStrategy(StraightMoveStrategy):
-    _DIRECTIONS = DIAGONAL_DIRECTIONS
+    _DIRECTIONS = _DIAGONAL_DIRECTIONS
 
 
 class RookMoveStrategy(StraightMoveStrategy):
-    _DIRECTIONS = ORTHOGONAL_DIRECTIONS
+    _DIRECTIONS = _ORTHOGONAL_DIRECTIONS
 
 
 class QueenMoveStrategy(StraightMoveStrategy):
-    _DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
+    _DIRECTIONS = _ORTHOGONAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
 
 
 class KingMoveStrategy(PatternMoveStrategy):

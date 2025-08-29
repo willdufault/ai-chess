@@ -2,16 +2,16 @@ from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
 
-TOP_BORDER = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
-MIDDLE_BORDER = "  ├───┼───┼───┼───┼───┼───┼───┼───┤"
-BOTTOM_BORDER = "  └───┴───┴───┴───┴───┴───┴───┴───┘"
+_TOP_BORDER = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐"
+_MIDDLE_BORDER = "  ├───┼───┼───┼───┼───┼───┼───┼───┤"
+_BOTTOM_BORDER = "  └───┴───┴───┴───┴───┴───┴───┴───┘"
 
 
 class BoardView:
     @staticmethod
     def draw(color: Color, board: Board) -> None:
         """Draw the board from the perspective of the color."""
-        rows = [TOP_BORDER]
+        rows = [_TOP_BORDER]
         if color is Color.WHITE:
             row_indexes = tuple(reversed(range(board.size)))
             column_indexes = tuple(range(board.size))
@@ -29,9 +29,9 @@ class BoardView:
             row_str = "".join(row)
             rows.append(row_str)
             if row_index != row_indexes[-1]:
-                rows.append(MIDDLE_BORDER)
+                rows.append(_MIDDLE_BORDER)
 
-        rows.append(BOTTOM_BORDER)
+        rows.append(_BOTTOM_BORDER)
         column_labels = f"    {'   '.join(map(str, column_indexes))}"
         rows.append(column_labels)
         board_str = "\n".join(rows)
