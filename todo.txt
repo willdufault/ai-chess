@@ -14,6 +14,5 @@ REFACTORS
 - replace board_controller.board() with immutable board hash?
 - be consistent with checking for piece type vs move strat type
 - make pyright happy, fix "# pyright:..." comments
-- make global consts private in all files
 - board: make board.size property and update refs to BOARD_SIZE (if it makes sense)
 - engine: get eval bar score [-10, 10]

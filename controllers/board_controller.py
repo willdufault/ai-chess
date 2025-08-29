@@ -9,8 +9,9 @@ from models.move_strategies import (
     PawnMoveStrategy,
     QueenMoveStrategy,
     RookMoveStrategy,
+    StraightMoveStrategy,
 )
-from models.pieces import FirstMovePiece, Knight, Pawn
+from models.pieces import FirstMovePiece, Pawn
 from utils.board_utils import get_last_row_index, is_coordinate_in_bounds
 
 
@@ -197,7 +198,8 @@ class BoardController:
     def _can_block_attacker(self, color: Color, attacker_coordinate: Coordinate):
         """Return whether the color can block an attack from the coordinate."""
         attacker = self._board.get_piece(attacker_coordinate)
-        if isinstance(attacker, Knight):
+        assert attacker is not None
+        if not isinstance(attacker.MOVE_STRATEGY, StraightMoveStrategy):
             return False
 
         king_coordinate = self._board.get_king_coordinate(color)
