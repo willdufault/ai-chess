@@ -97,7 +97,7 @@ class StraightMoveStrategy(MoveStrategy, ABC):
                     current_piece = board.get_piece(current_coordinate)
                     assert current_piece is not None
                     can_current_piece_attack_target = (
-                        isinstance(current_piece.move_strategy, cls)
+                        isinstance(current_piece.MOVE_STRATEGY, cls)
                         and direction in cls._DIRECTIONS
                     )
                     if can_current_piece_attack_target and current_piece.color == color:
@@ -154,7 +154,7 @@ class PatternMoveStrategy(MoveStrategy, ABC):
             current_piece = board.get_piece(current_coordinate)
             assert current_piece is not None
             can_current_piece_attack_target = isinstance(
-                current_piece.move_strategy, cls
+                current_piece.MOVE_STRATEGY, cls
             )
             if can_current_piece_attack_target and current_piece.color == color:
                 attacker_coordinates.append(current_coordinate)
@@ -219,7 +219,7 @@ class PawnMoveStrategy(MoveStrategy):
             current_piece = board.get_piece(current_coordinate)
             assert current_piece is not None
             is_current_piece_same_color_pawn = (
-                isinstance(current_piece.move_strategy, cls)
+                isinstance(current_piece.MOVE_STRATEGY, cls)
                 and current_piece.color == color
             )
             if is_current_piece_same_color_pawn:
@@ -271,7 +271,7 @@ class PawnMoveStrategy(MoveStrategy):
         one_back_piece = board.get_piece(one_back_coordinate)
         assert one_back_piece is not None
         is_one_back_piece_same_color_pawn = (
-            isinstance(one_back_piece.move_strategy, cls)
+            isinstance(one_back_piece.MOVE_STRATEGY, cls)
             and one_back_piece.color == color
         )
         if not is_one_back_piece_same_color_pawn:
@@ -288,7 +288,7 @@ class PawnMoveStrategy(MoveStrategy):
         two_back_piece = board.get_piece(two_back_coordinate)
         assert two_back_piece is not None
         is_two_back_piece_same_color_pawn = (
-            isinstance(two_back_piece.move_strategy, cls)
+            isinstance(two_back_piece.MOVE_STRATEGY, cls)
             and two_back_piece.color == color
         )
         # TODO: fix pyright warning

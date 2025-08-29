@@ -10,7 +10,7 @@ from models.move_strategies import (
     QueenMoveStrategy,
     RookMoveStrategy,
 )
-from models.pieces import FirstMovePiece, Knight, Pawn, Piece
+from models.pieces import FirstMovePiece, Knight, Pawn
 from utils.board_utils import get_last_row_index, is_coordinate_in_bounds
 
 

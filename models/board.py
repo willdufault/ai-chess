@@ -19,10 +19,6 @@ class Board:
         ]
         self._white_king_coordinate = Coordinate(-1, -1)
         self._black_king_coordinate = Coordinate(-1, -1)
-        # self._can_white_short_castle = True
-        # self._can_white_long_castle = True
-        # self._can_black_short_castle = True
-        # self._can_black_long_castle = True
 
     def set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""

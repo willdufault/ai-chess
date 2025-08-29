@@ -172,9 +172,9 @@ class Engine:
                 current_piece = board.get_piece(current_coordinate)
                 assert current_piece is not None
                 value = (
-                    current_piece.value
+                    current_piece.VALUE
                     if current_piece.color is Color.WHITE
-                    else -current_piece.value
+                    else -current_piece.VALUE
                 )
                 material_score += value
         return material_score

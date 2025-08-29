@@ -6,14 +6,12 @@ FEATURES
 * AI
 
 REFACTORS
-* tests: clean up per clean code book recs
+- tests: clean up per clean code book recs
 - mock testing
 - more informative return values?
 - error handling (ex: board.set_piece)
-- spell out for all public-facing methods/params/fields/vars
 - look into potentially using yields for performance
 - replace board_controller.board() with immutable board hash?
-- piece: make some fields class-level consts
 - be consistent with checking for piece type vs move strat type
 - make pyright happy, fix "# pyright:..." comments
 - XXXmovestrat.is_valid_move: use board.get_piece or just trust move.from_piece?

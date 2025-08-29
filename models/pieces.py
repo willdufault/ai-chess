@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from enums.color import Color
 
@@ -14,16 +14,9 @@ from .move_strategies import (
 
 
 class Piece(ABC):
-    """Represents an abstract chess piece."""
 
-    # TODO: think about making some fields class-level consts. best way to do that?
-    def __init__(
-        self, color: Color, value: int, symbol: str, move_strategy: MoveStrategy
-    ) -> None:
+    def __init__(self, color: Color) -> None:
         self._color = color
-        self._value = value
-        self._symbol = symbol
-        self._move_strategy = move_strategy
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -35,87 +28,121 @@ class Piece(ABC):
         return self._color
 
     @property
-    def value(self) -> int:
-        return self._value
+    @abstractmethod
+    def VALUE(self) -> int:
+        pass
 
     @property
+    @abstractmethod
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        pass
+
+    @property
+    @abstractmethod
     def symbol(self) -> str:
-        return self._symbol
-
-    @property
-    def move_strategy(self) -> MoveStrategy:
-        return self._move_strategy
+        pass
 
 
 class FirstMovePiece(Piece, ABC):
-    """Represents an abstract chess piece that tracks whether it has moved."""
 
-    def __init__(
-        self, color: Color, value: int, symbol: str, move_strategy: MoveStrategy
-    ) -> None:
-        super().__init__(color, value, symbol, move_strategy)
+    def __init__(self, color: Color) -> None:
+        super().__init__(color)
         self._has_moved = False
 
     @property
     def has_moved(self) -> bool:
-        """Get whether the piece has moved."""
         return self._has_moved
 
     @has_moved.setter
     def has_moved(self, has_moved: bool) -> None:
-        """Set whether the piece has moved."""
         self._has_moved = has_moved
 
 
 class Pawn(FirstMovePiece):
-    """Represents a pawn."""
 
-    def __init__(self, color: Color) -> None:
-        value = 1
-        symbol = "♙" if color is Color.WHITE else "♟"
-        super().__init__(color, value, symbol, PawnMoveStrategy())
+    @property
+    def VALUE(self) -> int:
+        return 1
+
+    @property
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        return PawnMoveStrategy()
+
+    @property
+    def symbol(self) -> str:
+        return "♙" if self.color is Color.WHITE else "♟"
 
 
 class Knight(Piece):
-    """Represents a knight."""
 
-    def __init__(self, color: Color) -> None:
-        value = 3
-        symbol = "♘" if color is Color.WHITE else "♞"
-        super().__init__(color, value, symbol, KnightMoveStrategy())
+    @property
+    def VALUE(self) -> int:
+        return 3
+
+    @property
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        return KnightMoveStrategy()
+
+    @property
+    def symbol(self) -> str:
+        return "♘" if self.color is Color.WHITE else "♞"
 
 
 class Bishop(Piece):
-    """Represents a bishop."""
 
-    def __init__(self, color: Color) -> None:
-        value = 3
-        symbol = "♗" if color is Color.WHITE else "♝"
-        super().__init__(color, value, symbol, BishopMoveStrategy())
+    @property
+    def VALUE(self) -> int:
+        return 3
+
+    @property
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        return BishopMoveStrategy()
+
+    @property
+    def symbol(self) -> str:
+        return "♗" if self.color is Color.WHITE else "♝"
 
 
 class Rook(FirstMovePiece):
-    """Represents a rook."""
 
-    def __init__(self, color: Color) -> None:
-        value = 5
-        symbol = "♖" if color is Color.WHITE else "♜"
-        super().__init__(color, value, symbol, RookMoveStrategy())
+    @property
+    def VALUE(self) -> int:
+        return 5
+
+    @property
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        return RookMoveStrategy()
+
+    @property
+    def symbol(self) -> str:
+        return "♖" if self.color is Color.WHITE else "♜"
 
 
 class Queen(Piece):
-    """Represents a queen."""
 
-    def __init__(self, color: Color) -> None:
-        value = 9
-        symbol = "♕" if color is Color.WHITE else "♛"
-        super().__init__(color, value, symbol, QueenMoveStrategy())
+    @property
+    def VALUE(self) -> int:
+        return 9
+
+    @property
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        return QueenMoveStrategy()
+
+    @property
+    def symbol(self) -> str:
+        return "♕" if self.color is Color.WHITE else "♛"
 
 
 class King(FirstMovePiece):
-    """Represents a king."""
 
-    def __init__(self, color: Color) -> None:
-        value = 99
-        symbol = "♔" if color is Color.WHITE else "♚"
-        super().__init__(color, value, symbol, KingMoveStrategy())
+    @property
+    def VALUE(self) -> int:
+        return 100
+
+    @property
+    def MOVE_STRATEGY(self) -> MoveStrategy:
+        return KingMoveStrategy()
+
+    @property
+    def symbol(self) -> str:
+        return "♔" if self.color is Color.WHITE else "♚"

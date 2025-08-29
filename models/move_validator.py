@@ -13,7 +13,7 @@ class MoveValidator:
             return False
 
         assert move.from_piece is not None
-        return move.from_piece.move_strategy.is_move_valid(move, board)
+        return move.from_piece.MOVE_STRATEGY.is_move_valid(move, board)
 
     @staticmethod
     def _does_move_pass_basic_checks(move: Move) -> bool:
