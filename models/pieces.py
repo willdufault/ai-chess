@@ -22,6 +22,9 @@ class Piece(ABC):
             return False
         return self.color == other.color
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(color={self.color})"
+
     @property
     def color(self) -> Color:
         return self._color

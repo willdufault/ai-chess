@@ -5,7 +5,7 @@ FEATURES
 - En passant?
 
 REFACTORS
-- tests: clean up per clean code book recs
+- !!! tests: clean up per clean code book recs, should be individual, not sequential
 - mock testing
 - more informative return values?
 - error handling (ex: board.set_piece)

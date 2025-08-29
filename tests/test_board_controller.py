@@ -115,86 +115,134 @@ def test_is_in_check(board_controller: BoardController) -> None:
     board_controller.board.set_piece(Coordinate(1, 4), Rook(Color.BLACK))
     assert board_controller.is_in_check(Color.WHITE) is True
 
+
 def test_is_in_checkmate_smother(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(0,5), Rook(Color.WHITE))
+    board.set_piece(Coordinate(0, 5), Rook(Color.WHITE))
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(1,6), Knight(Color.BLACK))
+    board.set_piece(Coordinate(1, 6), Knight(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is True
 
 
 def test_is_in_checkmate_back_rank(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(0,5),None)
-    board.set_piece(Coordinate(0,6),None)
+    board.set_piece(Coordinate(0, 5), None)
+    board.set_piece(Coordinate(0, 6), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(0,7),Rook(Color.BLACK))
+    board.set_piece(Coordinate(0, 7), Rook(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is True
+
 
 def test_is_in_checkmate_back_rank_block(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(0,5),None)
-    board.set_piece(Coordinate(0,6),None)
+    board.set_piece(Coordinate(0, 5), None)
+    board.set_piece(Coordinate(0, 6), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(0,7),Rook(Color.BLACK))
+    board.set_piece(Coordinate(0, 7), Rook(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is True
-    board.set_piece(Coordinate(1,6),Rook(Color.WHITE))
+    board.set_piece(Coordinate(1, 6), Rook(Color.WHITE))
     assert board_controller.is_in_checkmate(Color.WHITE) is False
+
 
 def test_is_in_checkmate_back_rank_capture(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(0,5),None)
-    board.set_piece(Coordinate(0,6),None)
+    board.set_piece(Coordinate(0, 5), None)
+    board.set_piece(Coordinate(0, 6), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(0,7),Rook(Color.BLACK))
+    board.set_piece(Coordinate(0, 7), Rook(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is True
-    board.set_piece(Coordinate(1,7),Rook(Color.WHITE))
+    board.set_piece(Coordinate(1, 7), Rook(Color.WHITE))
     assert board_controller.is_in_checkmate(Color.WHITE) is False
+
 
 def test_is_in_checkmate_back_rank_escape(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(0,5),None)
-    board.set_piece(Coordinate(0,6),None)
+    board.set_piece(Coordinate(0, 5), None)
+    board.set_piece(Coordinate(0, 6), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(0,7),Rook(Color.BLACK))
+    board.set_piece(Coordinate(0, 7), Rook(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is True
-    board.set_piece(Coordinate(1,4),None)
+    board.set_piece(Coordinate(1, 4), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    
+
 
 def test_is_in_checkmate_scholars(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(1,5), Queen(Color.BLACK))
+    board.set_piece(Coordinate(1, 5), Queen(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(3,7), Bishop(Color.BLACK))
+    board.set_piece(Coordinate(3, 7), Bishop(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is True
-    
+
 
 def test_is_in_checkmate_double(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(2,4), Rook(Color.BLACK))
-    board.set_piece(Coordinate(2,2), Bishop(Color.BLACK))
+    board.set_piece(Coordinate(2, 4), Rook(Color.BLACK))
+    board.set_piece(Coordinate(2, 2), Bishop(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(1,3), None)
-    board.set_piece(Coordinate(1,4), None)
+    board.set_piece(Coordinate(1, 3), None)
+    board.set_piece(Coordinate(1, 4), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is True
 
 
 def test_is_in_checkmate_double_escape(board_controller: BoardController) -> None:
     board = board_controller.board
     board.set_up_pieces()
-    board.set_piece(Coordinate(2,4), Rook(Color.BLACK))
-    board.set_piece(Coordinate(2,2), Bishop(Color.BLACK))
+    board.set_piece(Coordinate(2, 4), Rook(Color.BLACK))
+    board.set_piece(Coordinate(2, 2), Bishop(Color.BLACK))
     assert board_controller.is_in_checkmate(Color.WHITE) is False
-    board.set_piece(Coordinate(1,3), None)
-    board.set_piece(Coordinate(1,4), None)
+    board.set_piece(Coordinate(1, 3), None)
+    board.set_piece(Coordinate(1, 4), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is True
-    board.set_piece(Coordinate(1,5), None)
+    board.set_piece(Coordinate(1, 5), None)
     assert board_controller.is_in_checkmate(Color.WHITE) is False
+
+
+def test_get_legal_moves(board_controller: BoardController) -> None:
+    assert board_controller.get_legal_moves(Color.WHITE) == []
+    board_controller.board.set_up_pieces()
+    board_controller.board.set_piece(Coordinate(1, 0), None)
+    board_controller.board.set_piece(Coordinate(1, 4), None)
+    board_controller.board.set_piece(Coordinate(4, 7), Bishop(Color.BLACK))
+    pawn = board_controller.board.get_piece(Coordinate(1, 1))
+    assert isinstance(pawn, Pawn)
+    pawn.has_moved = True
+    assert board_controller.get_legal_moves(Color.WHITE) == [
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(1,0), Rook(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(2,0), Rook(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(3,0), Rook(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(4,0), Rook(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(5,0), Rook(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,0), Coordinate(6,0), Rook(Color.WHITE), Pawn(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(0,1), Coordinate(2,2), Knight(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,1), Coordinate(2,0), Knight(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,3), Coordinate(1,4), Queen(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,3), Coordinate(2,5), Queen(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,3), Coordinate(3,6), Queen(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,3), Coordinate(4,7), Queen(Color.WHITE), Bishop(Color.BLACK)),
+        Move(Color.WHITE, Coordinate(0,5), Coordinate(1,4), Bishop(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,5), Coordinate(2,3), Bishop(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,5), Coordinate(3,2), Bishop(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,5), Coordinate(4,1), Bishop(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,5), Coordinate(5,0), Bishop(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,6), Coordinate(1,4), Knight(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,6), Coordinate(2,7), Knight(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(0,6), Coordinate(2,5), Knight(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,1), Coordinate(2,1), pawn, None),
+        Move(Color.WHITE, Coordinate(1,2), Coordinate(2,2), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,2), Coordinate(3,2), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,3), Coordinate(2,3), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,3), Coordinate(3,3), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,5), Coordinate(2,5), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,5), Coordinate(3,5), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,6), Coordinate(2,6), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,6), Coordinate(3,6), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,7), Coordinate(2,7), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(1,7), Coordinate(3,7), Pawn(Color.WHITE), None),
+    ]

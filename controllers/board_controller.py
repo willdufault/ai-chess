@@ -87,10 +87,39 @@ class BoardController:
 
     def get_legal_moves(self, color: Color) -> list[Move]:
         """Return a list of all legal moves for the color."""
-        # TODO
-        raise NotImplementedError
+        candidate_moves = self._get_candidate_moves(color)
+        return self._get_legal_candidate_moves(candidate_moves)
 
-    def _simulate_defense(
+    def _get_legal_candidate_moves(self, candidate_moves: list[Move]) -> list[Move]:
+        """Return a list of legal moves out of the candidate moves."""
+        legal_moves = []
+        for move in candidate_moves:
+            if not self._is_in_discovered_check_after_move(move):
+                legal_moves.append(move)
+        return legal_moves
+
+    def _get_candidate_moves(self, color: Color) -> list[Move]:
+        """Return a list of candidate moves for the color."""
+        candidate_moves = []
+        for row_index in range(self._board.size):
+            for column_index in range(self._board.size):
+                current_coordinate = Coordinate(row_index, column_index)
+                if not self._board.is_occupied(current_coordinate):
+                    continue
+
+                current_piece = self._board.get_piece(current_coordinate)
+                assert current_piece is not None
+                if current_piece.color != color:
+                    continue
+
+                candidate_moves.extend(
+                    current_piece.MOVE_STRATEGY.get_candidate_moves(
+                        color, current_coordinate, self._board
+                    )
+                )
+        return candidate_moves
+
+    def _can_move_to_coordinate(
         self,
         color: Color,
         to_coordinate: Coordinate,
@@ -102,12 +131,16 @@ class BoardController:
         for from_coordinate in from_coordinates:
             from_piece = self._board.get_piece(from_coordinate)
             move = Move(color, from_coordinate, to_coordinate, from_piece, to_piece)
-            self.make_move(move)
-            is_still_in_check = self.is_in_check(color)
-            self.undo_move(move)
-            if not is_still_in_check:
+            if not self._is_in_discovered_check_after_move(move):
                 return True
         return False
+
+    def _is_in_discovered_check_after_move(self, move: Move) -> bool:
+        """Return whether making the move puts the color in check."""
+        self.make_move(move)
+        is_in_discovered_check = self.is_in_check(move.color)
+        self.undo_move(move)
+        return is_in_discovered_check
 
     def _is_king_trapped(self, color: Color) -> bool:
         """Return whether the king of the color has any empty escape squares."""
@@ -193,7 +226,9 @@ class BoardController:
         defender_coordinates = self._get_attacker_coordinates(
             color, attacker_coordinate
         )
-        return self._simulate_defense(color, attacker_coordinate, defender_coordinates)
+        return self._can_move_to_coordinate(
+            color, attacker_coordinate, defender_coordinates
+        )
 
     def _can_block_attacker(self, color: Color, attacker_coordinate: Coordinate):
         """Return whether the color can block an attack from the coordinate."""
@@ -210,7 +245,7 @@ class BoardController:
             blocker_coordinates = self._get_blocker_coordinates(
                 color, between_coordinate
             )
-            can_block_current_coordinate = self._simulate_defense(
+            can_block_current_coordinate = self._can_move_to_coordinate(
                 color, between_coordinate, blocker_coordinates
             )
             if can_block_current_coordinate:

@@ -54,7 +54,7 @@ class MoveStrategy(ABC):
         color: Color,
         from_coordinate: Coordinate,
         board: Board,
-    ) -> bool:
+    ) -> list[Move]:
         """Return a list of candidate moves from the from coordinate without
         accounting for discovered check."""
         pass
@@ -356,13 +356,11 @@ class PawnMoveStrategy(MoveStrategy):
         if not is_coordinate_in_bounds(from_coordinate):
             return []
 
-        # TODO: test each of these, then do get_legal_moves
         candidate_forward_moves = cls._get_candidate_forward_moves(
             color, from_coordinate, board
         )
         candidate_captures = cls._get_candidate_captures(color, from_coordinate, board)
-        candidate_moves = candidate_forward_moves + candidate_captures
-        return candidate_moves
+        return candidate_forward_moves + candidate_captures
 
     @classmethod
     def _get_candidate_forward_moves(
@@ -373,26 +371,54 @@ class PawnMoveStrategy(MoveStrategy):
         candidate_forward_moves = []
         from_piece = board.get_piece(from_coordinate)
         forward_row_delta = cls.get_forward_row_delta(color)
-        for move_row_delta in (cls._SINGLE_MOVE_ROW_DELTA, cls._DOUBLE_MOVE_ROW_DELTA):
-            forward_coordinate = Coordinate(
-                from_coordinate.row_index + move_row_delta * forward_row_delta,
+
+        # TODO: REFACTOR, CLEAN UP
+        # forward one
+        forward_one_coordinate = Coordinate(
+            from_coordinate.row_index + forward_row_delta,
+            from_coordinate.column_index,
+        )
+        if not is_coordinate_in_bounds(forward_one_coordinate):
+            return []
+
+        if board.is_occupied(forward_one_coordinate):
+            return []
+
+        forward_one_piece = board.get_piece(forward_one_coordinate)
+        forward_one_move = Move(
+            color,
+            from_coordinate,
+            forward_one_coordinate,
+            from_piece,
+            forward_one_piece,
+        )
+        candidate_forward_moves.append(forward_one_move)
+
+        # forward two
+        # TODO: fix pyright warning
+        assert from_piece is not None
+        if not from_piece.has_moved:  # pyright: ignore[reportAttributeAccessIssue]
+            forward_two_coordinate = Coordinate(
+                from_coordinate.row_index
+                + cls._DOUBLE_MOVE_ROW_DELTA * forward_row_delta,
                 from_coordinate.column_index,
             )
-            if not is_coordinate_in_bounds(forward_coordinate):
-                break
+            if not is_coordinate_in_bounds(forward_two_coordinate):
+                return candidate_forward_moves
 
-            if board.is_occupied(forward_coordinate):
-                break
+            if board.is_occupied(forward_two_coordinate):
+                return candidate_forward_moves
 
-            forward_piece = board.get_piece(forward_coordinate)
-            forward_move = Move(
+            forward_two_piece = board.get_piece(forward_two_coordinate)
+            forward_two_move = Move(
                 color,
                 from_coordinate,
-                forward_coordinate,
+                forward_two_coordinate,
                 from_piece,
-                forward_piece,
+                forward_two_piece,
             )
-            candidate_forward_moves.append(forward_move)
+            candidate_forward_moves.append(forward_two_move)
+
         return candidate_forward_moves
 
     @classmethod
