@@ -1,12 +1,10 @@
 from enums.color import Color
 from enums.game_mode import GameMode
-from models.ai import MAX_DEPTH
+from models.ai import _MAX_DEPTH
 from models.pieces import Bishop, Knight, Queen, Rook
 
 
 class GameView:
-    """Handles prompting the user for game-related inputs."""
-
     @classmethod
     def prompt_game_mode(cls) -> GameMode:
         """Prompt the user for the game mode and return it."""
@@ -31,10 +29,10 @@ class GameView:
     @classmethod
     def prompt_ai_depth(cls) -> int:
         """Prompt the user for the AI depth and return it."""
-        ai_depth_options = tuple(map(str, range(MAX_DEPTH + 1)))
+        ai_depth_options = tuple(map(str, range(_MAX_DEPTH + 1)))
         ai_depth_choice = cls._prompt_choice(
             ai_depth_options,
-            f"What would you like the AI depth to be? (0-{MAX_DEPTH}, higher is smarter but slower)",
+            f"What would you like the AI depth to be? (0-{_MAX_DEPTH}, higher is smarter but slower)",
         )
         ai_depth = int(ai_depth_choice)
         return ai_depth

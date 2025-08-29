@@ -6,8 +6,6 @@ from models.pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 # TODO: when generating legal moves, cache per board, make sure hash is efficient
 class Board:
-    """Represents a chessboard."""
-
     _KING_COLUMN_INDEX = 4
     _WHITE_PAWN_ROW_INDEX = 1
     _BLACK_PAWN_ROW_INDEX = BOARD_SIZE - 2

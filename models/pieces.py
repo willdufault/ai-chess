@@ -14,7 +14,6 @@ from .move_strategies import (
 
 
 class Piece(ABC):
-
     def __init__(self, color: Color) -> None:
         self._color = color
 
@@ -44,7 +43,6 @@ class Piece(ABC):
 
 
 class FirstMovePiece(Piece, ABC):
-
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self._has_moved = False
@@ -59,7 +57,6 @@ class FirstMovePiece(Piece, ABC):
 
 
 class Pawn(FirstMovePiece):
-
     @property
     def VALUE(self) -> int:
         return 1
@@ -74,7 +71,6 @@ class Pawn(FirstMovePiece):
 
 
 class Knight(Piece):
-
     @property
     def VALUE(self) -> int:
         return 3
@@ -89,7 +85,6 @@ class Knight(Piece):
 
 
 class Bishop(Piece):
-
     @property
     def VALUE(self) -> int:
         return 3
@@ -104,7 +99,6 @@ class Bishop(Piece):
 
 
 class Rook(FirstMovePiece):
-
     @property
     def VALUE(self) -> int:
         return 5
@@ -119,7 +113,6 @@ class Rook(FirstMovePiece):
 
 
 class Queen(Piece):
-
     @property
     def VALUE(self) -> int:
         return 9
@@ -134,7 +127,6 @@ class Queen(Piece):
 
 
 class King(FirstMovePiece):
-
     @property
     def VALUE(self) -> int:
         return 100
