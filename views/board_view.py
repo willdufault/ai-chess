@@ -8,8 +8,6 @@ BOTTOM_BORDER = "  └───┴───┴───┴───┴───�
 
 
 class BoardView:
-    """Handles drawing the board."""
-
     @staticmethod
     def draw(color: Color, board: Board) -> None:
         """Draw the board from the perspective of the color."""

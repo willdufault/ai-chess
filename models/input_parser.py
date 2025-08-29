@@ -2,8 +2,6 @@ from .coordinate import Coordinate
 
 
 class InputParser:
-    """Handle move input parsing."""
-
     @staticmethod
     def parse_input(move_input: str) -> tuple[Coordinate, Coordinate]:
         """Return the from and to coordinates from the valid input."""
