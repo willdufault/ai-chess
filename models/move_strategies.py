@@ -29,8 +29,6 @@ STRAIGHT_DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
 
 
 class MoveStrategy(ABC):
-    """Represents an abstract move strategy for a chess piece."""
-
     # TODO: this should probably take in a move instead of color + coords
     @classmethod
     @abstractmethod
@@ -162,8 +160,6 @@ class PatternMoveStrategy(MoveStrategy, ABC):
 
 
 class PawnMoveStrategy(MoveStrategy):
-    """Represents the move strategy for a pawn."""
-
     _SINGLE_MOVE_ROW_DELTA = 1
     _DOUBLE_MOVE_ROW_DELTA = 2
     _MOVE_COLUMN_DELTA = 0
@@ -348,8 +344,6 @@ class PawnMoveStrategy(MoveStrategy):
 
 
 class KnightMoveStrategy(PatternMoveStrategy):
-    """Represents the move strategy for a knight."""
-
     _MOVE_PATTERNS = (
         Direction(1, 2),
         Direction(1, -2),
@@ -363,26 +357,18 @@ class KnightMoveStrategy(PatternMoveStrategy):
 
 
 class BishopMoveStrategy(StraightMoveStrategy):
-    """Represents the move strategy for a bishop."""
-
     _DIRECTIONS = DIAGONAL_DIRECTIONS
 
 
 class RookMoveStrategy(StraightMoveStrategy):
-    """Represents the move strategy for a rook."""
-
     _DIRECTIONS = ORTHOGONAL_DIRECTIONS
 
 
 class QueenMoveStrategy(StraightMoveStrategy):
-    """Represents the move strategy for a queen."""
-
     _DIRECTIONS = ORTHOGONAL_DIRECTIONS + DIAGONAL_DIRECTIONS
 
 
 class KingMoveStrategy(PatternMoveStrategy):
-    """Represents the move strategy for a king."""
-
     _MOVE_PATTERNS = (
         Direction(0, 1),
         Direction(0, -1),

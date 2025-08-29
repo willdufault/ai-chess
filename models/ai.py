@@ -6,7 +6,7 @@ from .board import Board
 from .engine import Engine
 from .move import Move
 
-MAX_DEPTH = 10
+_MAX_DEPTH = 10
 
 
 # TODO: TBD WHICH FOLDER

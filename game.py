@@ -10,8 +10,6 @@ from views.game_view import GameView
 
 
 class Game:
-    """Represents a chess game."""
-
     def __init__(self, board_controller: BoardController) -> None:
         self._board_controller = board_controller
         self._game_mode = GameMode.TWO_PLAYER

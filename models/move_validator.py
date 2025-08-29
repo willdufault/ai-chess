@@ -4,8 +4,6 @@ from utils.board_utils import is_coordinate_in_bounds
 
 
 class MoveValidator:
-    """Handles move validation checking."""
-
     @staticmethod
     def is_move_valid(move: Move, board: Board) -> bool:
         """Return whether the move is valid, ignoring discovered check."""

@@ -15,8 +15,6 @@ from utils.board_utils import get_last_row_index, is_coordinate_in_bounds
 
 
 class BoardController:
-    """Manages the board state."""
-
     def __init__(self, board: Board) -> None:
         self._board = board
 
