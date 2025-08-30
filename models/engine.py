@@ -144,12 +144,12 @@ _ENDGAME_PLACEMENT_SCORES_BY_PIECE_TYPE = {
 
 
 class Engine:
-    @staticmethod
-    def evaluate(board: Board) -> int:
+    @classmethod
+    def evaluate(cls, board: Board) -> int:
         """Evaluate the board and return a number that represents which color is
         winning (higher = white, lower = black)."""
-        material_score = Engine._get_material_score(board)
-        positional_score = Engine._get_positional_score(board)
+        material_score = cls._get_material_score(board)
+        positional_score = cls._get_positional_score(board)
         return material_score * positional_score
 
     # TODO
@@ -179,12 +179,12 @@ class Engine:
                 material_score += value
         return material_score
 
-    @staticmethod
-    def _get_positional_score(board: Board) -> int:
+    @classmethod
+    def _get_positional_score(cls, board: Board) -> int:
         """Return the sum of the placement scores of all white pieces minus the
         sum of the placement scores of all black pieces."""
         positional_score = 0
-        is_in_endgame = Engine._is_in_endgame(board)
+        is_in_endgame = cls._is_in_endgame(board)
         for row_index in range(board.size):
             for column_index in range(board.size):
                 current_coordinate = Coordinate(row_index, column_index)
@@ -194,11 +194,11 @@ class Engine:
                 current_piece = board.get_piece(current_coordinate)
                 assert current_piece is not None
                 if is_in_endgame:
-                    positional_score += Engine._get_placement_score_endgame(
+                    positional_score += cls._get_placement_score_endgame(
                         current_piece, current_coordinate
                     )
                 else:
-                    positional_score += Engine._get_placement_score_middlegame(
+                    positional_score += cls._get_placement_score_middlegame(
                         current_piece, current_coordinate
                     )
         return positional_score
@@ -211,6 +211,7 @@ class Engine:
         placement_scores = _MIDDLEGAME_PLACEMENT_SCORES_BY_PIECE_TYPE[type[piece]]
         return (
             sign
+            * piece.VALUE
             * placement_scores[sign * coordinate.row_index][
                 sign * coordinate.column_index
             ]
@@ -224,6 +225,7 @@ class Engine:
         placement_scores = _ENDGAME_PLACEMENT_SCORES_BY_PIECE_TYPE[type[piece]]
         return (
             sign
+            * piece.VALUE
             * placement_scores[sign * coordinate.row_index][
                 sign * coordinate.column_index
             ]

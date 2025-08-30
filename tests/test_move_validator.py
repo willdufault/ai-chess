@@ -50,9 +50,25 @@ def test_is_move_valid_to_piece_same_color(board: Board) -> None:
     assert (
         MoveValidator.is_move_valid(
             Move(
-                Color.WHITE, Coordinate(0, 0), Coordinate(0, 0), None, Pawn(Color.WHITE)
+                Color.WHITE,
+                Coordinate(0, 0),
+                Coordinate(0, 0),
+                Pawn(Color.WHITE),
+                Pawn(Color.WHITE),
             ),
             board,
         )
         is False
+    )
+
+
+def test_is_move_valid_move_valid(board: Board) -> None:
+    assert (
+        MoveValidator.is_move_valid(
+            Move(
+                Color.WHITE, Coordinate(0, 0), Coordinate(1, 0), Pawn(Color.WHITE), None
+            ),
+            board,
+        )
+        is True
     )

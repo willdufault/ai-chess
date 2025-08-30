@@ -4,10 +4,10 @@ from utils.board_utils import is_coordinate_in_bounds
 
 
 class MoveValidator:
-    @staticmethod
-    def is_move_valid(move: Move, board: Board) -> bool:
+    @classmethod
+    def is_move_valid(cls, move: Move, board: Board) -> bool:
         """Return whether the move is valid, ignoring discovered check."""
-        if not MoveValidator._does_move_pass_basic_checks(move):
+        if not cls._does_move_pass_basic_checks(move):
             return False
 
         assert move.from_piece is not None

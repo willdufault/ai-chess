@@ -1,15 +1,15 @@
-from controllers.board_controller import BoardController
-from game import Game
+from controllers.game_controller import GameController
 from models.board import Board
+from models.game import Game
 
 
 def main() -> None:
     board = Board()
     board.set_up_pieces()
-    board_controller = BoardController(board)
-    game = Game(board_controller)
-    game.configure()
-    game.play()
+    game = Game(board)
+    game_controller = GameController(game)
+    game_controller.configure()
+    game_controller.play()
 
 
 if __name__ == "__main__":

@@ -95,7 +95,9 @@ class StraightMoveStrategy(MoveStrategy, ABC):
         if not is_valid_direction:
             return False
 
-        is_path_clear = not board.is_blocked(move.from_coordinate, move.to_coordinate)
+        is_path_clear = not board.is_path_blocked(
+            move.from_coordinate, move.to_coordinate
+        )
         return is_path_clear
 
     @classmethod

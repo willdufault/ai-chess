@@ -5,6 +5,10 @@ FEATURES
 - En passant?
 
 REFACTORS
+
+* REFACTOR WITH CORRECT MVC DESIGN, GET AI TO CLEANLY CALL LEGAL MOVES
+
+- _method = internal, not private. rename + reorder methods accordingly
 - !!! tests: clean up per clean code book recs, should be individual, not sequential
 - mock testing
 - more informative return values?

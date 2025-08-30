@@ -3,6 +3,7 @@ from pytest import fixture
 from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
+from models.move import Move
 from models.pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
 
@@ -110,8 +111,48 @@ def test_get_coordinates_between_far(board: Board) -> None:
 
 
 def test_is_blocked(board: Board) -> None:
-    assert board.is_blocked(Coordinate(3, 3), Coordinate(3, 3)) is False
-    assert board.is_blocked(Coordinate(3, 3), Coordinate(3, 4)) is False
-    assert board.is_blocked(Coordinate(3, 3), Coordinate(3, 5)) is False
+    assert board.is_path_blocked(Coordinate(3, 3), Coordinate(3, 3)) is False
+    assert board.is_path_blocked(Coordinate(3, 3), Coordinate(3, 4)) is False
+    assert board.is_path_blocked(Coordinate(3, 3), Coordinate(3, 5)) is False
     board.set_piece(Coordinate(3, 4), Pawn(Color.WHITE))
-    assert board.is_blocked(Coordinate(3, 3), Coordinate(3, 5)) is True
+    assert board.is_path_blocked(Coordinate(3, 3), Coordinate(3, 5)) is True
+
+
+def test_make_move(board: Board) -> None:
+    from_coordinate = Coordinate(0, 0)
+    to_coordinate = Coordinate(1, 1)
+    from_piece = Pawn(Color.WHITE)
+    to_piece = Pawn(Color.BLACK)
+    board.set_piece(from_coordinate, from_piece)
+    board.set_piece(to_coordinate, to_piece)
+    assert board.get_piece(from_coordinate) == from_piece
+    assert board.get_piece(to_coordinate) == to_piece
+    move = Move(Color.WHITE, from_coordinate, to_coordinate, from_piece, to_piece)
+    board.make_move(move)
+    assert board.get_piece(from_coordinate) == None
+    assert board.get_piece(to_coordinate) == from_piece
+    assert from_piece.has_moved is True
+
+
+def test_undo_move(board: Board) -> None:
+    # TODO: this is copied from test_make_move, DRY
+    from_coordinate = Coordinate(0, 0)
+    to_coordinate = Coordinate(1, 1)
+    from_piece = Pawn(Color.WHITE)
+    to_piece = Pawn(Color.BLACK)
+    board.set_piece(from_coordinate, from_piece)
+    board.set_piece(to_coordinate, to_piece)
+    assert board.get_piece(from_coordinate) == from_piece
+    assert board.get_piece(to_coordinate) == to_piece
+    move = Move(Color.WHITE, from_coordinate, to_coordinate, from_piece, to_piece)
+    board.make_move(move)
+    assert board.get_piece(from_coordinate) == None
+    assert board.get_piece(to_coordinate) == from_piece
+    assert from_piece.has_moved is True
+    board.undo_move(move)
+    assert board.get_piece(from_coordinate) == from_piece
+    assert board.get_piece(to_coordinate) == to_piece
+    assert from_piece.has_moved is False
+
+def test_is_attacking_coordinate_out_of_bounds(board: Board) -> None:
+    assert board.is_attacking(Color.WHITE, Coordinate(-1,-1)) == False

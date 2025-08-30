@@ -1,7 +1,6 @@
+from constants.ai_constants import MAX_DEPTH
 from enums.color import Color
 from enums.game_mode import GameMode
-from models.ai import _MAX_DEPTH
-from models.pieces import Bishop, Knight, Queen, Rook
 
 
 class GameView:
@@ -29,10 +28,10 @@ class GameView:
     @classmethod
     def prompt_ai_depth(cls) -> int:
         """Prompt the user for the AI depth and return it."""
-        ai_depth_options = tuple(map(str, range(_MAX_DEPTH + 1)))
+        ai_depth_options = tuple(map(str, range(MAX_DEPTH + 1)))
         ai_depth_choice = cls._prompt_choice(
             ai_depth_options,
-            f"What would you like the AI depth to be? (0-{_MAX_DEPTH}, higher is smarter but slower)",
+            f"What would you like the AI depth to be? (0-{MAX_DEPTH}, higher is smarter but slower)",
         )
         ai_depth = int(ai_depth_choice)
         return ai_depth
@@ -44,24 +43,14 @@ class GameView:
         return move_coords
 
     @classmethod
-    def prompt_promotion(cls) -> type[Knight | Bishop | Rook | Queen]:
+    def prompt_promotion(cls) -> str:
         """Prompt the user for the piece type to promote their pawn to."""
         new_piece_options = ("k", "b", "r", "q")
         new_piece_choice = cls._prompt_choice(
             new_piece_options,
             "What would you like to promote to? (k/b/r/q)",
         )
-        match new_piece_choice:
-            case "k":
-                return Knight
-            case "b":
-                return Bishop
-            case "r":
-                return Rook
-            case "q":
-                return Queen
-            case _:
-                raise ValueError
+        return new_piece_choice
 
     @staticmethod
     def show_turn_status(current_color: Color, is_in_check: bool) -> None:

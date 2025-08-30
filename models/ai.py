@@ -1,5 +1,6 @@
 from math import inf
 
+from controllers.board_controller import BoardController
 from enums.color import Color
 
 from .board import Board
@@ -11,9 +12,9 @@ _MAX_DEPTH = 10
 
 # TODO: TBD WHICH FOLDER
 class AI:
-    def __init__(self, color: Color, depth: int, board: Board, engine: Engine) -> None:
+    def __init__(self, color: Color, depth: int, board_controller: BoardController, engine: Engine) -> None:
         self._color = color
-        self._board = board
+        self._board_controller = board_controller
         self._depth = depth
         self._engine = engine
 
