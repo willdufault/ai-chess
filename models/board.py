@@ -11,7 +11,7 @@ from models.move_strategies import (
     RookMoveStrategy,
 )
 from models.pieces import Bishop, FirstMovePiece, King, Knight, Pawn, Piece, Queen, Rook
-from utils.board_utils import is_coordinate_in_bounds
+from utils.board_utils import get_board_index, is_coordinate_in_bounds
 
 _KING_COLUMN_INDEX = 4
 _WHITE_PAWN_ROW_INDEX = 1
@@ -22,11 +22,25 @@ _BLACK_PAWN_ROW_INDEX = BOARD_SIZE - 2
 class Board:
     def __init__(self) -> None:
         self.size = BOARD_SIZE
-        self._squares: list[list[Piece | None]] = [
-            [None] * self.size for _ in range(self.size)
-        ]
+        self._squares: list[Piece | None] = [None] * (self.size * self.size)
         self._white_king_coordinate = Coordinate(-1, -1)
         self._black_king_coordinate = Coordinate(-1, -1)
+
+    def to_key(self) -> str:
+        """Return an immutable version of the board state for caching."""
+        key = []
+        for row_index in range(self.size):
+            for column_index in range(self.size):
+                coordinate = Coordinate(row_index, column_index)
+                if not self.is_occupied(coordinate):
+                    key.append("_")
+                    continue
+
+                piece = self.get_piece(coordinate)
+                assert piece is not None
+                key.append(piece.to_key())
+        key_str = "".join(key)
+        return key_str
 
     def set_up_pieces(self) -> None:
         """Place the pieces on their starting squares."""
@@ -47,11 +61,13 @@ class Board:
 
     def get_piece(self, coordinate: Coordinate) -> Piece | None:
         """Get the piece at the coordinate."""
-        return self._squares[coordinate.row_index][coordinate.column_index]
+        board_index = get_board_index(coordinate)
+        return self._squares[board_index]
 
     def set_piece(self, coordinate: Coordinate, piece: Piece | None) -> None:
         """Set the piece at the coordinate."""
-        self._squares[coordinate.row_index][coordinate.column_index] = piece
+        board_index = get_board_index(coordinate)
+        self._squares[board_index] = piece
         if isinstance(piece, King):
             self._set_king_coordinate(piece.color, coordinate)
 

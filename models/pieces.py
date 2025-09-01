@@ -25,6 +25,10 @@ class Piece(ABC):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(color={self.color})"
 
+    def to_key(self) -> str:
+        """Return an immutable version of the piece state for caching."""
+        return self.symbol
+
     @property
     def color(self) -> Color:
         return self._color
@@ -49,6 +53,10 @@ class FirstMovePiece(Piece, ABC):
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self._has_moved = False
+
+    def to_key(self) -> str:
+        """Return an immutable version of the piece state for caching."""
+        return f"{self.symbol}{'+' if self._has_moved else '-'}"
 
     @property
     def has_moved(self) -> bool:

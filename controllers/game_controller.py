@@ -78,7 +78,6 @@ class GameController:
                 self._game.current_color = self._game.current_color.opposite
         BoardView.draw(winner_color, self._game.board)
         GameView.show_winner_message(winner_color)
-        breakpoint()
 
     def _handle_human_move(self, color: Color) -> None:
         """Prompt the player to make a legal move for the color and promote if

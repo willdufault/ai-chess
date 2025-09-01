@@ -12,9 +12,11 @@ class Coordinate:
         )
 
     def __repr__(self) -> str:
-        return (
-            f"Coordinate({self.row_index}, {self.column_index})"
-        )
+        return f"Coordinate({self.row_index}, {self.column_index})"
+
+    def to_key(self) -> str:
+        """Return an immutable version of the piece state for caching."""
+        return f"{self.row_index},{self.column_index}"
 
     @property
     def row_index(self) -> int:

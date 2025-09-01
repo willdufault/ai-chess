@@ -19,9 +19,7 @@ class AI:
         self._color = color
         self._depth = depth
         self._board = board
-        # TODO REMOVE
-        self.prune_count = 0
-        self.total_count = 0
+        self._cache = {}  # TODO better name
 
     @property
     def color(self) -> Color:
@@ -60,19 +58,14 @@ class AI:
         return scores
 
     def _minimax(self, color: Color, depth: int, alpha: int, beta: int) -> int:
-        """TODO
-        get legal moves for color
-        try them all with depth n-1
-        if depth = 0, eval
-        a-b pruning
-        cache in engine at depth >= cur_depth
-        !!! efficient board hashing !!! (test w/ diff strats?)
-        """
         if depth == 0:
             return Engine.evaluate(self._board)
 
-        # TODO TEMP
-        self.total_count += 1
+        board_key = self._board.to_key()
+        if board_key in self._cache:
+            cached_depth, cached_score = self._cache[board_key]
+            if cached_depth >= depth:
+                return cached_score
 
         moves = Rules.get_legal_moves(color, self._board)
         if color is Color.WHITE:
@@ -84,9 +77,8 @@ class AI:
                 best_score = max(best_score, current_score)
                 alpha = max(alpha, best_score)
                 if best_score >= beta:
-                    # TODO TEMP
-                    self.prune_count += 1
                     break
+            self._cache[board_key] = (depth, best_score)
             return best_score
         else:
             best_score = _MAX_SCORE
@@ -97,7 +89,6 @@ class AI:
                 best_score = min(best_score, current_score)
                 beta = min(beta, best_score)
                 if best_score <= alpha:
-                    # TODO TEMP
-                    self.prune_count += 1
                     break
+            self._cache[board_key] = (depth, best_score)
             return best_score
