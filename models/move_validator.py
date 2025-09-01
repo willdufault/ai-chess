@@ -16,10 +16,10 @@ class MoveValidator:
     @staticmethod
     def _does_move_pass_basic_checks(move: Move) -> bool:
         """Return whether the move passes basic validity checks."""
-        are_coords_in_bounds = is_coordinate_in_bounds(
+        are_coordinates_in_bounds = is_coordinate_in_bounds(
             move.from_coordinate
         ) and is_coordinate_in_bounds(move.to_coordinate)
-        if not are_coords_in_bounds:
+        if not are_coordinates_in_bounds:
             return False
 
         is_moving_wrong_piece = (

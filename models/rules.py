@@ -58,9 +58,9 @@ class Rules:
     def is_in_check_after_move(cls, move: Move, board: Board) -> bool:
         """Return whether making the move puts the color in check."""
         board.make_move(move)
-        is_in_discovered_check = cls.is_in_check(move.color, board)
+        is_in_check = cls.is_in_check(move.color, board)
         board.undo_move(move)
-        return is_in_discovered_check
+        return is_in_check
 
     @classmethod
     def _get_legal_candidate_moves(

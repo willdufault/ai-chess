@@ -17,3 +17,4 @@ REFACTORS
 - replace board_controller.board() with immutable board hash?
 - make pyright happy, fix "# pyright:..." comments
 - engine: get eval bar score
+- convert minimax to negamax?

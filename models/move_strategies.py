@@ -27,7 +27,7 @@ _DIAGONAL_DIRECTIONS = (
 
 
 class MoveStrategy(ABC):
-    # TODO: this should probably take in a move instead of color + coords
+    # TODO: this should probably take in a move instead of color + coordinates
     @classmethod
     @abstractmethod
     def is_move_valid(

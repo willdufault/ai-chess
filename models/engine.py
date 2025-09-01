@@ -150,7 +150,7 @@ class Engine:
         winning (higher = white, lower = black)."""
         material_score = cls._get_material_score(board)
         positional_score = cls._get_positional_score(board)
-        return material_score * positional_score
+        return material_score + positional_score
 
     # TODO
     @staticmethod
@@ -208,7 +208,7 @@ class Engine:
         """Return the placement score for the piece at the coordinate during the
         middlegame."""
         sign = 1 if piece.color is Color.WHITE else -1
-        placement_scores = _MIDDLEGAME_PLACEMENT_SCORES_BY_PIECE_TYPE[type[piece]]
+        placement_scores = _MIDDLEGAME_PLACEMENT_SCORES_BY_PIECE_TYPE[type(piece)]
         return (
             sign
             * piece.VALUE
@@ -222,7 +222,7 @@ class Engine:
         """Return the placement score for the piece at the coordinate during the
         endgame."""
         sign = 1 if piece.color is Color.WHITE else -1
-        placement_scores = _ENDGAME_PLACEMENT_SCORES_BY_PIECE_TYPE[type[piece]]
+        placement_scores = _ENDGAME_PLACEMENT_SCORES_BY_PIECE_TYPE[type(piece)]
         return (
             sign
             * piece.VALUE

@@ -1,33 +1,36 @@
 from enums.color import Color
 from enums.game_mode import GameMode
+from models.ai import AI
 from models.game import Game
 from models.input_parser import InputParser
 from models.input_validator import InputValidator
 from models.move import Move
 from models.move_validator import MoveValidator
-from models.pieces import Bishop, Knight, Queen, Rook
+from models.pieces import Bishop, Knight, Piece, Queen, Rook
 from models.rules import Rules
 from views.board_view import BoardView
 from views.game_view import GameView
 
 
 class GameController:
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: Game, ai: AI) -> None:
         self._game = game
+        self._ai = ai
+        self._game_mode = GameMode.TWO_PLAYER
 
     def configure(self) -> None:
         """Prompt the user to configure the game options."""
-        self._game.game_mode = GameView.prompt_game_mode()
-
-        if self._game.game_mode == GameMode.TWO_PLAYER:
+        self._game_mode = GameView.prompt_game_mode()
+        if self._game_mode == GameMode.TWO_PLAYER:
             return
 
-        self._game.player_color = GameView.prompt_player_color()
-        self._game.ai_depth = GameView.prompt_ai_depth()
+        human_color = GameView.prompt_human_color()
+        self._ai.color = human_color.opposite
+        self._ai.depth = GameView.prompt_ai_depth()
 
     def play(self) -> None:
         """Play a game of chess."""
-        match self._game.game_mode:
+        match self._game_mode:
             case GameMode.TWO_PLAYER:
                 self._play_two_player()
             case GameMode.AI:
@@ -38,29 +41,60 @@ class GameController:
     def _play_two_player(self) -> None:
         """Play a game of chess between two humans."""
         winner_color = None
-        current_color = Color.WHITE
         while winner_color is None:
-            BoardView.draw(current_color, self._game.board)
+            BoardView.draw(self._game.current_color, self._game.board)
+            is_in_check = Rules.is_in_check(self._game.current_color, self._game.board)
+            GameView.show_turn_status(self._game.current_color, is_in_check)
 
-            is_in_check = Rules.is_in_check(current_color, self._game.board)
-            GameView.show_turn_status(current_color, is_in_check)
+            self._handle_human_move(self._game.current_color)
 
-            move = self._handle_move(current_color)
-            self._handle_promotion(move)
-
-            opponent_color = current_color.opposite
-            if Rules.is_in_checkmate(opponent_color, self._game.board):
-                winner_color = current_color
-            current_color = opponent_color
+            if Rules.is_in_checkmate(
+                self._game.current_color.opposite, self._game.board
+            ):
+                winner_color = self._game.current_color
+            else:
+                self._game.current_color = self._game.current_color.opposite
         BoardView.draw(winner_color, self._game.board)
         GameView.show_winner_message(winner_color)
 
     def _play_ai(self) -> None:
         """Play a game of chess between a human and the AI."""
-        raise NotImplementedError
+        winner_color = None
+        while winner_color is None:
+            BoardView.draw(self._game.current_color, self._game.board)
+            is_in_check = Rules.is_in_check(self._game.current_color, self._game.board)
+            GameView.show_turn_status(self._game.current_color, is_in_check)
 
-    def _handle_move(self, color: Color) -> Move:
-        """Prompt the user for a valid move, then make and return the move."""
+            if self._game.current_color == self._ai.color:
+                self._handle_ai_move(self._game.current_color)
+            else:
+                self._handle_human_move(self._game.current_color)
+
+            if Rules.is_in_checkmate(
+                self._game.current_color.opposite, self._game.board
+            ):
+                winner_color = self._game.current_color
+            else:
+                self._game.current_color = self._game.current_color.opposite
+        BoardView.draw(winner_color, self._game.board)
+        GameView.show_winner_message(winner_color)
+        breakpoint()
+
+    def _handle_human_move(self, color: Color) -> None:
+        """Prompt the player to make a legal move for the color and promote if
+        applicable."""
+        move = self._prompt_legal_move(color)
+        self._game.make_move(move)
+        self._handle_human_promotion(move)
+
+    def _handle_ai_move(self, color: Color) -> None:
+        """Have the AI choose a move for the color and promote if applicable."""
+        move = self._ai.get_best_move(color)
+        self._game.make_move(move)
+        self._handle_ai_promotion(move)
+
+    def _prompt_legal_move(self, color: Color) -> Move:
+        """Prompt the user for a legal move and return it."""
         is_legal_move = False
         while not is_legal_move:
             move_coordinates = GameView.prompt_move_coordinates()
@@ -81,16 +115,24 @@ class GameController:
                 GameView.show_illegal_move(is_in_check)
                 continue
 
-            self._game.make_move(move)
             is_legal_move = True
         return move
 
-    def _handle_promotion(self, move: Move) -> None:
-        """Check if the move meets the criteria for promotion, prompt the user
-        for the new piece type, and promote the pawn."""
-        if not Rules.does_move_trigger_promotion(move):
-            return
+    def _handle_human_promotion(self, move: Move) -> None:
+        """If the move triggers promotion, prompt the player for a new piece and
+        promote the pawn."""
+        if Rules.does_move_trigger_promotion(move):
+            new_piece = self._prompt_promotion_piece(move)
+            self._game.set_piece(move.to_coordinate, new_piece)
 
+    def _handle_ai_promotion(self, move: Move) -> None:
+        """If the move triggers promotion, have the AI choose a piece to promote to."""
+        if Rules.does_move_trigger_promotion(move):
+            # TODO
+            print("Game._handle_ai_promotion NOT IMPLEMENTED YET!")
+
+    def _prompt_promotion_piece(self, move: Move) -> Piece:
+        """Prompt the user for the new piece and return it."""
         BoardView.draw(move.color, self._game.board)
         new_piece_choice = GameView.prompt_promotion()
         match new_piece_choice:
@@ -104,4 +146,4 @@ class GameController:
                 new_piece = Queen(move.color)
             case _:
                 raise ValueError
-        self._game.set_piece(move.to_coordinate, new_piece)
+        return new_piece

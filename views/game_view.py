@@ -16,8 +16,8 @@ class GameView:
         return game_mode
 
     @classmethod
-    def prompt_player_color(cls) -> Color:
-        """Prompt the user for the player color and return it."""
+    def prompt_human_color(cls) -> Color:
+        """Prompt the user for the human color and return it."""
         player_color_options = ("w", "b")
         player_color_choice = cls._prompt_choice(
             player_color_options, "Would you like to play as white or black? (w/b)"
@@ -39,8 +39,8 @@ class GameView:
     @staticmethod
     def prompt_move_coordinates() -> str:
         """Prompt the user for from and to coordinates for a move."""
-        move_coords = input("Where would you like to move (rcrc)? ")
-        return move_coords
+        move_coordinates = input("Where would you like to move (rcrc)? ")
+        return move_coordinates
 
     @classmethod
     def prompt_promotion(cls) -> str:
