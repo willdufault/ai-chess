@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from enums.color import Color
-from models.board import Board
+from models.board import Board, SimpleBoard
 from models.coordinate import Coordinate
 from models.move import Move
 from models.move_strategies import (
@@ -17,7 +17,7 @@ from models.pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
 @fixture
 def board() -> Board:
-    return Board()
+    return SimpleBoard()
 
 
 def test_bishop_is_move_valid(board: Board) -> None:

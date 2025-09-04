@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from enums.color import Color
-from models.board import Board
+from models.board import Board, SimpleBoard
 from models.coordinate import Coordinate
 from models.move import Move
 from models.move_validator import MoveValidator
@@ -10,7 +10,7 @@ from models.pieces import Pawn
 
 @fixture
 def board() -> Board:
-    return Board()
+    return SimpleBoard()
 
 
 def test_is_move_valid_coordinate_out_of_bounds(board: Board) -> None:

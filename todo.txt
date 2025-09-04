@@ -14,7 +14,7 @@ REFACTORS
 - more informative return values?
 - error handling (ex: board.set_piece)
 - look into potentially using yields for performance
-- replace board_controller.board() with immutable board hash?
+- replace board_controller.SimpleBoard() with immutable board hash?
 - make pyright happy, fix "# pyright:..." comments
 - engine: get eval bar score
 - convert minimax to negamax?
