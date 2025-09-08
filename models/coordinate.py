@@ -14,10 +14,6 @@ class Coordinate:
     def __repr__(self) -> str:
         return f"Coordinate({self.row_index}, {self.column_index})"
 
-    def to_key(self) -> str:
-        """Return an immutable version of the piece state for caching."""
-        return f"{self.row_index},{self.column_index}"
-
     @property
     def row_index(self) -> int:
         return self._row_index
@@ -25,3 +21,7 @@ class Coordinate:
     @property
     def column_index(self) -> int:
         return self._column_index
+
+    # def to_key(self) -> tuple[int, ...]:
+    #     """Return an immutable version of the piece state for caching."""
+    #     return self._row_index, self._column_index

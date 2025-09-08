@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from enums.color import Color
-from models.board import Board, SimpleBoard
+from models.board import BitBoard, Board
 from models.coordinate import Coordinate
 from models.move import Move
 from models.pieces import Bishop, King, Knight, Pawn, Queen, Rook
@@ -9,7 +9,7 @@ from models.pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
 @fixture
 def board() -> Board:
-    return SimpleBoard()
+    return BitBoard()
 
 
 def test_get_set_piece(board: Board) -> None:
@@ -130,8 +130,11 @@ def test_make_move(board: Board) -> None:
     move = Move(Color.WHITE, from_coordinate, to_coordinate, from_piece, to_piece)
     board.make_move(move)
     assert board.get_piece(from_coordinate) == None
-    assert board.get_piece(to_coordinate) == from_piece
-    assert from_piece.has_moved is True
+    # not playing nice with board preset pieces because i need to modify piece in move...
+    # better of just creating new piece each time. optimize later if necessary
+    assert board.get_piece(to_coordinate) == move.from_piece
+    assert isinstance(move.from_piece, Pawn)
+    assert move.from_piece.has_moved is True
 
 
 def test_undo_move(board: Board) -> None:
@@ -147,10 +150,11 @@ def test_undo_move(board: Board) -> None:
     move = Move(Color.WHITE, from_coordinate, to_coordinate, from_piece, to_piece)
     board.make_move(move)
     assert board.get_piece(from_coordinate) == None
-    assert board.get_piece(to_coordinate) == from_piece
-    assert from_piece.has_moved is True
+    assert board.get_piece(to_coordinate) == move.from_piece
+    assert isinstance(move.from_piece, Pawn)
+    assert move.from_piece.has_moved is True
     board.undo_move(move)
-    assert board.get_piece(from_coordinate) == from_piece
+    assert board.get_piece(from_coordinate) == move.from_piece
     assert board.get_piece(to_coordinate) == to_piece
     assert from_piece.has_moved is False
 

@@ -64,9 +64,8 @@ class StraightMoveStrategy(MoveStrategy, ABC):
     """Represents an abstract move strategy for a chess piece that moves in
     straight lines."""
 
-    # TODO: cleaner way to do this? same below for _MOVE_PATTERNS
+    # Abstract class variable must be implemented.
     _DIRECTIONS: tuple[Direction, ...] = ()
-    _get_attacker_coordinates_cache = {}
 
     @classmethod
     def is_move_valid(
@@ -108,10 +107,6 @@ class StraightMoveStrategy(MoveStrategy, ABC):
         """Return a list of coordinates of all pieces of the color attacking the
         target coordinate in a straight line."""
 
-        # cache_key = (board.to_key(), target_coordinate.to_key())
-        # if cache_key in cls._get_attacker_coordinates_cache:
-        #     return cls._get_attacker_coordinates_cache[cache_key]
-
         attacker_coordinates = []
         for direction in cls._DIRECTIONS:
             current_coordinate = Coordinate(
@@ -135,7 +130,6 @@ class StraightMoveStrategy(MoveStrategy, ABC):
                     current_coordinate.row_index + direction.row_delta,
                     current_coordinate.column_index + direction.column_delta,
                 )
-        # cls._get_attacker_coordinates_cache[cache_key] = attacker_coordinates
         return attacker_coordinates
 
     @classmethod
@@ -179,6 +173,7 @@ class PatternMoveStrategy(MoveStrategy, ABC):
     """Represents an abstract move strategy for a chess piece that moves in a
     specific pattern."""
 
+    # Abstract class variable must be implemented.
     _MOVE_PATTERNS: tuple[Direction, ...] = ()
 
     @classmethod

@@ -20,10 +20,10 @@ class Piece(ABC):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
-        return self.color == other.color
+        return self._color == other._color
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(color={self.color})"
+        return f"{self.__class__.__name__}(color={self._color})"
 
     def to_key(self) -> str:
         """Return an immutable version of the piece state for caching."""
@@ -53,6 +53,14 @@ class FirstMovePiece(Piece, ABC):
     def __init__(self, color: Color) -> None:
         super().__init__(color)
         self._has_moved = False
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        return self._color == other._color and self._has_moved == other._has_moved
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(color={self._color}, has_moved={self._has_moved})"
 
     def to_key(self) -> str:
         """Return an immutable version of the piece state for caching."""

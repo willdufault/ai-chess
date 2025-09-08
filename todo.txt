@@ -6,7 +6,10 @@ FEATURES
 
 REFACTORS
 
-* REFACTOR WITH CORRECT MVC DESIGN, GET AI TO CLEANLY CALL LEGAL MOVES
+* FINISH + CLEAN UP BITBOARD, EXTRACT COMMON BOARD METHODS
+- look for side effects, try to refactor out
+- consider namedtuple for data-only immutable classes
+- fix test cases, add test cases for methods missing them
 
 - _method = internal, not private. rename + reorder methods accordingly
 - !!! tests: clean up per clean code book recs, should be individual, not sequential
@@ -18,3 +21,4 @@ REFACTORS
 - make pyright happy, fix "# pyright:..." comments
 - engine: get eval bar score
 - convert minimax to negamax?
+- movestrats: fix abs class var weird implementation, find cleaner solution

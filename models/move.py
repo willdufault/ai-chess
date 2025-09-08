@@ -23,7 +23,7 @@ class Move:
         self._from_piece_has_moved = getattr(from_piece, "has_moved", False)
 
     def __repr__(self) -> str:
-        return f"Move(color={self._color}, from_c={self._from_coordinate}, to_c={self._to_coordinate}, from_p={self._from_piece}, to_p={self._to_piece})"
+        return f"Move(color={self._color}, from_c={self._from_coordinate}, to_c={self._to_coordinate}, from_p={self._from_piece}, to_p={self._to_piece}, from_p_hm={self._from_piece_has_moved})"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Move):
@@ -52,6 +52,10 @@ class Move:
     @property
     def from_piece(self) -> Piece | None:
         return self._from_piece
+
+    @from_piece.setter
+    def from_piece(self, from_piece: Piece | None) -> None:
+        self._from_piece = from_piece
 
     @property
     def to_piece(self) -> Piece | None:

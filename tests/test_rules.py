@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from enums.color import Color
-from models.board import Board, SimpleBoard
+from models.board import BitBoard, Board
 from models.coordinate import Coordinate
 from models.move import Move
 from models.pieces import Bishop, Knight, Pawn, Queen, Rook
@@ -10,18 +10,20 @@ from models.rules import Rules
 
 @fixture
 def board() -> Board:
-    return SimpleBoard()
+    return BitBoard()
 
 
 def test_is_in_check(board: Board) -> None:
     board.set_up_pieces()
+    from views.board_view import BoardView
     assert Rules.is_in_check(Color.WHITE, board) is False
+    breakpoint()
     board.set_piece(Coordinate(1, 4), Rook(Color.BLACK))
+    breakpoint()
     assert Rules.is_in_check(Color.WHITE, board) is True
 
 
 def test_is_in_checkmate_smother(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(0, 5), Rook(Color.WHITE))
     assert Rules.is_in_checkmate(Color.WHITE, board) is False
@@ -30,7 +32,6 @@ def test_is_in_checkmate_smother(board: Board) -> None:
 
 
 def test_is_in_checkmate_back_rank(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(0, 5), None)
     board.set_piece(Coordinate(0, 6), None)
@@ -40,7 +41,6 @@ def test_is_in_checkmate_back_rank(board: Board) -> None:
 
 
 def test_is_in_checkmate_back_rank_block(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(0, 5), None)
     board.set_piece(Coordinate(0, 6), None)
@@ -52,7 +52,6 @@ def test_is_in_checkmate_back_rank_block(board: Board) -> None:
 
 
 def test_is_in_checkmate_back_rank_capture(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(0, 5), None)
     board.set_piece(Coordinate(0, 6), None)
@@ -64,7 +63,6 @@ def test_is_in_checkmate_back_rank_capture(board: Board) -> None:
 
 
 def test_is_in_checkmate_back_rank_escape(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(0, 5), None)
     board.set_piece(Coordinate(0, 6), None)
@@ -76,7 +74,6 @@ def test_is_in_checkmate_back_rank_escape(board: Board) -> None:
 
 
 def test_is_in_checkmate_scholars(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(1, 5), Queen(Color.BLACK))
     assert Rules.is_in_checkmate(Color.WHITE, board) is False
@@ -85,7 +82,6 @@ def test_is_in_checkmate_scholars(board: Board) -> None:
 
 
 def test_is_in_checkmate_double(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(2, 4), Rook(Color.BLACK))
     board.set_piece(Coordinate(2, 2), Bishop(Color.BLACK))
@@ -96,7 +92,6 @@ def test_is_in_checkmate_double(board: Board) -> None:
 
 
 def test_is_in_checkmate_double_escape(board: Board) -> None:
-    board = board
     board.set_up_pieces()
     board.set_piece(Coordinate(2, 4), Rook(Color.BLACK))
     board.set_piece(Coordinate(2, 2), Bishop(Color.BLACK))
@@ -108,7 +103,7 @@ def test_is_in_checkmate_double_escape(board: Board) -> None:
     assert Rules.is_in_checkmate(Color.WHITE, board) is False
 
 
-def test_does_move_trigger_promotion(board: Board) -> None:
+def test_does_move_trigger_promotion() -> None:
     move_triggers = Move(
         Color.WHITE, Coordinate(0, 0), Coordinate(7, 0), Pawn(Color.WHITE), None
     )
