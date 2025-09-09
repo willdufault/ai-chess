@@ -34,18 +34,13 @@ class MoveStrategy(ABC):
         cls,
         move: Move,
         board: Board,
-    ) -> bool:
-        """Return whether the move is valid."""
-        pass
+    ) -> bool: ...
 
     @classmethod
     @abstractmethod
     def get_attacker_coordinates(
         cls, color: Color, target_coordinate: Coordinate, board: Board
-    ) -> list[Coordinate]:
-        """Return a list of coordinates of all pieces of the color attacking the
-        target coordinate."""
-        pass
+    ) -> list[Coordinate]: ...
 
     @classmethod
     @abstractmethod
@@ -54,10 +49,7 @@ class MoveStrategy(ABC):
         color: Color,
         from_coordinate: Coordinate,
         board: Board,
-    ) -> list[Move]:
-        """Return a list of candidate moves from the from coordinate without
-        accounting for discovered check."""
-        pass
+    ) -> list[Move]: ...
 
 
 class StraightMoveStrategy(MoveStrategy, ABC):

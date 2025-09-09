@@ -20,96 +20,60 @@ from utils.board_utils import get_board_index, is_coordinate_in_bounds
 class Board(ABC):
     @property
     @abstractmethod
-    def size(self) -> int:
-        pass
+    def size(self) -> int: ...
 
     @abstractmethod
-    def to_key(self) -> tuple[Any, ...]:
-        """Return an immutable version of the board state for caching."""
-        pass
+    def to_key(self) -> tuple[Any, ...]: ...
 
     @abstractmethod
-    def set_up_pieces(self) -> None:
-        """Place the pieces on their starting squares."""
-        pass
+    def set_up_pieces(self) -> None: ...
 
     @abstractmethod
-    def get_piece(self, coordinate: Coordinate) -> Piece | None:
-        """Get the piece at the coordinate."""
-        pass
+    def get_piece(self, coordinate: Coordinate) -> Piece | None: ...
 
     @abstractmethod
-    def set_piece(self, coordinate: Coordinate, piece: Piece | None) -> None:
-        """Set the piece at the coordinate."""
-        pass
+    def set_piece(self, coordinate: Coordinate, piece: Piece | None) -> None: ...
 
     @abstractmethod
-    def get_king_coordinate(self, color: Color) -> Coordinate:
-        """Get the coordinate of the king of the color."""
-        pass
+    def get_king_coordinate(self, color: Color) -> Coordinate: ...
 
     @abstractmethod
-    def is_occupied(self, coordinate: Coordinate) -> bool:
-        """Return whether the coordinate has a piece on it."""
-        pass
+    def is_occupied(self, coordinate: Coordinate) -> bool: ...
 
     @abstractmethod
-    def make_move(self, move: Move) -> None:
-        """Make the move and update the state of the from piece."""
-        pass
+    def make_move(self, move: Move) -> None: ...
 
     @abstractmethod
-    def undo_move(self, move: Move) -> None:
-        """Undo a move and restore the state of both the from and to pieces."""
-        pass
+    def undo_move(self, move: Move) -> None: ...
 
     @abstractmethod
     def get_coordinates_between(
         self, from_coordinate: Coordinate, to_coordinate: Coordinate
-    ) -> list[Coordinate]:
-        """Return a list of coordinates in a straight line between the from and
-        to coordinates."""
-        pass
+    ) -> list[Coordinate]: ...
 
     @abstractmethod
     def is_path_blocked(
         self, from_coordinate: Coordinate, to_coordinate: Coordinate
-    ) -> bool:
-        """Return whether there is a piece between the from and to coordinates
-        along a straight line."""
-        pass
+    ) -> bool: ...
 
     @abstractmethod
     def get_attacker_coordinates(
         self, color: Color, target_coordinate: Coordinate
-    ) -> list[Coordinate]:
-        """Return a list of coordinates of all pieces of the color that can
-        attack the target coordinate."""
-        pass
+    ) -> list[Coordinate]: ...
 
     @abstractmethod
     def get_blocker_coordinates(
         self, color: Color, target_coordinate: Coordinate
-    ) -> list[Coordinate]:
-        """Return the coordinates of all pieces of the color that can block an
-        attack by moving to the empty target coordinate."""
-        pass
+    ) -> list[Coordinate]: ...
 
     @abstractmethod
-    def is_king_trapped(self, color: Color) -> bool:
-        """Return whether the king of the color has any empty escape squares."""
-        pass
+    def is_king_trapped(self, color: Color) -> bool: ...
 
     @abstractmethod
-    def get_candidate_moves(self, color: Color) -> list[Move]:
-        """Return a list of candidate moves for the color not accounting for
-        discovered check."""
-        pass
+    def get_candidate_moves(self, color: Color) -> list[Move]: ...
 
     @abstractmethod
-    def is_attacking(self, color: Color, coordinate: Coordinate) -> bool:
-        """Return whether the color is attacking the coordinate."""
-        pass
+    def is_attacking(self, color: Color, coordinate: Coordinate) -> bool: ...
 
 
 class SimpleBoard(Board):

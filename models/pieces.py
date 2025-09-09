@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import ClassVar
 
 from enums.color import Color
 
@@ -13,147 +15,91 @@ from .move_strategies import (
 )
 
 
+@dataclass(slots=True)
 class Piece(ABC):
-    def __init__(self, color: Color) -> None:
-        self._color = color
+    color: Color
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-        return self._color == other._color
+    @property
+    @abstractmethod
+    def VALUE(self) -> int: ...
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(color={self._color})"
+    @property
+    @abstractmethod
+    def MOVE_STRATEGY(self) -> MoveStrategy: ...
+
+    @property
+    @abstractmethod
+    def symbol(self) -> str: ...
 
     def to_key(self) -> str:
         """Return an immutable version of the piece state for caching."""
         return self.symbol
 
-    @property
-    def color(self) -> Color:
-        return self._color
 
-    @property
-    @abstractmethod
-    def VALUE(self) -> int:
-        pass
-
-    @property
-    @abstractmethod
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        pass
-
-    @property
-    @abstractmethod
-    def symbol(self) -> str:
-        pass
-
-
+@dataclass(slots=True)
 class FirstMovePiece(Piece, ABC):
-    def __init__(self, color: Color) -> None:
-        super().__init__(color)
-        self._has_moved = False
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-        return self._color == other._color and self._has_moved == other._has_moved
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(color={self._color}, has_moved={self._has_moved})"
+    has_moved: bool = False
 
     def to_key(self) -> str:
         """Return an immutable version of the piece state for caching."""
-        return f"{self.symbol}{'+' if self._has_moved else '-'}"
-
-    @property
-    def has_moved(self) -> bool:
-        return self._has_moved
-
-    @has_moved.setter
-    def has_moved(self, has_moved: bool) -> None:
-        self._has_moved = has_moved
+        return f"{self.symbol}{'+' if self.has_moved else '-'}"
 
 
+@dataclass(slots=True)
 class Pawn(FirstMovePiece):
-    @property
-    def VALUE(self) -> int:
-        return 1
+    VALUE: ClassVar[int] = 1
+    MOVE_STRATEGY: ClassVar[MoveStrategy] = PawnMoveStrategy()
+    symbol: str = field(init=False)
 
-    @property
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        return PawnMoveStrategy()
-
-    @property
-    def symbol(self) -> str:
-        return "♙" if self.color is Color.WHITE else "♟"
+    def __post_init__(self) -> None:
+        self.symbol = "♙" if self.color is Color.WHITE else "♟"
 
 
+@dataclass(slots=True)
 class Knight(Piece):
-    @property
-    def VALUE(self) -> int:
-        return 3
+    VALUE: ClassVar[int] = 3
+    MOVE_STRATEGY: ClassVar[MoveStrategy] = KnightMoveStrategy()
+    symbol: str = field(init=False)
 
-    @property
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        return KnightMoveStrategy()
-
-    @property
-    def symbol(self) -> str:
-        return "♘" if self.color is Color.WHITE else "♞"
+    def __post_init__(self) -> None:
+        self.symbol = "♘" if self.color is Color.WHITE else "♞"
 
 
+@dataclass(slots=True)
 class Bishop(Piece):
-    @property
-    def VALUE(self) -> int:
-        return 3
+    VALUE: ClassVar[int] = 3
+    MOVE_STRATEGY: ClassVar[MoveStrategy] = BishopMoveStrategy()
+    symbol: str = field(init=False)
 
-    @property
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        return BishopMoveStrategy()
-
-    @property
-    def symbol(self) -> str:
-        return "♗" if self.color is Color.WHITE else "♝"
+    def __post_init__(self) -> None:
+        self.symbol = "♗" if self.color is Color.WHITE else "♝"
 
 
+@dataclass(slots=True)
 class Rook(FirstMovePiece):
-    @property
-    def VALUE(self) -> int:
-        return 5
+    VALUE: ClassVar[int] = 5
+    MOVE_STRATEGY: ClassVar[MoveStrategy] = RookMoveStrategy()
+    symbol: str = field(init=False)
 
-    @property
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        return RookMoveStrategy()
-
-    @property
-    def symbol(self) -> str:
-        return "♖" if self.color is Color.WHITE else "♜"
+    def __post_init__(self) -> None:
+        self.symbol = "♖" if self.color is Color.WHITE else "♜"
 
 
+@dataclass(slots=True)
 class Queen(Piece):
-    @property
-    def VALUE(self) -> int:
-        return 9
+    VALUE: ClassVar[int] = 9
+    MOVE_STRATEGY: ClassVar[MoveStrategy] = QueenMoveStrategy()
+    symbol: str = field(init=False)
 
-    @property
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        return QueenMoveStrategy()
-
-    @property
-    def symbol(self) -> str:
-        return "♕" if self.color is Color.WHITE else "♛"
+    def __post_init__(self) -> None:
+        self.symbol = "♕" if self.color is Color.WHITE else "♛"
 
 
+@dataclass(slots=True)
 class King(FirstMovePiece):
-    @property
-    def VALUE(self) -> int:
-        return 100
+    VALUE: ClassVar[int] = 100
+    MOVE_STRATEGY: ClassVar[MoveStrategy] = KingMoveStrategy()
+    symbol: str = field(init=False)
 
-    @property
-    def MOVE_STRATEGY(self) -> MoveStrategy:
-        return KingMoveStrategy()
-
-    @property
-    def symbol(self) -> str:
-        return "♔" if self.color is Color.WHITE else "♚"
+    def __post_init__(self) -> None:
+        self.symbol = "♔" if self.color is Color.WHITE else "♚"

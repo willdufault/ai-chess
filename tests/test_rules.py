@@ -17,9 +17,7 @@ def test_is_in_check(board: Board) -> None:
     board.set_up_pieces()
     from views.board_view import BoardView
     assert Rules.is_in_check(Color.WHITE, board) is False
-    breakpoint()
     board.set_piece(Coordinate(1, 4), Rook(Color.BLACK))
-    breakpoint()
     assert Rules.is_in_check(Color.WHITE, board) is True
 
 
