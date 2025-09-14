@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from models.pieces import Piece
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Move:
     color: Color
     from_coordinate: Coordinate
@@ -18,4 +18,4 @@ class Move:
 
     def __post_init__(self) -> None:
         from_piece_has_moved = getattr(self.from_piece, "has_moved", False)
-        object.__setattr__(self, "from_piece_has_moved", from_piece_has_moved)
+        self.from_piece_has_moved = from_piece_has_moved

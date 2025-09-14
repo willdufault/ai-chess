@@ -57,8 +57,9 @@ class Rules:
         if key in cls._legal_moves_cache:
             return cls._legal_moves_cache[key]
         candidate_moves = board.get_candidate_moves(color)
-        cls._legal_moves_cache[key] = candidate_moves
-        return candidate_moves
+        legal_moves = cls._get_legal_candidate_moves(candidate_moves, board)
+        cls._legal_moves_cache[key] = legal_moves
+        return legal_moves
 
     @classmethod
     def is_in_check_after_move(cls, move: Move, board: Board) -> bool:

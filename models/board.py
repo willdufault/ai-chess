@@ -458,9 +458,7 @@ class BitBoard(Board):
 
     def get_king_coordinate(self, color: Color) -> Coordinate:
         """Get the coordinate of the king of the color."""
-        king_offset = (
-            self._white_king_offset if color is Color.WHITE else self._black_king_offset
-        )
+        king_offset = self._get_king_offset(color)
         row_index, column_index = divmod(king_offset, self.size)
         return Coordinate(row_index, column_index)
 
@@ -621,6 +619,12 @@ class BitBoard(Board):
         if not is_coordinate_in_bounds(coordinate):
             return False
         return len(self.get_attacker_coordinates(color, coordinate)) > 0
+
+    def _get_king_offset(self, color: Color) -> int:
+        """Return the position of the kinf of the color."""
+        return (
+            self._white_king_offset if color is Color.WHITE else self._black_king_offset
+        )
 
     def _set_king_offset(self, color: Color, coordinate: Coordinate) -> None:
         """Set the position of the king of the color."""
