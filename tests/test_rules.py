@@ -15,7 +15,6 @@ def board() -> Board:
 
 def test_is_in_check(board: Board) -> None:
     board.set_up_pieces()
-    from views.board_view import BoardView
     assert Rules.is_in_check(Color.WHITE, board) is False
     board.set_piece(Coordinate(1, 4), Rook(Color.BLACK))
     assert Rules.is_in_check(Color.WHITE, board) is True
@@ -122,9 +121,7 @@ def test_get_legal_moves(board: Board) -> None:
     board.set_piece(Coordinate(1, 0), None)
     board.set_piece(Coordinate(1, 4), None)
     board.set_piece(Coordinate(4, 7), Bishop(Color.BLACK))
-    pawn = board.get_piece(Coordinate(1, 1))
-    assert isinstance(pawn, Pawn)
-    pawn.has_moved = True
+    board.set_piece(Coordinate(1, 1), Pawn(Color.WHITE, True))
     assert Rules.get_legal_moves(Color.WHITE, board) == [
         Move(Color.WHITE, Coordinate(0, 0), Coordinate(1, 0), Rook(Color.WHITE), None),
         Move(Color.WHITE, Coordinate(0, 0), Coordinate(2, 0), Rook(Color.WHITE), None),
@@ -178,7 +175,7 @@ def test_get_legal_moves(board: Board) -> None:
         Move(
             Color.WHITE, Coordinate(0, 6), Coordinate(2, 5), Knight(Color.WHITE), None
         ),
-        Move(Color.WHITE, Coordinate(1, 1), Coordinate(2, 1), pawn, None),
+        Move(Color.WHITE, Coordinate(1, 1), Coordinate(2, 1), Pawn(Color.WHITE, True), None),
         Move(Color.WHITE, Coordinate(1, 2), Coordinate(2, 2), Pawn(Color.WHITE), None),
         Move(Color.WHITE, Coordinate(1, 2), Coordinate(3, 2), Pawn(Color.WHITE), None),
         Move(Color.WHITE, Coordinate(1, 3), Coordinate(2, 3), Pawn(Color.WHITE), None),

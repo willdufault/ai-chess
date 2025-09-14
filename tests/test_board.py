@@ -130,8 +130,6 @@ def test_make_move(board: Board) -> None:
     move = Move(Color.WHITE, from_coordinate, to_coordinate, from_piece, to_piece)
     board.make_move(move)
     assert board.get_piece(from_coordinate) == None
-    # not playing nice with board preset pieces because i need to modify piece in move...
-    # better of just creating new piece each time. optimize later if necessary
     assert board.get_piece(to_coordinate) == move.from_piece
     assert isinstance(move.from_piece, Pawn)
     assert move.from_piece.has_moved is True

@@ -221,20 +221,19 @@ def test_pawn_get_blocker_coordinates(board: Board) -> None:
 
 def test_pawn_get_candidate_moves(board: Board) -> None:
     assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(-1,-1), board) == []
-    pawn = Pawn(Color.WHITE)
-    board.set_piece(Coordinate(3,3), pawn)
+    board.set_piece(Coordinate(3,3), Pawn(Color.WHITE))
     assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
-        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), pawn, None),
-        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,3), pawn, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), Pawn(Color.WHITE), None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(5,3), Pawn(Color.WHITE), None),
     ]
-    pawn.has_moved = True
+    board.set_piece(Coordinate(3,3), Pawn(Color.WHITE, True))
     assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
-        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), pawn, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), Pawn(Color.WHITE, True), None),
     ]
-    pawn.has_moved = False
+    board.set_piece(Coordinate(3,3), Pawn(Color.WHITE))
     board.set_piece(Coordinate(5,3), Pawn(Color.WHITE))
     assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
-        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), pawn, None),
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,3), Pawn(Color.WHITE), None),
     ]
     board.set_piece(Coordinate(4,3), Pawn(Color.BLACK))
     assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == []
@@ -247,7 +246,7 @@ def test_pawn_get_candidate_moves(board: Board) -> None:
     board.set_piece(Coordinate(4,2), Pawn(Color.WHITE))
     board.set_piece(Coordinate(4,4), Pawn(Color.BLACK))
     assert PawnMoveStrategy.get_candidate_moves(Color.WHITE, Coordinate(3,3), board) == [
-        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), pawn, Pawn(Color.BLACK))
+        Move(Color.WHITE, Coordinate(3,3), Coordinate(4,4), Pawn(Color.WHITE), Pawn(Color.BLACK))
     ]
     
 def test_knight_get_candidate_moves(board: Board) -> None:

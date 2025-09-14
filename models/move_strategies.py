@@ -380,13 +380,12 @@ class PawnMoveStrategy(MoveStrategy):
         if board.is_occupied(forward_one_coordinate):
             return []
 
-        forward_one_piece = board.get_piece(forward_one_coordinate)
         forward_one_move = Move(
             color,
             from_coordinate,
             forward_one_coordinate,
             from_piece,
-            forward_one_piece,
+            None,
         )
         candidate_forward_moves.append(forward_one_move)
 
@@ -405,13 +404,12 @@ class PawnMoveStrategy(MoveStrategy):
             if board.is_occupied(forward_two_coordinate):
                 return candidate_forward_moves
 
-            forward_two_piece = board.get_piece(forward_two_coordinate)
             forward_two_move = Move(
                 color,
                 from_coordinate,
                 forward_two_coordinate,
                 from_piece,
-                forward_two_piece,
+                None,
             )
             candidate_forward_moves.append(forward_two_move)
 

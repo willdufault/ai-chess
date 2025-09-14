@@ -8,6 +8,8 @@ from utils.board_utils import get_last_row_index
 
 
 class Rules:
+    _legal_moves_cache = {}
+
     @staticmethod
     def is_in_check(color: Color, board: Board) -> bool:
         """Return whether the color is in check."""
@@ -51,8 +53,12 @@ class Rules:
     @classmethod
     def get_legal_moves(cls, color: Color, board: Board) -> list[Move]:
         """Return a list of all legal moves for the color."""
+        key = (color, board.to_key())
+        if key in cls._legal_moves_cache:
+            return cls._legal_moves_cache[key]
         candidate_moves = board.get_candidate_moves(color)
-        return cls._get_legal_candidate_moves(candidate_moves, board)
+        cls._legal_moves_cache[key] = candidate_moves
+        return candidate_moves
 
     @classmethod
     def is_in_check_after_move(cls, move: Move, board: Board) -> bool:

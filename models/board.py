@@ -157,10 +157,7 @@ class SimpleBoard(Board):
 
     def undo_move(self, move: Move) -> None:
         """Undo a move and restore the state of both the from and to pieces."""
-        reversed_move = Move(
-            move.color, move.to_coordinate, move.from_coordinate, move.from_piece, None
-        )
-        self.make_move(reversed_move)
+        self.set_piece(move.from_coordinate, move.from_piece)
         self.set_piece(move.to_coordinate, move.to_piece)
         if isinstance(move.from_piece, FirstMovePiece):
             move.from_piece.has_moved = move.from_piece_has_moved
@@ -330,32 +327,6 @@ class BitBoard(Board):
     _WHITE_KING_STARTING_OFFSET = 4
     _BLACK_KING_STARTING_OFFSET = 60
 
-    _WHITE_PAWN_NOT_MOVED = Pawn(Color.WHITE)
-    _WHITE_PAWN_MOVED = Pawn(Color.WHITE)
-    _WHITE_PAWN_MOVED.has_moved = True
-    _WHITE_KNIGHT = Knight(Color.WHITE)
-    _WHITE_BISHOP = Bishop(Color.WHITE)
-    _WHITE_ROOK_NOT_MOVED = Rook(Color.WHITE)
-    _WHITE_ROOK_MOVED = Rook(Color.WHITE)
-    _WHITE_ROOK_MOVED.has_moved = True
-    _WHITE_QUEEN = Queen(Color.WHITE)
-    _WHITE_KING_NOT_MOVED = King(Color.WHITE)
-    _WHITE_KING_MOVED = King(Color.WHITE)
-    _WHITE_KING_MOVED.has_moved = True
-
-    _BLACK_PAWN_NOT_MOVED = Pawn(Color.BLACK)
-    _BLACK_PAWN_MOVED = Pawn(Color.BLACK)
-    _BLACK_PAWN_MOVED.has_moved = True
-    _BLACK_KNIGHT = Knight(Color.BLACK)
-    _BLACK_BISHOP = Bishop(Color.BLACK)
-    _BLACK_ROOK_NOT_MOVED = Rook(Color.BLACK)
-    _BLACK_ROOK_MOVED = Rook(Color.BLACK)
-    _BLACK_ROOK_MOVED.has_moved = True
-    _BLACK_QUEEN = Queen(Color.BLACK)
-    _BLACK_KING_NOT_MOVED = King(Color.BLACK)
-    _BLACK_KING_MOVED = King(Color.BLACK)
-    _BLACK_KING_MOVED.has_moved = True
-
     def __init__(self) -> None:
         self._size = BOARD_SIZE
 
@@ -435,42 +406,42 @@ class BitBoard(Board):
         board_mask = 1 << board_offset
         # TODO: cleaner way of doing this? DRY?
         if (board_mask & self._white_pawns_not_moved_position) > 0:
-            return self._WHITE_PAWN_NOT_MOVED
+            return Pawn(Color.WHITE)
         if (board_mask & self._white_pawns_moved_position) > 0:
-            return self._WHITE_PAWN_MOVED
+            return Pawn(Color.WHITE, True)
         if (board_mask & self._white_knights_position) > 0:
-            return self._WHITE_KNIGHT
+            return Knight(Color.WHITE)
         if (board_mask & self._white_bishops_position) > 0:
-            return self._WHITE_BISHOP
+            return Bishop(Color.WHITE)
         if (board_mask & self._white_rooks_not_moved_position) > 0:
-            return self._WHITE_ROOK_NOT_MOVED
+            return Rook(Color.WHITE)
         if (board_mask & self._white_rooks_moved_position) > 0:
-            return self._WHITE_ROOK_MOVED
+            return Rook(Color.WHITE, True)
         if (board_mask & self._white_queens_position) > 0:
-            return self._WHITE_QUEEN
+            return Queen(Color.WHITE)
         if (board_mask & self._white_kings_not_moved_position) > 0:
-            return self._WHITE_KING_NOT_MOVED
+            return King(Color.WHITE)
         if (board_mask & self._white_kings_moved_position) > 0:
-            return self._WHITE_KING_MOVED
+            return King(Color.WHITE, True)
 
         if (board_mask & self._black_pawns_not_moved_position) > 0:
-            return self._BLACK_PAWN_NOT_MOVED
+            return Pawn(Color.BLACK)
         if (board_mask & self._black_pawns_moved_position) > 0:
-            return self._BLACK_PAWN_MOVED
+            return Pawn(Color.BLACK, True)
         if (board_mask & self._black_knights_position) > 0:
-            return self._BLACK_KNIGHT
+            return Knight(Color.BLACK)
         if (board_mask & self._black_bishops_position) > 0:
-            return self._BLACK_BISHOP
+            return Bishop(Color.BLACK)
         if (board_mask & self._black_rooks_not_moved_position) > 0:
-            return self._BLACK_ROOK_NOT_MOVED
+            return Rook(Color.BLACK)
         if (board_mask & self._black_rooks_moved_position) > 0:
-            return self._BLACK_ROOK_MOVED
+            return Rook(Color.BLACK, True)
         if (board_mask & self._black_queens_position) > 0:
-            return self._BLACK_QUEEN
+            return Queen(Color.BLACK)
         if (board_mask & self._black_kings_not_moved_position) > 0:
-            return self._BLACK_KING_NOT_MOVED
+            return King(Color.BLACK)
         if (board_mask & self._black_kings_moved_position) > 0:
-            return self._BLACK_KING_MOVED
+            return King(Color.BLACK, True)
 
         return None
 
@@ -501,45 +472,16 @@ class BitBoard(Board):
     def make_move(self, move: Move) -> None:
         """Make the move and update the state of the from piece."""
         self.set_piece(move.from_coordinate, None)
-        self.set_piece(move.to_coordinate, move.from_piece)
         if isinstance(move.from_piece, FirstMovePiece):
-            # TODO: move to helper, expand to all firstmovepieces
-            # might be able to simplify logic above instead of setting and resetting
-            board_offset = self._get_board_offset(move.to_coordinate)
-            board_mask = 1 << board_offset
-            if isinstance(move.from_piece, Pawn):
-                moved_from_piece = (
-                    self._WHITE_PAWN_MOVED
-                    if move.color is Color.WHITE
-                    else self._BLACK_PAWN_MOVED
-                )
-                move.from_piece = moved_from_piece
-                self._clear_position_bit(board_mask)
-                self.set_piece(move.to_coordinate, moved_from_piece)
+            move.from_piece.has_moved = True
+        self.set_piece(move.to_coordinate, move.from_piece)
 
     def undo_move(self, move: Move) -> None:
         """Undo a move and restore the state of both the from and to pieces."""
-        reversed_move = Move(
-            move.color, move.to_coordinate, move.from_coordinate, move.from_piece, None
-        )
-        self.make_move(reversed_move)
         self.set_piece(move.to_coordinate, move.to_piece)
-        if (
-            isinstance(move.from_piece, FirstMovePiece)
-            and move.from_piece_has_moved is False
-        ):
-            board_offset = self._get_board_offset(move.from_coordinate)
-            board_mask = 1 << board_offset
-            # TODO: move to helper, expand to all firstmovepieces
-            # might be able to simplify logic above instead of setting and resetting
-            if isinstance(move.from_piece, Pawn):
-                moved_piece = (
-                    self._WHITE_PAWN_NOT_MOVED
-                    if move.color is Color.WHITE
-                    else self._BLACK_PAWN_NOT_MOVED
-                )
-                # self._clear_position_bit(board_mask)
-                # self.set_piece(move.from_coordinate, moved_piece)
+        if isinstance(move.from_piece, FirstMovePiece):
+            move.from_piece.has_moved = move.from_piece_has_moved
+        self.set_piece(move.from_coordinate, move.from_piece)
 
     def get_coordinates_between(
         self, from_coordinate: Coordinate, to_coordinate: Coordinate
@@ -716,41 +658,43 @@ class BitBoard(Board):
 
     def _set_position_bit(self, piece: Piece, board_mask: int) -> None:
         """Set the bit given by the bit mask for the corresponding piece position."""
-        if piece == self._WHITE_PAWN_NOT_MOVED:
-            self._white_pawns_not_moved_position |= board_mask
-        elif piece == self._WHITE_PAWN_MOVED:
-            self._white_pawns_moved_position |= board_mask
-        elif piece == self._WHITE_KNIGHT:
-            self._white_knights_position |= board_mask
-        elif piece == self._WHITE_BISHOP:
-            self._white_bishops_position |= board_mask
-        elif piece == self._WHITE_ROOK_NOT_MOVED:
-            self._white_rooks_not_moved_position |= board_mask
-        elif piece == self._WHITE_ROOK_MOVED:
-            self._white_rooks_moved_position |= board_mask
-        elif piece == self._WHITE_QUEEN:
-            self._white_queens_position |= board_mask
-        elif piece == self._WHITE_KING_NOT_MOVED:
-            self._white_kings_not_moved_position |= board_mask
-        elif piece == self._WHITE_KING_MOVED:
-            self._white_kings_moved_position |= board_mask
-        elif piece == self._BLACK_PAWN_NOT_MOVED:
-            self._black_pawns_not_moved_position |= board_mask
-        elif piece == self._BLACK_PAWN_MOVED:
-            self._black_pawns_moved_position |= board_mask
-        elif piece == self._BLACK_KNIGHT:
-            self._black_knights_position |= board_mask
-        elif piece == self._BLACK_BISHOP:
-            self._black_bishops_position |= board_mask
-        elif piece == self._BLACK_ROOK_NOT_MOVED:
-            self._black_rooks_not_moved_position |= board_mask
-        elif piece == self._BLACK_ROOK_MOVED:
-            self._black_rooks_moved_position |= board_mask
-        elif piece == self._BLACK_QUEEN:
-            self._black_queens_position |= board_mask
-        elif piece == self._BLACK_KING_NOT_MOVED:
-            self._black_kings_not_moved_position |= board_mask
-        elif piece == self._BLACK_KING_MOVED:
-            self._black_kings_moved_position |= board_mask
-        else:
-            raise ValueError
+        match piece:
+            case Pawn(Color.WHITE, False):
+                self._white_pawns_not_moved_position |= board_mask
+            case Pawn(Color.WHITE, True):
+                self._white_pawns_moved_position |= board_mask
+            case Knight(Color.WHITE):
+                self._white_knights_position |= board_mask
+            case Bishop(Color.WHITE):
+                self._white_bishops_position |= board_mask
+            case Rook(Color.WHITE, False):
+                self._white_rooks_not_moved_position |= board_mask
+            case Rook(Color.WHITE, True):
+                self._white_rooks_moved_position |= board_mask
+            case Queen(Color.WHITE):
+                self._white_queens_position |= board_mask
+            case King(Color.WHITE, False):
+                self._white_kings_not_moved_position |= board_mask
+            case King(Color.WHITE, True):
+                self._white_kings_moved_position |= board_mask
+
+            case Pawn(Color.BLACK, False):
+                self._black_pawns_not_moved_position |= board_mask
+            case Pawn(Color.BLACK, True):
+                self._black_pawns_moved_position |= board_mask
+            case Knight(Color.BLACK):
+                self._black_knights_position |= board_mask
+            case Bishop(Color.BLACK):
+                self._black_bishops_position |= board_mask
+            case Rook(Color.BLACK, False):
+                self._black_rooks_not_moved_position |= board_mask
+            case Rook(Color.BLACK, True):
+                self._black_rooks_moved_position |= board_mask
+            case Queen(Color.BLACK):
+                self._black_queens_position |= board_mask
+            case King(Color.BLACK, False):
+                self._black_kings_not_moved_position |= board_mask
+            case King(Color.BLACK, True):
+                self._black_kings_moved_position |= board_mask
+            case _:
+                raise ValueError
