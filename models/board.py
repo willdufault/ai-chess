@@ -327,6 +327,26 @@ class BitBoard(Board):
     _WHITE_KING_STARTING_OFFSET = 4
     _BLACK_KING_STARTING_OFFSET = 60
 
+    _WHITE_PAWN_NOT_MOVED = Pawn(Color.WHITE, False)
+    _WHITE_PAWN_MOVED = Pawn(Color.WHITE, True)
+    _WHITE_KNIGHT = Knight(Color.WHITE)
+    _WHITE_BISHOP = Bishop(Color.WHITE)
+    _WHITE_ROOK_NOT_MOVED = Rook(Color.WHITE, False)
+    _WHITE_ROOK_MOVED = Rook(Color.WHITE, True)
+    _WHITE_QUEEN = Queen(Color.WHITE)
+    _WHITE_KING_NOT_MOVED = King(Color.WHITE, False)
+    _WHITE_KING_MOVED = King(Color.WHITE, True)
+
+    _BLACK_PAWN_NOT_MOVED = Pawn(Color.BLACK, False)
+    _BLACK_PAWN_MOVED = Pawn(Color.BLACK, True)
+    _BLACK_KNIGHT = Knight(Color.BLACK)
+    _BLACK_BISHOP = Bishop(Color.BLACK)
+    _BLACK_ROOK_NOT_MOVED = Rook(Color.BLACK, False)
+    _BLACK_ROOK_MOVED = Rook(Color.BLACK, True)
+    _BLACK_QUEEN = Queen(Color.BLACK)
+    _BLACK_KING_NOT_MOVED = King(Color.BLACK, False)
+    _BLACK_KING_MOVED = King(Color.BLACK, True)
+
     def __init__(self) -> None:
         self._size = BOARD_SIZE
 
@@ -406,42 +426,42 @@ class BitBoard(Board):
         board_mask = 1 << board_offset
         # TODO: cleaner way of doing this? DRY?
         if (board_mask & self._white_pawns_not_moved_position) > 0:
-            return Pawn(Color.WHITE)
+            return self._WHITE_PAWN_NOT_MOVED
         if (board_mask & self._white_pawns_moved_position) > 0:
-            return Pawn(Color.WHITE, True)
+            return self._WHITE_PAWN_MOVED
         if (board_mask & self._white_knights_position) > 0:
-            return Knight(Color.WHITE)
+            return self._WHITE_KNIGHT
         if (board_mask & self._white_bishops_position) > 0:
-            return Bishop(Color.WHITE)
+            return self._WHITE_BISHOP
         if (board_mask & self._white_rooks_not_moved_position) > 0:
-            return Rook(Color.WHITE)
+            return self._WHITE_ROOK_NOT_MOVED
         if (board_mask & self._white_rooks_moved_position) > 0:
-            return Rook(Color.WHITE, True)
+            return self._WHITE_ROOK_MOVED
         if (board_mask & self._white_queens_position) > 0:
-            return Queen(Color.WHITE)
+            return self._WHITE_QUEEN
         if (board_mask & self._white_kings_not_moved_position) > 0:
-            return King(Color.WHITE)
+            return self._WHITE_KING_NOT_MOVED
         if (board_mask & self._white_kings_moved_position) > 0:
-            return King(Color.WHITE, True)
+            return self._WHITE_KING_MOVED
 
         if (board_mask & self._black_pawns_not_moved_position) > 0:
-            return Pawn(Color.BLACK)
+            return self._BLACK_PAWN_NOT_MOVED
         if (board_mask & self._black_pawns_moved_position) > 0:
-            return Pawn(Color.BLACK, True)
+            return self._BLACK_PAWN_MOVED
         if (board_mask & self._black_knights_position) > 0:
-            return Knight(Color.BLACK)
+            return self._BLACK_KNIGHT
         if (board_mask & self._black_bishops_position) > 0:
-            return Bishop(Color.BLACK)
+            return self._BLACK_BISHOP
         if (board_mask & self._black_rooks_not_moved_position) > 0:
-            return Rook(Color.BLACK)
+            return self._BLACK_ROOK_NOT_MOVED
         if (board_mask & self._black_rooks_moved_position) > 0:
-            return Rook(Color.BLACK, True)
+            return self._BLACK_ROOK_MOVED
         if (board_mask & self._black_queens_position) > 0:
-            return Queen(Color.BLACK)
+            return self._BLACK_QUEEN
         if (board_mask & self._black_kings_not_moved_position) > 0:
-            return King(Color.BLACK)
+            return self._BLACK_KING_NOT_MOVED
         if (board_mask & self._black_kings_moved_position) > 0:
-            return King(Color.BLACK, True)
+            return self._BLACK_KING_MOVED
 
         return None
 
@@ -471,14 +491,57 @@ class BitBoard(Board):
         """Make the move and update the state of the from piece."""
         self.set_piece(move.from_coordinate, None)
         if isinstance(move.from_piece, FirstMovePiece):
-            move.from_piece.has_moved = True
+            match move.from_piece:
+                case Pawn():
+                    move.from_piece = (
+                        self._WHITE_PAWN_MOVED
+                        if move.color is Color.WHITE
+                        else self._BLACK_PAWN_MOVED
+                    )
+                case Rook():
+                    move.from_piece = (
+                        self._WHITE_ROOK_MOVED
+                        if move.color is Color.WHITE
+                        else self._BLACK_ROOK_MOVED
+                    )
+                case King():
+                    move.from_piece = (
+                        self._WHITE_KING_MOVED
+                        if move.color is Color.WHITE
+                        else self._BLACK_KING_MOVED
+                    )
+                case _:
+                    raise ValueError
         self.set_piece(move.to_coordinate, move.from_piece)
 
     def undo_move(self, move: Move) -> None:
         """Undo a move and restore the state of both the from and to pieces."""
         self.set_piece(move.to_coordinate, move.to_piece)
-        if isinstance(move.from_piece, FirstMovePiece):
-            move.from_piece.has_moved = move.from_piece_has_moved
+        if (
+            isinstance(move.from_piece, FirstMovePiece)
+            and not move.from_piece_has_moved
+        ):
+            match move.from_piece:
+                case Pawn():
+                    move.from_piece = (
+                        self._WHITE_PAWN_NOT_MOVED
+                        if move.color is Color.WHITE
+                        else self._BLACK_PAWN_NOT_MOVED
+                    )
+                case Rook():
+                    move.from_piece = (
+                        self._WHITE_ROOK_NOT_MOVED
+                        if move.color is Color.WHITE
+                        else self._BLACK_ROOK_NOT_MOVED
+                    )
+                case King():
+                    move.from_piece = (
+                        self._WHITE_KING_NOT_MOVED
+                        if move.color is Color.WHITE
+                        else self._BLACK_KING_NOT_MOVED
+                    )
+                case _:
+                    raise ValueError
         self.set_piece(move.from_coordinate, move.from_piece)
 
     def get_coordinates_between(

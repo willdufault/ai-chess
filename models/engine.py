@@ -817,6 +817,8 @@ _ENDGAME_PLACEMENT_SCORES_BY_PIECE_TYPE = {
 
 
 class Engine:
+    _get_material_score_cache = {}
+    
     @classmethod
     def evaluate(cls, board: Board) -> int:
         """Evaluate the board and return a number that represents which color is

@@ -1,12 +1,12 @@
 from controllers.game_controller import GameController
 from enums.color import Color
 from models.ai import AI
-from models.board import SimpleBoard
+from models.board import BitBoard, SimpleBoard
 from models.game import Game
 
 
 def main() -> None:
-    board = SimpleBoard()
+    board = BitBoard()
     board.set_up_pieces()
     ai = AI(Color.WHITE, 0, board)
     game = Game(board)
