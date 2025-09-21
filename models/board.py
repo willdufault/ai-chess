@@ -1,8 +1,10 @@
-from enums.piece import Piece
+from enums.color import Color
 from models.coordinate import Coordinate
 from models.move import Move
+from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
-_BOARD_SIZE = 8
+BOARD_SIZE = 8
+_BOARD_LEN = 64
 
 _WHITE_PAWN_INITIAL_MASK = (
     0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000
@@ -21,6 +23,9 @@ _WHITE_QUEEN_INITIAL_MASK = (
 )
 _WHITE_KING_INITIAL_MASK = (
     0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000
+)
+_WHITE_PIECES_INITIAL_MASK = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_11111111
 )
 
 _BLACK_PAWN_INITIAL_MASK = (
@@ -41,13 +46,13 @@ _BLACK_QUEEN_INITIAL_MASK = (
 _BLACK_KING_INITIAL_MASK = (
     0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
 )
-
-_WHITE_KING_INITIAL_OFFSET = 4
-_BLACK_KING_INITIAL_OFFSET = 60
+_BLACK_PIECES_INITIAL_MASK = (
+    0b11111111_11111111_00000000_00000000_00000000_00000000_00000000_00000000
+)
 
 
 class Board:
-    SIZE = _BOARD_SIZE
+    SIZE = BOARD_SIZE
 
     def __init__(self) -> None:
         self._white_pawn_mask = 0
@@ -56,6 +61,7 @@ class Board:
         self._white_rook_mask = 0
         self._white_queen_mask = 0
         self._white_king_mask = 0
+        self._white_pieces_mask = 0
 
         self._black_pawn_mask = 0
         self._black_knight_mask = 0
@@ -63,9 +69,68 @@ class Board:
         self._black_rook_mask = 0
         self._black_queen_mask = 0
         self._black_king_mask = 0
+        self._black_pieces_mask = 0
 
-        self._white_king_offset = -1
-        self._black_king_offset = -1
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Board):
+            return False
+        return self.state == other.state
+
+    def __hash__(self) -> int:
+        return hash(self.state)
+
+    @property
+    def state(self) -> tuple[int, ...]:
+        return (
+            self._white_pawn_mask,
+            self._white_knight_mask,
+            self._white_bishop_mask,
+            self._white_rook_mask,
+            self._white_queen_mask,
+            self._white_king_mask,
+            self._black_pawn_mask,
+            self._black_knight_mask,
+            self._black_bishop_mask,
+            self._black_rook_mask,
+            self._black_queen_mask,
+            self._black_king_mask,
+        )
+
+    def generate_white_pawn_moves(self) -> list[Move]:
+        moves = []
+        for offset in range(_BOARD_LEN - BOARD_SIZE):
+            from_mask = 1 << offset
+            is_white_pawn = from_mask & self._white_pawn_mask
+            if not is_white_pawn:
+                continue
+
+            to_mask = from_mask << BOARD_SIZE
+            if self._is_square_occupied(to_mask):
+                continue
+
+            from_coordinate = self._get_coordinate_from_mask(from_mask)
+            to_coordinate = self._get_coordinate_from_mask(to_mask)
+            move = Move(Color.WHITE, from_coordinate, to_coordinate)
+            moves.append(move)
+        return moves
+
+    def generate_black_pawn_moves(self) -> list[Move]:
+        moves = []
+        for offset in range(BOARD_SIZE, _BOARD_LEN):
+            from_mask = 1 << offset
+            is_black_pawn = from_mask & self._white_pawn_mask
+            if not is_black_pawn:
+                continue
+
+            to_mask = from_mask >> BOARD_SIZE
+            if self._is_square_occupied(to_mask):
+                continue
+
+            from_coordinate = self._get_coordinate_from_mask(from_mask)
+            to_coordinate = self._get_coordinate_from_mask(to_mask)
+            move = Move(Color.WHITE, from_coordinate, to_coordinate)
+            moves.append(move)
+        return moves
 
     def set_up_pieces(self) -> None:
         self._white_pawn_mask = _WHITE_PAWN_INITIAL_MASK
@@ -74,6 +139,7 @@ class Board:
         self._white_rook_mask = _WHITE_ROOK_INITIAL_MASK
         self._white_queen_mask = _WHITE_QUEEN_INITIAL_MASK
         self._white_king_mask = _WHITE_KING_INITIAL_MASK
+        self._white_pieces_mask = _WHITE_PIECES_INITIAL_MASK
 
         self._black_pawn_mask = _BLACK_PAWN_INITIAL_MASK
         self._black_knight_mask = _BLACK_KNIGHT_INITIAL_MASK
@@ -81,102 +147,98 @@ class Board:
         self._black_rook_mask = _BLACK_ROOK_INITIAL_MASK
         self._black_queen_mask = _BLACK_QUEEN_INITIAL_MASK
         self._black_king_mask = _BLACK_KING_INITIAL_MASK
-
-        self._white_king_offset = _WHITE_KING_INITIAL_OFFSET
-        self._black_king_offset = _BLACK_KING_INITIAL_OFFSET
+        self._black_pieces_mask = _BLACK_PIECES_INITIAL_MASK
 
     def get_piece(self, coordinate: Coordinate) -> Piece | None:
         mask = self._get_mask_from_coordinate(coordinate)
 
-        if self._white_pawn_mask & mask:
-            return Piece.WHITE_PAWN
-        if self._white_knight_mask & mask:
-            return Piece.WHITE_KNIGHT
-        if self._white_bishop_mask & mask:
-            return Piece.WHITE_BISHOP
-        if self._white_rook_mask & mask:
-            return Piece.WHITE_ROOK
-        if self._white_queen_mask & mask:
-            return Piece.WHITE_QUEEN
-        if self._white_king_mask & mask:
-            return Piece.WHITE_KING
+        if self._white_pawn_mask & mask > 0:
+            return Pawn(Color.WHITE)
+        if self._white_knight_mask & mask > 0:
+            return Knight(Color.WHITE)
+        if self._white_bishop_mask & mask > 0:
+            return Bishop(Color.WHITE)
+        if self._white_rook_mask & mask > 0:
+            return Rook(Color.WHITE)
+        if self._white_queen_mask & mask > 0:
+            return Queen(Color.WHITE)
+        if self._white_king_mask & mask > 0:
+            return King(Color.WHITE)
 
-        if self._black_pawn_mask & mask:
-            return Piece.BLACK_PAWN
-        if self._black_knight_mask & mask:
-            return Piece.BLACK_KNIGHT
-        if self._black_bishop_mask & mask:
-            return Piece.BLACK_BISHOP
-        if self._black_rook_mask & mask:
-            return Piece.BLACK_ROOK
-        if self._black_queen_mask & mask:
-            return Piece.BLACK_QUEEN
-        if self._black_king_mask & mask:
-            return Piece.BLACK_KING
+        if self._black_pawn_mask & mask > 0:
+            return Pawn(Color.BLACK)
+        if self._black_knight_mask & mask > 0:
+            return Knight(Color.BLACK)
+        if self._black_bishop_mask & mask > 0:
+            return Bishop(Color.BLACK)
+        if self._black_rook_mask & mask > 0:
+            return Rook(Color.BLACK)
+        if self._black_queen_mask & mask > 0:
+            return Queen(Color.BLACK)
+        if self._black_king_mask & mask > 0:
+            return King(Color.BLACK)
 
         return None
 
     def set_piece(self, coordinate: Coordinate, piece: Piece | None) -> None:
         mask = self._get_mask_from_coordinate(coordinate)
-        self._clear_bit_from_piece_masks(mask)
+        self._clear_bit(mask)
 
         if piece is None:
             return
 
-        if piece is Piece.WHITE_PAWN:
-            self._white_pawn_mask |= mask
-        elif piece is Piece.WHITE_KNIGHT:
-            self._white_knight_mask |= mask
-        elif piece is Piece.WHITE_BISHOP:
-            self._white_bishop_mask |= mask
-        elif piece is Piece.WHITE_ROOK:
-            self._white_rook_mask |= mask
-        elif piece is Piece.WHITE_QUEEN:
-            self._white_queen_mask |= mask
-        elif piece is Piece.WHITE_KING:
-            self._white_king_mask |= mask
+        match piece:
+            case Pawn(Color.WHITE):
+                self._white_pawn_mask |= mask
+            case Knight(Color.WHITE):
+                self._white_knight_mask |= mask
+            case Bishop(Color.WHITE):
+                self._white_bishop_mask |= mask
+            case Rook(Color.WHITE):
+                self._white_rook_mask |= mask
+            case Queen(Color.WHITE):
+                self._white_queen_mask |= mask
+            case King(Color.WHITE):
+                self._white_king_mask |= mask
 
-        elif piece is Piece.BLACK_PAWN:
-            self._black_pawn_mask |= mask
-        elif piece is Piece.BLACK_KNIGHT:
-            self._black_knight_mask |= mask
-        elif piece is Piece.BLACK_BISHOP:
-            self._black_bishop_mask |= mask
-        elif piece is Piece.BLACK_ROOK:
-            self._black_rook_mask |= mask
-        elif piece is Piece.BLACK_QUEEN:
-            self._black_queen_mask |= mask
-        elif piece is Piece.BLACK_KING:
-            self._black_king_mask |= mask
+            case Pawn(Color.BLACK):
+                self._black_pawn_mask |= mask
+            case Knight(Color.BLACK):
+                self._black_knight_mask |= mask
+            case Bishop(Color.BLACK):
+                self._black_bishop_mask |= mask
+            case Rook(Color.BLACK):
+                self._black_rook_mask |= mask
+            case Queen(Color.BLACK):
+                self._black_queen_mask |= mask
+            case King(Color.BLACK):
+                self._black_king_mask |= mask
+
+        if piece.color is Color.WHITE:
+            self._white_pieces_mask |= mask
+        else:
+            self._black_pieces_mask |= mask
 
     def make_move(self, move: Move) -> None:
         piece = self.get_piece(move.from_coordinate)
         self.set_piece(move.from_coordinate, None)
         self.set_piece(move.to_coordinate, piece)
 
-        to_offset = self._get_offset_from_coordinate(move.to_coordinate)
-
-        if piece is Piece.WHITE_KING:
-            self._white_king_offset = to_offset
-        elif piece is Piece.BLACK_KING:
-            self._black_king_offset = to_offset
-
-    def undo_move(self, move: Move) -> None:
-        raise NotImplementedError
-
-    def _get_offset_from_coordinate(self, coordinate: Coordinate) -> int:
-        return self.SIZE * coordinate.row_index + coordinate.column_index
-
     def _get_mask_from_coordinate(self, coordinate: Coordinate) -> int:
-        return 1 << self._get_offset_from_coordinate(coordinate)
+        return 1 << (self.SIZE * coordinate.row_index + coordinate.column_index)
 
-    def _clear_bit_from_piece_masks(self, mask: int) -> None:
+    def _get_coordinate_from_mask(self, mask: int) -> Coordinate:
+        row_index, column_index = divmod(mask.bit_length() - 1, BOARD_SIZE)
+        return Coordinate(row_index, column_index)
+
+    def _clear_bit(self, mask: int) -> None:
         self._white_pawn_mask &= ~mask
         self._white_knight_mask &= ~mask
         self._white_bishop_mask &= ~mask
         self._white_rook_mask &= ~mask
         self._white_queen_mask &= ~mask
         self._white_king_mask &= ~mask
+        self._white_pieces_mask &= ~mask
 
         self._black_pawn_mask &= ~mask
         self._black_knight_mask &= ~mask
@@ -184,3 +246,7 @@ class Board:
         self._black_rook_mask &= ~mask
         self._black_queen_mask &= ~mask
         self._black_king_mask &= ~mask
+        self._black_pieces_mask &= ~mask
+
+    def _is_square_occupied(self, mask: int) -> bool:
+        return mask & self._white_pieces_mask > 0 or mask & self._black_pieces_mask > 0

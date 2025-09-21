@@ -1,23 +1,23 @@
 from enums.color import Color
-from enums.piece import Piece
 
 # TODO: should not interact directly with model
 from models.board import Board
 from models.coordinate import Coordinate
+from models.piece import Bishop, King, Knight, Pawn, Queen, Rook
 
 _PIECE_TO_SYMBOL = {
-    Piece.WHITE_PAWN: "♙",
-    Piece.WHITE_KNIGHT: "♘",
-    Piece.WHITE_BISHOP: "♗",
-    Piece.WHITE_ROOK: "♖",
-    Piece.WHITE_QUEEN: "♕",
-    Piece.WHITE_KING: "♔",
-    Piece.BLACK_PAWN: "♟",
-    Piece.BLACK_KNIGHT: "♞",
-    Piece.BLACK_BISHOP: "♝",
-    Piece.BLACK_ROOK: "♜",
-    Piece.BLACK_QUEEN: "♛",
-    Piece.BLACK_KING: "♚",
+    Pawn(Color.WHITE): "♙",
+    Knight(Color.WHITE): "♘",
+    Bishop(Color.WHITE): "♗",
+    Rook(Color.WHITE): "♖",
+    Queen(Color.WHITE): "♕",
+    King(Color.WHITE): "♔",
+    Pawn(Color.BLACK): "♟",
+    Knight(Color.BLACK): "♞",
+    Bishop(Color.BLACK): "♝",
+    Rook(Color.BLACK): "♜",
+    Queen(Color.BLACK): "♛",
+    King(Color.BLACK): "♚",
 }
 
 
