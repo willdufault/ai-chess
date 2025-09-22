@@ -5,7 +5,7 @@ from models.board import Board
 from models.coordinate import Coordinate
 from models.move import Move
 from models.move_generator import MoveGenerator
-from models.piece import Bishop, Knight, Pawn
+from models.piece import Bishop, Knight, Pawn, Rook
 
 
 @fixture
@@ -56,7 +56,7 @@ def test_generate_knight_moves(board: Board) -> None:
     )
 
 
-def test_generate_bishop_moves(board: Board) -> None:
+def test_generate_diagonal_moves(board: Board) -> None:
     board.set_piece(Coordinate(0, 0), Bishop(Color.WHITE))
     board.set_piece(Coordinate(7, 0), Bishop(Color.WHITE))
     board.set_piece(Coordinate(7, 7), Bishop(Color.WHITE))
@@ -90,5 +90,75 @@ def test_generate_bishop_moves(board: Board) -> None:
             Move(Color.WHITE, Coordinate(3, 3), Coordinate(4, 4)),
             Move(Color.WHITE, Coordinate(3, 3), Coordinate(5, 5)),
             Move(Color.WHITE, Coordinate(3, 3), Coordinate(6, 6)),
+        ]
+    )
+
+
+def test_generate_horizontal_moves(board: Board) -> None:
+    board.set_piece(Coordinate(0, 0), Rook(Color.WHITE))
+    board.set_piece(Coordinate(7, 0), Rook(Color.WHITE))
+    board.set_piece(Coordinate(7, 7), Rook(Color.WHITE))
+    board.set_piece(Coordinate(0, 7), Rook(Color.WHITE))
+    board.set_piece(Coordinate(3, 3), Rook(Color.WHITE))
+    board.set_piece(Coordinate(4, 3), Pawn(Color.WHITE))
+    board.set_piece(Coordinate(2, 3), Pawn(Color.BLACK))
+    assert set(MoveGenerator.generate_white_rook_moves(board)) == set(
+        [
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 1)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 2)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 3)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 4)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 5)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 6)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(1, 0)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(2, 0)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(3, 0)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(4, 0)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(5, 0)),
+            Move(Color.WHITE, Coordinate(0, 0), Coordinate(6, 0)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(7, 1)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(7, 2)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(7, 3)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(7, 4)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(7, 5)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(7, 6)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(6, 0)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(5, 0)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(4, 0)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(3, 0)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(2, 0)),
+            Move(Color.WHITE, Coordinate(7, 0), Coordinate(1, 0)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(7, 6)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(7, 5)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(7, 4)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(7, 3)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(7, 2)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(7, 1)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(6, 7)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(5, 7)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(4, 7)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(3, 7)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(2, 7)),
+            Move(Color.WHITE, Coordinate(7, 7), Coordinate(1, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(1, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(2, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(3, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(4, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(5, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(6, 7)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(0, 6)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(0, 5)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(0, 4)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(0, 3)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(0, 2)),
+            Move(Color.WHITE, Coordinate(0, 7), Coordinate(0, 1)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(2, 3)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 0)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 1)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 2)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 4)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 5)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 6)),
+            Move(Color.WHITE, Coordinate(3, 3), Coordinate(3, 7)),
         ]
     )
