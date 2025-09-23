@@ -1,6 +1,8 @@
 from enums.color import Color
 from models.board import Board
+from models.coordinate import Coordinate
 from models.move import Move
+from models.piece import Piece
 
 _KNIGHT_UP_LEFT_SHIFT = 15
 _KNIGHT_UP_RIGHT_SHIFT = 17
@@ -84,12 +86,19 @@ _HORIZONTAL_DIRECTIONS = (
 
 class MoveGenerator:
     @staticmethod
-    def generate_white_pawn_moves(board: Board) -> list[Move]:
+    def generate_pawn_moves(board: Board, color: Color) -> list[Move]:
         moves = []
-        for offset in range(board.LEN - board.SIZE):
+        if color is Color.WHITE:
+            pawn_mask = board.white_pawn_mask
+            offsets = range(board.LEN - board.SIZE)
+        else:
+            pawn_mask = board.black_pawn_mask
+            offsets = range(board.SIZE, board.LEN)
+
+        for offset in offsets:
             from_mask = 1 << offset
-            is_white_pawn = from_mask & board.white_pawn_mask > 0
-            if not is_white_pawn:
+            is_same_color_pawn = from_mask & pawn_mask > 0
+            if not is_same_color_pawn:
                 continue
 
             to_mask = from_mask << board.SIZE
@@ -98,36 +107,24 @@ class MoveGenerator:
 
             from_coordinate = board.get_coordinate_from_mask(from_mask)
             to_coordinate = board.get_coordinate_from_mask(to_mask)
-            move = Move(Color.WHITE, from_coordinate, to_coordinate)
+            move = Move(color, from_coordinate, to_coordinate)
             moves.append(move)
         return moves
 
     @staticmethod
-    def generate_black_pawn_moves(board: Board) -> list[Move]:
+    def generate_knight_moves(board: Board, color: Color) -> list[Move]:
         moves = []
-        for offset in range(board.SIZE, board.LEN):
-            from_mask = 1 << offset
-            is_black_pawn = from_mask & board.black_pawn_mask > 0
-            if not is_black_pawn:
-                continue
+        if color is Color.WHITE:
+            knight_mask = board.white_knight_mask
+            same_color_mask = board.white_pieces_mask
+        else:
+            knight_mask = board.black_knight_mask
+            same_color_mask = board.black_pieces_mask
 
-            to_mask = from_mask >> board.SIZE
-            if board.is_square_occupied(to_mask):
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            to_coordinate = board.get_coordinate_from_mask(to_mask)
-            move = Move(Color.WHITE, from_coordinate, to_coordinate)
-            moves.append(move)
-        return moves
-
-    @staticmethod
-    def generate_white_knight_moves(board: Board) -> list[Move]:
-        moves = []
         for offset in range(board.LEN):
             from_mask = 1 << offset
-            is_white_knight = from_mask & board.white_knight_mask > 0
-            if not is_white_knight:
+            is_same_color_knight = from_mask & knight_mask > 0
+            if not is_same_color_knight:
                 continue
 
             to_masks = []
@@ -150,252 +147,54 @@ class MoveGenerator:
 
             from_coordinate = board.get_coordinate_from_mask(from_mask)
             for to_mask in to_masks:
-                is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                if not is_attacking_white_piece:
+                is_attacking_same_color_piece = to_mask & same_color_mask > 0
+                if not is_attacking_same_color_piece:
                     to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.WHITE, from_coordinate, to_coordinate)
+                    move = Move(color, from_coordinate, to_coordinate)
                     moves.append(move)
         return moves
 
-    @staticmethod
-    def generate_black_knight_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_black_knight = from_mask & board.black_knight_mask
-            if not is_black_knight:
-                continue
+    @classmethod
+    def generate_bishop_moves(cls, board: Board, color: Color) -> list[Move]:
+        bishop_mask = (
+            board.white_bishop_mask if color is Color.WHITE else board.black_bishop_mask
+        )
+        return cls._generate_straight_moves(
+            board, color, bishop_mask, _DIAGONAL_DIRECTIONS
+        )
 
-            to_masks = []
-            if from_mask & _KNIGHT_UP_LEFT_MASK > 0:
-                to_masks.append(from_mask << _KNIGHT_UP_LEFT_SHIFT)
-            if from_mask & _KNIGHT_UP_RIGHT_MASK > 0:
-                to_masks.append(from_mask << _KNIGHT_UP_RIGHT_SHIFT)
-            if from_mask & _KNIGHT_RIGHT_UP_MASK > 0:
-                to_masks.append(from_mask << _KNIGHT_RIGHT_UP_SHIFT)
-            if from_mask & _KNIGHT_RIGHT_DOWN_MASK > 0:
-                to_masks.append(from_mask >> -_KNIGHT_RIGHT_DOWN_SHIFT)
-            if from_mask & _KNIGHT_DOWN_RIGHT_MASK > 0:
-                to_masks.append(from_mask >> -_KNIGHT_DOWN_RIGHT_SHIFT)
-            if from_mask & _KNIGHT_DOWN_LEFT_MASK > 0:
-                to_masks.append(from_mask >> -_KNIGHT_DOWN_LEFT_SHIFT)
-            if from_mask & _KNIGHT_LEFT_DOWN_MASK > 0:
-                to_masks.append(from_mask >> -_KNIGHT_LEFT_DOWN_SHIFT)
-            if from_mask & _KNIGHT_LEFT_UP_MASK > 0:
-                to_masks.append(from_mask << _KNIGHT_LEFT_UP_SHIFT)
+    @classmethod
+    def generate_rook_moves(cls, board: Board, color: Color) -> list[Move]:
+        rook_mask = (
+            board.white_rook_mask if color is Color.WHITE else board.black_rook_mask
+        )
+        return cls._generate_straight_moves(
+            board, color, rook_mask, _HORIZONTAL_DIRECTIONS
+        )
 
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for to_mask in to_masks:
-                is_attacking_black_piece = to_mask & board.black_pieces_mask
-                if not is_attacking_black_piece:
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.BLACK, from_coordinate, to_coordinate)
-                    moves.append(move)
-        return moves
+    @classmethod
+    def generate_queen_moves(cls, board: Board, color: Color) -> list[Move]:
+        queen_mask = (
+            board.white_queen_mask if color is Color.WHITE else board.black_queen_mask
+        )
+        return cls._generate_straight_moves(
+            board, color, queen_mask, _HORIZONTAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
+        )
 
     @staticmethod
-    def generate_white_bishop_moves(board: Board) -> list[Move]:
+    def generate_king_moves(board: Board, color: Color) -> list[Move]:
         moves = []
+        if color is Color.WHITE:
+            king_mask = board.white_king_mask
+            same_color_mask = board.white_pieces_mask
+        else:
+            king_mask = board.black_king_mask
+            same_color_mask = board.black_pieces_mask
+
         for offset in range(board.LEN):
             from_mask = 1 << offset
-            is_white_bishop = from_mask & board.white_bishop_mask > 0
-            if not is_white_bishop:
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in _DIAGONAL_DIRECTIONS:
-                to_mask = from_mask
-                while to_mask & direction_mask > 0:
-                    to_mask = (
-                        to_mask << direction_shift
-                        if direction_shift > 0
-                        else to_mask >> -direction_shift
-                    )
-
-                    is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                    if is_attacking_white_piece:
-                        break
-
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.WHITE, from_coordinate, to_coordinate)
-                    moves.append(move)
-
-                    is_attacking_black_piece = to_mask & board.black_pieces_mask > 0
-                    if is_attacking_black_piece:
-                        break
-        return moves
-
-    @staticmethod
-    def generate_black_bishop_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_black_bishop = from_mask & board.black_bishop_mask > 0
-            if not is_black_bishop:
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in _DIAGONAL_DIRECTIONS:
-                to_mask = from_mask
-                while to_mask & direction_mask > 0:
-                    to_mask = (
-                        to_mask << direction_shift
-                        if direction_shift > 0
-                        else to_mask >> -direction_shift
-                    )
-
-                    is_attacking_black_piece = to_mask & board.black_pieces_mask > 0
-                    if is_attacking_black_piece:
-                        break
-
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.BLACK, from_coordinate, to_coordinate)
-                    moves.append(move)
-
-                    is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                    if is_attacking_white_piece:
-                        break
-        return moves
-
-    @staticmethod
-    def generate_white_rook_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_white_rook = from_mask & board.white_rook_mask
-            if not is_white_rook:
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in _HORIZONTAL_DIRECTIONS:
-                to_mask = from_mask
-                while to_mask & direction_mask > 0:
-                    to_mask = (
-                        to_mask << direction_shift
-                        if direction_shift > 0
-                        else to_mask >> -direction_shift
-                    )
-
-                    is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                    if is_attacking_white_piece:
-                        break
-
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.WHITE, from_coordinate, to_coordinate)
-                    moves.append(move)
-
-                    is_attacking_black_piece = to_mask & board.black_pieces_mask > 0
-                    if is_attacking_black_piece:
-                        break
-        return moves
-
-    @staticmethod
-    def generate_black_rook_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_black_rook = from_mask & board.black_rook_mask
-            if not is_black_rook:
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in _HORIZONTAL_DIRECTIONS:
-                to_mask = from_mask
-                while to_mask & direction_mask > 0:
-                    to_mask = (
-                        to_mask << direction_shift
-                        if direction_shift > 0
-                        else to_mask >> -direction_shift
-                    )
-
-                    is_attacking_black_piece = to_mask & board.black_pieces_mask > 0
-                    if is_attacking_black_piece:
-                        break
-
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.BLACK, from_coordinate, to_coordinate)
-                    moves.append(move)
-
-                    is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                    if is_attacking_white_piece:
-                        break
-        return moves
-
-    @staticmethod
-    def generate_white_queen_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_white_queen = from_mask & board.white_queen_mask
-            if not is_white_queen:
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in (
-                _HORIZONTAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
-            ):
-                to_mask = from_mask
-                while to_mask & direction_mask > 0:
-                    to_mask = (
-                        to_mask << direction_shift
-                        if direction_shift > 0
-                        else to_mask >> -direction_shift
-                    )
-
-                    is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                    if is_attacking_white_piece:
-                        break
-
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.WHITE, from_coordinate, to_coordinate)
-                    moves.append(move)
-
-                    is_attacking_black_piece = to_mask & board.black_pieces_mask > 0
-                    if is_attacking_black_piece:
-                        break
-        return moves
-
-    @staticmethod
-    def generate_black_queen_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_black_queen = from_mask & board.black_queen_mask
-            if not is_black_queen:
-                continue
-
-            from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in (
-                _HORIZONTAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
-            ):
-                to_mask = from_mask
-                while to_mask & direction_mask > 0:
-                    to_mask = (
-                        to_mask << direction_shift
-                        if direction_shift > 0
-                        else to_mask >> -direction_shift
-                    )
-
-                    is_attacking_black_piece = to_mask & board.black_pieces_mask > 0
-                    if is_attacking_black_piece:
-                        break
-
-                    to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.BLACK, from_coordinate, to_coordinate)
-                    moves.append(move)
-
-                    is_attacking_white_piece = to_mask & board.white_pieces_mask > 0
-                    if is_attacking_white_piece:
-                        break
-        return moves
-
-    @staticmethod
-    def generate_white_king_moves(board: Board) -> list[Move]:
-        moves = []
-        for offset in range(board.LEN):
-            from_mask = 1 << offset
-            is_white_king = from_mask & board.white_king_mask
-            if not is_white_king:
+            is_same_color_king = from_mask & king_mask
+            if not is_same_color_king:
                 continue
 
             from_coordinate = board.get_coordinate_from_mask(from_mask)
@@ -409,40 +208,60 @@ class MoveGenerator:
                 )
 
                 can_move_in_direction = to_mask & direction_mask > 0
-                if can_move_in_direction:
-                    if to_mask & board.white_pieces_mask > 0:
-                        break
-
+                is_attacking_same_color_piece = to_mask & same_color_mask > 0
+                if can_move_in_direction and not is_attacking_same_color_piece:
                     to_coordinate = board.get_coordinate_from_mask(to_mask)
                     move = Move(Color.WHITE, from_coordinate, to_coordinate)
                     moves.append(move)
         return moves
 
     @staticmethod
-    def generate_black_king_moves(board: Board) -> list[Move]:
+    def list_attacking_(
+        board: Board, color: Color, coordinate: Coordinate
+    ) -> list[Piece]: ...
+
+    @staticmethod
+    def _generate_straight_moves(
+        board: Board,
+        color: Color,
+        piece_mask: int,
+        directions: tuple[tuple[int, int], ...],
+    ) -> list[Move]:
         moves = []
+        if color is Color.WHITE:
+            same_color_mask = board.white_pieces_mask
+            opposite_color_mask = board.black_pieces_mask
+        else:
+            same_color_mask = board.black_pieces_mask
+            opposite_color_mask = board.white_pieces_mask
+
         for offset in range(board.LEN):
             from_mask = 1 << offset
-            is_black_king = from_mask & board.black_king_mask
-            if not is_black_king:
+            is_same_color_right_piece = from_mask & piece_mask > 0
+            if not is_same_color_right_piece:
                 continue
 
             from_coordinate = board.get_coordinate_from_mask(from_mask)
-            for direction_mask, direction_shift in (
-                _HORIZONTAL_DIRECTIONS + _DIAGONAL_DIRECTIONS
-            ):
-                to_mask = (
-                    from_mask << direction_shift
-                    if direction_shift > 0
-                    else from_mask >> -direction_shift
-                )
+            for direction_mask, direction_shift in directions:
+                to_mask = from_mask
+                while to_mask & direction_mask > 0:
+                    to_mask = (
+                        to_mask << direction_shift
+                        if direction_shift > 0
+                        else to_mask >> -direction_shift
+                    )
 
-                can_move_in_direction = to_mask & direction_mask > 0
-                if can_move_in_direction:
-                    if to_mask & board.black_pieces_mask > 0:
+                    is_attacking_same_color_piece = to_mask & same_color_mask > 0
+                    if is_attacking_same_color_piece:
                         break
 
                     to_coordinate = board.get_coordinate_from_mask(to_mask)
-                    move = Move(Color.BLACK, from_coordinate, to_coordinate)
+                    move = Move(color, from_coordinate, to_coordinate)
                     moves.append(move)
+
+                    is_attacking_opposite_color_piece = (
+                        to_mask & opposite_color_mask > 0
+                    )
+                    if is_attacking_opposite_color_piece:
+                        break
         return moves

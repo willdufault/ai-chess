@@ -19,7 +19,7 @@ def test_generate_pawn_moves_forward_one(board: Board) -> None:
     board.set_piece(Coordinate(2, 1), Pawn(Color.BLACK))
     board.set_piece(Coordinate(6, 6), Pawn(Color.WHITE))
     board.set_piece(Coordinate(7, 7), Pawn(Color.WHITE))
-    assert set(MoveGenerator.generate_white_pawn_moves(board)) == set(
+    assert set(MoveGenerator.generate_pawn_moves(board, Color.WHITE)) == set(
         [
             Move(Color.WHITE, Coordinate(0, 0), Coordinate(1, 0)),
             Move(Color.WHITE, Coordinate(6, 6), Coordinate(7, 6)),
@@ -35,7 +35,7 @@ def test_generate_knight_moves(board: Board) -> None:
     board.set_piece(Coordinate(3, 3), Knight(Color.WHITE))
     board.set_piece(Coordinate(4, 5), Pawn(Color.WHITE))
     board.set_piece(Coordinate(5, 1), Pawn(Color.BLACK))
-    assert set(MoveGenerator.generate_white_knight_moves(board)) == set(
+    assert set(MoveGenerator.generate_knight_moves(board, Color.WHITE)) == set(
         [
             Move(Color.WHITE, Coordinate(7, 0), Coordinate(5, 1)),
             Move(Color.WHITE, Coordinate(7, 0), Coordinate(6, 2)),
@@ -64,7 +64,7 @@ def test_generate_diagonal_moves(board: Board) -> None:
     board.set_piece(Coordinate(3, 3), Bishop(Color.WHITE))
     board.set_piece(Coordinate(4, 2), Pawn(Color.WHITE))
     board.set_piece(Coordinate(2, 4), Pawn(Color.BLACK))
-    assert set(MoveGenerator.generate_white_bishop_moves(board)) == set(
+    assert set(MoveGenerator.generate_bishop_moves(board, Color.WHITE)) == set(
         [
             Move(Color.WHITE, Coordinate(0, 0), Coordinate(1, 1)),
             Move(Color.WHITE, Coordinate(0, 0), Coordinate(2, 2)),
@@ -102,7 +102,7 @@ def test_generate_horizontal_moves(board: Board) -> None:
     board.set_piece(Coordinate(3, 3), Rook(Color.WHITE))
     board.set_piece(Coordinate(4, 3), Pawn(Color.WHITE))
     board.set_piece(Coordinate(2, 3), Pawn(Color.BLACK))
-    assert set(MoveGenerator.generate_white_rook_moves(board)) == set(
+    assert set(MoveGenerator.generate_rook_moves(board, Color.WHITE)) == set(
         [
             Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 1)),
             Move(Color.WHITE, Coordinate(0, 0), Coordinate(0, 2)),
