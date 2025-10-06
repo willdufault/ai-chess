@@ -4,6 +4,35 @@ from models.coordinate import Coordinate
 from models.move import Move
 from models.piece import Piece
 
+_WHITE_PAWN_CAPTURE_LEFT_SHIFT = 7
+_WHITE_PAWN_CAPTURE_RIGHT_SHIFT = 9
+_BLACK_PAWN_CAPTURE_LEFT_SHIFT = -9
+_BLACK_PAWN_CAPTURE_RIGHT_SHIFT = -7
+_WHITE_PAWN_UP_ONE_MASK = (
+    0b00000000_11111111_11111111_11111111_11111111_11111111_11111111_11111111
+)
+_WHITE_PAWN_UP_TWO_MASK = (
+    0b00000000_00000000_11111111_11111111_11111111_11111111_11111111_11111111
+)
+_WHITE_PAWN_CAPTURE_LEFT_MASK = (
+    0b00000000_11111110_11111110_11111110_11111110_11111110_11111110_11111110
+)
+_WHITE_PAWN_CAPTURE_RIGHT_MASK = (
+    0b00000000_01111111_01111111_01111111_01111111_01111111_01111111_01111111
+)
+_BLACK_PAWN_DOWN_ONE_MASK = (
+    0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_00000000
+)
+_BLACK_PAWN_DOWN_TWO_MASK = (
+    0b11111111_11111111_11111111_11111111_11111111_11111111_00000000_00000000
+)
+_BLACK_PAWN_CAPTURE_LEFT_MASK = (
+    0b11111110_11111110_11111110_11111110_11111110_11111110_11111110_00000000
+)
+_BLACK_PAWN_CAPTURE_RIGHT_MASK = (
+    0b01111111_01111111_01111111_01111111_01111111_01111111_01111111_00000000
+)
+
 _KNIGHT_UP_LEFT_SHIFT = 15
 _KNIGHT_UP_RIGHT_SHIFT = 17
 _KNIGHT_RIGHT_UP_SHIFT = 10
@@ -86,29 +115,153 @@ _HORIZONTAL_DIRECTIONS = (
 
 class MoveGenerator:
     @staticmethod
-    def generate_pawn_moves(board: Board, color: Color) -> list[Move]:
+    def _is_pawn_single_move_valid(board: Board, color: Color, from_mask: int) -> bool:
+        """Assumes a valid pawn at from_mask."""
+        move_mask = (
+            _WHITE_PAWN_UP_ONE_MASK
+            if color is Color.WHITE
+            else _BLACK_PAWN_DOWN_ONE_MASK
+        )
+        is_move_in_bounds = from_mask & move_mask > 0
+        if not is_move_in_bounds:
+            return False
+
+        forward_one_mask = (
+            from_mask << board.SIZE if color is Color.WHITE else from_mask >> board.SIZE
+        )
+        if board.is_square_occupied(forward_one_mask):
+            return False
+
+        return True
+
+    @staticmethod
+    def _is_pawn_double_move_valid(board: Board, color: Color, from_mask: int) -> bool:
+        """Assumes a valid pawn at from_mask."""
+        move_mask = (
+            _WHITE_PAWN_UP_TWO_MASK
+            if color is Color.WHITE
+            else _BLACK_PAWN_DOWN_TWO_MASK
+        )
+        is_move_in_bounds = from_mask & move_mask > 0
+        if not is_move_in_bounds:
+            return False
+
+        forward_one_mask = (
+            from_mask << board.SIZE if color is Color.WHITE else from_mask >> board.SIZE
+        )
+        if board.is_square_occupied(forward_one_mask):
+            return False
+
+        forward_two_mask = (
+            from_mask << (board.SIZE << 1)
+            if color is Color.WHITE
+            else from_mask >> (board.SIZE << 1)
+        )
+        if board.is_square_occupied(forward_two_mask):
+            return False
+
+        # TODO
+        has_pawn_moved = True
+        if has_pawn_moved:
+            return False
+
+        return True
+
+    @staticmethod
+    def _is_pawn_capture_valid(
+        board: Board, color: Color, from_mask: int, is_left: bool
+    ) -> bool:
+        """Assumes a valid pawn at from_mask."""
+        if color is Color.WHITE:
+            if is_left:
+                move_mask = _WHITE_PAWN_CAPTURE_LEFT_MASK
+                move_shift = _WHITE_PAWN_CAPTURE_LEFT_SHIFT
+            else:
+                move_mask = _WHITE_PAWN_CAPTURE_RIGHT_MASK
+                move_shift = _WHITE_PAWN_CAPTURE_RIGHT_SHIFT
+        else:
+            if is_left:
+                move_mask = _BLACK_PAWN_CAPTURE_LEFT_MASK
+                move_shift = _BLACK_PAWN_CAPTURE_LEFT_SHIFT
+            else:
+                move_mask = _BLACK_PAWN_CAPTURE_RIGHT_MASK
+                move_shift = _BLACK_PAWN_CAPTURE_RIGHT_SHIFT
+
+        is_move_in_bounds = from_mask & move_mask > 0
+        if not is_move_in_bounds:
+            return False
+
+        capture_mask = (
+            from_mask << move_shift
+            if color is Color.WHITE
+            else from_mask >> -move_shift
+        )
+        is_capturing_opposite_color_piece = (
+            board.is_black_piece_on_square(capture_mask)
+            if color is Color.WHITE
+            else board.is_white_piece_on_square(capture_mask)
+        )
+        if not is_capturing_opposite_color_piece:
+            return False
+
+        return True
+
+    @classmethod
+    def generate_pawn_moves(cls, board: Board, color: Color) -> list[Move]:
         moves = []
         if color is Color.WHITE:
             pawn_mask = board.white_pawn_mask
-            offsets = range(board.LEN - board.SIZE)
         else:
             pawn_mask = board.black_pawn_mask
-            offsets = range(board.SIZE, board.LEN)
 
-        for offset in offsets:
+        for offset in range(board.LEN):
             from_mask = 1 << offset
             is_same_color_pawn = from_mask & pawn_mask > 0
             if not is_same_color_pawn:
                 continue
 
-            to_mask = from_mask << board.SIZE
-            if board.is_square_occupied(to_mask):
-                continue
-
             from_coordinate = board.get_coordinate_from_mask(from_mask)
-            to_coordinate = board.get_coordinate_from_mask(to_mask)
-            move = Move(color, from_coordinate, to_coordinate)
-            moves.append(move)
+
+            if cls._is_pawn_single_move_valid(board, color, from_mask):
+                to_mask = (
+                    from_mask << board.SIZE
+                    if color is Color.WHITE
+                    else from_mask >> board.SIZE
+                )
+                to_coordinate = board.get_coordinate_from_mask(to_mask)
+                move = Move(color, from_coordinate, to_coordinate)
+                moves.append(move)
+
+            if cls._is_pawn_double_move_valid(board, color, from_mask):
+                to_mask = (
+                    from_mask << (board.SIZE << 1)
+                    if color is Color.WHITE
+                    else from_mask >> (board.SIZE << 1)
+                )
+                to_coordinate = board.get_coordinate_from_mask(to_mask)
+                move = Move(color, from_coordinate, to_coordinate)
+                moves.append(move)
+
+            if cls._is_pawn_capture_valid(board, color, from_mask, True):
+                to_mask = (
+                    from_mask << _WHITE_PAWN_CAPTURE_LEFT_MASK
+                    if color is Color.WHITE
+                    else from_mask >> -_BLACK_PAWN_CAPTURE_LEFT_MASK
+                )
+                to_coordinate = board.get_coordinate_from_mask(to_mask)
+                move = Move(color, from_coordinate, to_coordinate)
+                moves.append(move)
+
+            if cls._is_pawn_capture_valid(board, color, from_mask, False):
+                to_mask = (
+                    from_mask << _WHITE_PAWN_CAPTURE_RIGHT_MASK
+                    if color is Color.WHITE
+                    else from_mask >> -_BLACK_PAWN_CAPTURE_RIGHT_MASK
+                )
+                to_coordinate = board.get_coordinate_from_mask(to_mask)
+                move = Move(color, from_coordinate, to_coordinate)
+                moves.append(move)
+
         return moves
 
     @staticmethod

@@ -193,8 +193,16 @@ class Board:
         row_index, column_index = divmod(mask.bit_length() - 1, _BOARD_SIZE)
         return Coordinate(row_index, column_index)
 
+    def is_white_piece_on_square(self, mask: int) -> bool:
+        return mask & self.white_pieces_mask > 0
+
+    def is_black_piece_on_square(self, mask: int) -> bool:
+        return mask & self.black_pieces_mask > 0
+
     def is_square_occupied(self, mask: int) -> bool:
-        return mask & self.white_pieces_mask > 0 or mask & self.black_pieces_mask > 0
+        return self.is_white_piece_on_square(mask) or self.is_black_piece_on_square(
+            mask
+        )
 
     def _get_mask_from_coordinate(self, coordinate: Coordinate) -> int:
         return 1 << (self.SIZE * coordinate.row_index + coordinate.column_index)
