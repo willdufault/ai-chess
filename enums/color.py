@@ -5,5 +5,10 @@ class Color(Enum):
     WHITE = auto()
     BLACK = auto()
 
-    def opposite(self, color: Color) -> Color:
-        return Color.WHITE if color == Color.BLACK else Color.BLACK
+    @property
+    def opposite(self) -> Color:
+        return Color.WHITE if self.value == Color.BLACK else Color.BLACK
+
+    @property
+    def forward_row_delta(self) -> int:
+        return 1 if self.value == Color.WHITE else -1

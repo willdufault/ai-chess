@@ -14,7 +14,7 @@ def main() -> None:
     p1 = b.get_piece(c1)
     p2 = b.get_piece(c2)
     m = Move(c1, c2, p1, p2, Color.WHITE)
-    v = MoveValidator.is_valid(m)
+    v = MoveValidator.is_valid_move(m)
     if v:
         b.move(m)
         b.print(Color.WHITE)
