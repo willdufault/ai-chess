@@ -2,7 +2,6 @@ from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
 from models.move import Move
-from models.piece import Piece
 
 _WHITE_PAWN_CAPTURE_LEFT_SHIFT = 7
 _WHITE_PAWN_CAPTURE_RIGHT_SHIFT = 9
@@ -114,98 +113,6 @@ _HORIZONTAL_DIRECTIONS = (
 
 
 class MoveGenerator:
-    @staticmethod
-    def _is_pawn_single_move_valid(board: Board, color: Color, from_mask: int) -> bool:
-        """Assumes a valid pawn at from_mask."""
-        move_mask = (
-            _WHITE_PAWN_UP_ONE_MASK
-            if color is Color.WHITE
-            else _BLACK_PAWN_DOWN_ONE_MASK
-        )
-        is_move_in_bounds = from_mask & move_mask > 0
-        if not is_move_in_bounds:
-            return False
-
-        forward_one_mask = (
-            from_mask << board.SIZE if color is Color.WHITE else from_mask >> board.SIZE
-        )
-        if board.is_square_occupied(forward_one_mask):
-            return False
-
-        return True
-
-    @staticmethod
-    def _is_pawn_double_move_valid(board: Board, color: Color, from_mask: int) -> bool:
-        """Assumes a valid pawn at from_mask."""
-        move_mask = (
-            _WHITE_PAWN_UP_TWO_MASK
-            if color is Color.WHITE
-            else _BLACK_PAWN_DOWN_TWO_MASK
-        )
-        is_move_in_bounds = from_mask & move_mask > 0
-        if not is_move_in_bounds:
-            return False
-
-        forward_one_mask = (
-            from_mask << board.SIZE if color is Color.WHITE else from_mask >> board.SIZE
-        )
-        if board.is_square_occupied(forward_one_mask):
-            return False
-
-        forward_two_mask = (
-            from_mask << (board.SIZE << 1)
-            if color is Color.WHITE
-            else from_mask >> (board.SIZE << 1)
-        )
-        if board.is_square_occupied(forward_two_mask):
-            return False
-
-        # TODO
-        has_pawn_moved = True
-        if has_pawn_moved:
-            return False
-
-        return True
-
-    @staticmethod
-    def _is_pawn_capture_valid(
-        board: Board, color: Color, from_mask: int, is_left: bool
-    ) -> bool:
-        """Assumes a valid pawn at from_mask."""
-        if color is Color.WHITE:
-            if is_left:
-                move_mask = _WHITE_PAWN_CAPTURE_LEFT_MASK
-                move_shift = _WHITE_PAWN_CAPTURE_LEFT_SHIFT
-            else:
-                move_mask = _WHITE_PAWN_CAPTURE_RIGHT_MASK
-                move_shift = _WHITE_PAWN_CAPTURE_RIGHT_SHIFT
-        else:
-            if is_left:
-                move_mask = _BLACK_PAWN_CAPTURE_LEFT_MASK
-                move_shift = _BLACK_PAWN_CAPTURE_LEFT_SHIFT
-            else:
-                move_mask = _BLACK_PAWN_CAPTURE_RIGHT_MASK
-                move_shift = _BLACK_PAWN_CAPTURE_RIGHT_SHIFT
-
-        is_move_in_bounds = from_mask & move_mask > 0
-        if not is_move_in_bounds:
-            return False
-
-        capture_mask = (
-            from_mask << move_shift
-            if color is Color.WHITE
-            else from_mask >> -move_shift
-        )
-        is_capturing_opposite_color_piece = (
-            board.is_black_piece_on_square(capture_mask)
-            if color is Color.WHITE
-            else board.is_white_piece_on_square(capture_mask)
-        )
-        if not is_capturing_opposite_color_piece:
-            return False
-
-        return True
-
     @classmethod
     def generate_pawn_moves(cls, board: Board, color: Color) -> list[Move]:
         moves = []
@@ -222,6 +129,8 @@ class MoveGenerator:
 
             from_coordinate = board.get_coordinate_from_mask(from_mask)
 
+            # TODO: make move two masks? pass to_mask as arg here? pass move as
+            # TODO: arg with the two masks?
             if cls._is_pawn_single_move_valid(board, color, from_mask):
                 to_mask = (
                     from_mask << board.SIZE
@@ -369,9 +278,118 @@ class MoveGenerator:
         return moves
 
     @staticmethod
-    def list_attacking_(
-        board: Board, color: Color, coordinate: Coordinate
-    ) -> list[Piece]: ...
+    def is_attacking(board: Board, color: Color, target_mask: int) -> bool:
+        # pawn
+        if color is Color.WHITE:
+            pawn_capture_left_mask = _WHITE_PAWN_CAPTURE_LEFT_MASK
+            pawn_capture_left_shift = _WHITE_PAWN_CAPTURE_LEFT_SHIFT
+            pawn_capture_right_mask = _WHITE_PAWN_CAPTURE_RIGHT_MASK
+            pawn_capture_right_shift = _WHITE_PAWN_CAPTURE_RIGHT_SHIFT
+        else:
+            pawn_capture_left_mask = _BLACK_PAWN_CAPTURE_LEFT_MASK
+            pawn_capture_left_shift = _BLACK_PAWN_CAPTURE_LEFT_SHIFT
+            pawn_capture_right_mask = _BLACK_PAWN_CAPTURE_RIGHT_MASK
+            pawn_capture_right_shift = _BLACK_PAWN_CAPTURE_RIGHT_SHIFT
+
+        # TODO: need mask for if can be attacked by pawn since subtracting mask
+        # TODO: could be OOB
+
+        # knight
+        # king
+        # straights
+        return []
+
+    @staticmethod
+    def _is_pawn_single_move_valid(board: Board, color: Color, from_mask: int) -> bool:
+        """Assumes a valid pawn at from_mask."""
+        move_mask = (
+            _WHITE_PAWN_UP_ONE_MASK
+            if color is Color.WHITE
+            else _BLACK_PAWN_DOWN_ONE_MASK
+        )
+        is_move_in_bounds = from_mask & move_mask > 0
+        if not is_move_in_bounds:
+            return False
+
+        forward_one_mask = (
+            from_mask << board.SIZE if color is Color.WHITE else from_mask >> board.SIZE
+        )
+        if board.is_square_occupied(forward_one_mask):
+            return False
+
+        return True
+
+    @staticmethod
+    def _is_pawn_double_move_valid(board: Board, color: Color, from_mask: int) -> bool:
+        """Assumes a valid pawn at from_mask."""
+        move_mask = (
+            _WHITE_PAWN_UP_TWO_MASK
+            if color is Color.WHITE
+            else _BLACK_PAWN_DOWN_TWO_MASK
+        )
+        is_move_in_bounds = from_mask & move_mask > 0
+        if not is_move_in_bounds:
+            return False
+
+        forward_one_mask = (
+            from_mask << board.SIZE if color is Color.WHITE else from_mask >> board.SIZE
+        )
+        if board.is_square_occupied(forward_one_mask):
+            return False
+
+        forward_two_mask = (
+            from_mask << (board.SIZE << 1)
+            if color is Color.WHITE
+            else from_mask >> (board.SIZE << 1)
+        )
+        if board.is_square_occupied(forward_two_mask):
+            return False
+
+        # TODO
+        has_pawn_moved = True
+        if has_pawn_moved:
+            return False
+
+        return True
+
+    @staticmethod
+    def _is_pawn_capture_valid(
+        board: Board, color: Color, from_mask: int, is_left: bool
+    ) -> bool:
+        """Assumes a valid pawn at from_mask."""
+        if color is Color.WHITE:
+            if is_left:
+                move_mask = _WHITE_PAWN_CAPTURE_LEFT_MASK
+                move_shift = _WHITE_PAWN_CAPTURE_LEFT_SHIFT
+            else:
+                move_mask = _WHITE_PAWN_CAPTURE_RIGHT_MASK
+                move_shift = _WHITE_PAWN_CAPTURE_RIGHT_SHIFT
+        else:
+            if is_left:
+                move_mask = _BLACK_PAWN_CAPTURE_LEFT_MASK
+                move_shift = _BLACK_PAWN_CAPTURE_LEFT_SHIFT
+            else:
+                move_mask = _BLACK_PAWN_CAPTURE_RIGHT_MASK
+                move_shift = _BLACK_PAWN_CAPTURE_RIGHT_SHIFT
+
+        is_move_in_bounds = from_mask & move_mask > 0
+        if not is_move_in_bounds:
+            return False
+
+        capture_mask = (
+            from_mask << move_shift
+            if color is Color.WHITE
+            else from_mask >> -move_shift
+        )
+        is_capturing_opposite_color_piece = (
+            board.is_black_piece_on_square(capture_mask)
+            if color is Color.WHITE
+            else board.is_white_piece_on_square(capture_mask)
+        )
+        if not is_capturing_opposite_color_piece:
+            return False
+
+        return True
 
     @staticmethod
     def _generate_straight_moves(
