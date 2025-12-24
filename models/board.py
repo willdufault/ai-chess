@@ -1,3 +1,6 @@
+from models.coordinate import Coordinate
+
+
 class Board:
     def __init__(self) -> None:
         self.size = 8
@@ -14,7 +17,7 @@ class Board:
         self._black_bishops = 0
         self._black_queens = 0
 
-    def _set_up_pieces(self) -> None:
+    def set_up_pieces(self) -> None:
         self._white_pawns = (
             0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000
         )
@@ -59,6 +62,7 @@ class Board:
             for col_offset in range(self.size):
                 offset = self.size * row_offset + col_offset
                 square = 1 << offset
+
                 if (self._white_pawns & square) != 0:
                     print("♙", end=" ")
                 elif (self._white_knights & square) != 0:
@@ -71,6 +75,7 @@ class Board:
                     print("♕", end=" ")
                 elif (self._white_kings & square) != 0:
                     print("♔", end=" ")
+
                 elif (self._black_pawns & square) != 0:
                     print("♟", end=" ")
                 elif (self._black_knights & square) != 0:
@@ -85,11 +90,48 @@ class Board:
                     print("♚", end=" ")
                 else:
                     print(".", end=" ")
-                pass
             print()
 
+    def move(self, from_coordinate: Coordinate, to_coordinate: Coordinate) -> None:
+        from_offset = from_coordinate.row_index * self.size + from_coordinate.col_index
+        from_square = 1 << from_offset
+        to_offset = to_coordinate.row_index * self.size + to_coordinate.col_index
+        to_square = 1 << to_offset
 
-if __name__ == "__main__":
-    b = Board()
-    b._set_up_pieces()
-    b.print()
+        if self._white_pawns & from_square != 0:
+            self._white_pawns ^= from_square
+            self._white_pawns |= to_square
+        elif self._white_knights & from_square != 0:
+            self._white_knights ^= from_square
+            self._white_knights |= to_square
+        elif self._white_bishops & from_square != 0:
+            self._white_bishops ^= from_square
+            self._white_bishops |= to_square
+        elif self._white_rooks & from_square != 0:
+            self._white_rooks ^= from_square
+            self._white_rooks |= to_square
+        elif self._white_queens & from_square != 0:
+            self._white_queens ^= from_square
+            self._white_queens |= to_square
+        elif self._white_kings & from_square != 0:
+            self._white_kings ^= from_square
+            self._white_kings |= to_square
+
+        elif self._black_pawns & from_square != 0:
+            self._black_pawns ^= from_square
+            self._black_pawns |= to_square
+        elif self._black_knights & from_square != 0:
+            self._black_knights ^= from_square
+            self._black_knights |= to_square
+        elif self._black_bishops & from_square != 0:
+            self._black_bishops ^= from_square
+            self._black_bishops |= to_square
+        elif self._black_rooks & from_square != 0:
+            self._black_rooks ^= from_square
+            self._black_rooks |= to_square
+        elif self._black_queens & from_square != 0:
+            self._black_queens ^= from_square
+            self._black_queens |= to_square
+        elif self._black_kings & from_square != 0:
+            self._black_kings ^= from_square
+            self._black_kings |= to_square
