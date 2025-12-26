@@ -1,3 +1,4 @@
+from enums.color import Color
 from models.board import Board
 from utils.board_utils import signed_shift
 
@@ -39,6 +40,11 @@ KNIGHT_LEFT2_DOWN_SHIFT = -10
 KNIGHT_RIGHT2_UP_SHIFT = 10
 KNIGHT_RIGHT2_DOWN_SHIFT = -6
 
+PAWN_UP_TRANSFORMS = [(UP_LEFT_MASK, UP_LEFT_SHIFT), (UP_RIGHT_MASK, UP_RIGHT_SHIFT)]
+PAWN_DOWN_TRANSFORMS = [
+    (DOWN_LEFT_MASK, DOWN_LEFT_SHIFT),
+    (DOWN_RIGHT_MASK, DOWN_RIGHT_SHIFT),
+]
 HORIZONTAL_TRANSFORMS = [
     (UP_MASK, UP_SHIFT),
     (DOWN_MASK, DOWN_SHIFT),
@@ -64,53 +70,77 @@ KNIGHT_TRANSFORMS = [
 
 
 class Rules:
-    @staticmethod
-    def is_white_in_check(board: Board) -> bool:
-        # TODO: clean up, make relative to board size
-        # TODO: after, check if all info makes sense in this fcn
-        # pawn
-        if board._white_king_square & UP_LEFT_MASK != 0:
-            up_left_square = board._white_king_square << UP_LEFT_SHIFT
-            if board._black_pawn_squares & up_left_square:
-                return True
-        if board._white_king_square & UP_RIGHT_MASK != 0:
-            up_right_square = board._white_king_square << UP_RIGHT_SHIFT
-            if board._black_pawn_squares & up_right_square:
-                return True
+    @classmethod
+    def is_in_check(cls, color: Color, board: Board) -> bool:
+        if color == Color.WHITE:
+            king_square = board._white_king_square
+            pawn_transforms = PAWN_UP_TRANSFORMS
+            opponent_pawn_squares = board._black_pawn_squares
+            opponent_knight_squares = board._black_knight_squares
+            opponent_bishop_squares = board._black_bishop_squares
+            opponent_rook_squares = board._black_rook_squares
+            opponent_queen_squares = board._black_queen_squares
+        else:
+            king_square = board._black_king_square
+            pawn_transforms = PAWN_DOWN_TRANSFORMS
+            opponent_pawn_squares = board._white_pawn_squares
+            opponent_knight_squares = board._white_knight_squares
+            opponent_bishop_squares = board._white_bishop_squares
+            opponent_rook_squares = board._white_rook_squares
+            opponent_queen_squares = board._white_queen_squares
 
-        # knight
+        for mask, shift in pawn_transforms:
+            if king_square & mask != 0:
+                pawn_square = signed_shift(king_square, shift)
+                if opponent_pawn_squares & pawn_square:
+                    return True
+
         for mask, shift in KNIGHT_TRANSFORMS:
-            if board._white_king_square & mask != 0:
-                knight_square = signed_shift(board._white_king_square, shift)
-                if board._black_knight_squares & knight_square:
+            if king_square & mask != 0:
+                knight_square = signed_shift(king_square, shift)
+                if opponent_knight_squares & knight_square:
                     return True
 
-        # bishop & queen
-        for mask, shift in DIAGONAL_TRANSFORMS:
-            diagonal_square = board._white_king_square
-            while diagonal_square & mask != 0:
-                diagonal_square = signed_shift(diagonal_square, shift)
-                if (
-                    diagonal_square & board._black_bishop_squares
-                    or diagonal_square & board._black_queen_squares
+        is_under_diagonal_attack = cls._is_under_straight_attack(
+            board,
+            king_square,
+            [opponent_bishop_squares, opponent_queen_squares],
+            DIAGONAL_TRANSFORMS,
+        )
+        if is_under_diagonal_attack:
+            return True
+
+        is_under_horizontal_attack = cls._is_under_straight_attack(
+            board,
+            king_square,
+            [opponent_rook_squares, opponent_queen_squares],
+            HORIZONTAL_TRANSFORMS,
+        )
+        if is_under_horizontal_attack:
+            return True
+
+        return False
+
+    @staticmethod
+    def _is_under_straight_attack(
+        board: Board,
+        king_square: int,
+        attacker_squares: list[int],
+        transforms: list[tuple[int, int]],
+    ) -> bool:
+        for mask, shift in transforms:
+            current_square = king_square
+            while current_square & mask != 0:
+                current_square = signed_shift(current_square, shift)
+                if any(
+                    [
+                        current_square & attacker_square != 0
+                        for attacker_square in attacker_squares
+                    ]
                 ):
                     return True
 
-                if board.is_occupied(diagonal_square):
-                    break
-
-        # rook & queen
-        for mask, shift in HORIZONTAL_TRANSFORMS:
-            horizontal_square = board._white_king_square
-            while horizontal_square & mask != 0:
-                horizontal_square = signed_shift(horizontal_square, shift)
-                if (
-                    horizontal_square & board._black_rook_squares
-                    or horizontal_square & board._black_queen_squares
-                ):
-                    return True
-
-                if board.is_occupied(horizontal_square):
+                if board.is_occupied(current_square):
                     break
 
         return False
