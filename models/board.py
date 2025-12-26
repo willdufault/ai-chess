@@ -3,7 +3,7 @@ from enums.color import Color
 from models.coordinate import Coordinate
 from models.move import Move
 from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
-from utils.board_utils import signed_shift
+from utils.board_utils import calculate_mask, signed_shift
 
 UP_MASK = 0b00000000_11111111_11111111_11111111_11111111_11111111_11111111_11111111
 DOWN_MASK = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_00000000
@@ -141,7 +141,7 @@ class Board:
 
         for row_index in row_indexes:
             for column_index in column_indexes:
-                square = self._calculate_mask(row_index, column_index)
+                square = calculate_mask(row_index, column_index)
 
                 if (self._white_pawn_squares & square) != 0:
                     print("♙", end=" ")
@@ -172,11 +172,12 @@ class Board:
                     print(".", end=" ")
             print()
 
+    # TODO: reuse get/set piece here?
     def move(self, move: Move) -> None:
-        from_square = self._calculate_mask(
+        from_square = calculate_mask(
             move.from_coordinate.row_index, move.from_coordinate.column_index
         )
-        to_square = self._calculate_mask(
+        to_square = calculate_mask(
             move.to_coordinate.row_index, move.to_coordinate.column_index
         )
 
@@ -218,8 +219,11 @@ class Board:
             self._black_king_square ^= from_square
             self._black_king_square |= to_square
 
-    def get_piece(self, coordinate: Coordinate) -> Piece | None:
-        square = self._calculate_mask(coordinate.row_index, coordinate.column_index)
+    def get_piece_from_coordinate(self, coordinate: Coordinate) -> Piece | None:
+        square = calculate_mask(coordinate.row_index, coordinate.column_index)
+        return self.get_piece_from_square(square)
+
+    def get_piece_from_square(self, square: int) -> Piece | None:
         if self._white_pawn_squares & square != 0:
             return Pawn(Color.WHITE)
         elif self._white_knight_squares & square != 0:
@@ -249,7 +253,7 @@ class Board:
         return None
 
     def set_piece(self, coordinate: Coordinate, piece: Piece | None) -> None:
-        mask = self._calculate_mask(coordinate.row_index, coordinate.column_index)
+        mask = calculate_mask(coordinate.row_index, coordinate.column_index)
 
         self._white_pawn_squares &= ~mask
         self._white_knight_squares &= ~mask
@@ -378,6 +382,42 @@ class Board:
 
         return attacker_squares
 
-    def _calculate_mask(self, row_index: int, column_index: int) -> int:
-        shift = row_index * self.size + column_index
-        return 1 << shift
+    def calculate_intermediate_squares(self, from_square: int, to_square: int) -> int:
+        """Return a bitboard of all squares between two squares. Return 0 if the
+        two squares aren't in a straight line."""
+        from_row_index, from_column_index = divmod(from_square.bit_length(), self.size)
+        to_row_index, to_column_index = divmod(to_square.bit_length(), self.size)
+        row_delta = to_row_index - from_row_index
+        column_delta = to_column_index - from_column_index
+
+        # TODO: dupe logic with move_validator
+        is_horizontal = 0 in (row_delta, column_delta)
+        is_along_diagonal = abs(row_delta) == abs(column_delta)
+        if not (is_horizontal or is_along_diagonal):
+            return 0
+
+        row_step = row_delta // abs(row_delta) if row_delta != 0 else 0
+        column_step = column_delta // abs(column_delta) if column_delta != 0 else 0
+        if row_step == 0:
+            row_shift = 0
+        if row_step == 1:
+            row_shift = UP_SHIFT
+        elif row_step == -1:
+            row_shift = DOWN_SHIFT
+        if column_step == 0:
+            column_shift = 0
+        elif column_step == 1:
+            column_shift = RIGHT_SHIFT
+        elif column_step == -1:
+            column_shift = LEFT_SHIFT
+
+        intermediate_squares = 0
+        intermediate_square = signed_shift(
+            signed_shift(from_square, row_shift), column_shift
+        )
+        while intermediate_square != to_square:
+            intermediate_squares |= intermediate_square
+            intermediate_square = signed_shift(
+                signed_shift(intermediate_square, row_shift), column_shift
+            )
+        return intermediate_squares
