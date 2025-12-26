@@ -1,9 +1,75 @@
+from constants.board_constants import BOARD_SIZE
 from enums.color import Color
 from models.coordinate import Coordinate
 from models.move import Move
 from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
+from utils.board_utils import signed_shift
 
-BOARD_SIZE = 8
+UP_MASK = 0b00000000_11111111_11111111_11111111_11111111_11111111_11111111_11111111
+DOWN_MASK = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_00000000
+LEFT_MASK = 0b11111110_11111110_11111110_11111110_11111110_11111110_11111110_11111110
+RIGHT_MASK = 0b01111111_01111111_01111111_01111111_01111111_01111111_01111111_01111111
+
+UP_LEFT_MASK = UP_MASK & LEFT_MASK
+UP_RIGHT_MASK = UP_MASK & RIGHT_MASK
+DOWN_LEFT_MASK = DOWN_MASK & LEFT_MASK
+DOWN_RIGHT_MASK = DOWN_MASK & RIGHT_MASK
+
+UP_SHIFT = 8
+DOWN_SHIFT = -8
+LEFT_SHIFT = -1
+RIGHT_SHIFT = 1
+
+UP_LEFT_SHIFT = 7
+UP_RIGHT_SHIFT = 9
+DOWN_LEFT_SHIFT = -9
+DOWN_RIGHT_SHIFT = -7
+
+KNIGHT_UP2_LEFT_MASK = signed_shift(UP_LEFT_MASK, DOWN_SHIFT)
+KNIGHT_UP2_RIGHT_MASK = signed_shift(UP_RIGHT_MASK, DOWN_SHIFT)
+KNIGHT_DOWN2_LEFT_MASK = DOWN_LEFT_MASK & signed_shift(DOWN_LEFT_MASK, UP_SHIFT)
+KNIGHT_DOWN2_RIGHT_MASK = DOWN_RIGHT_MASK & signed_shift(DOWN_RIGHT_MASK, UP_SHIFT)
+KNIGHT_LEFT2_UP_MASK = UP_LEFT_MASK & signed_shift(UP_LEFT_MASK, RIGHT_SHIFT)
+KNIGHT_LEFT2_DOWN_MASK = DOWN_LEFT_MASK & signed_shift(DOWN_LEFT_MASK, RIGHT_SHIFT)
+KNIGHT_RIGHT2_UP_MASK = UP_RIGHT_MASK & signed_shift(UP_RIGHT_MASK, LEFT_SHIFT)
+KNIGHT_RIGHT2_DOWN_MASK = DOWN_RIGHT_MASK & signed_shift(DOWN_RIGHT_MASK, LEFT_SHIFT)
+
+KNIGHT_UP2_LEFT_SHIFT = 15
+KNIGHT_UP2_RIGHT_SHIFT = 17
+KNIGHT_DOWN2_LEFT_SHIFT = -17
+KNIGHT_DOWN2_RIGHT_SHIFT = -15
+KNIGHT_LEFT2_UP_SHIFT = 6
+KNIGHT_LEFT2_DOWN_SHIFT = -10
+KNIGHT_RIGHT2_UP_SHIFT = 10
+KNIGHT_RIGHT2_DOWN_SHIFT = -6
+
+PAWN_UP_TRANSFORMS = [(UP_LEFT_MASK, UP_LEFT_SHIFT), (UP_RIGHT_MASK, UP_RIGHT_SHIFT)]
+PAWN_DOWN_TRANSFORMS = [
+    (DOWN_LEFT_MASK, DOWN_LEFT_SHIFT),
+    (DOWN_RIGHT_MASK, DOWN_RIGHT_SHIFT),
+]
+HORIZONTAL_TRANSFORMS = [
+    (UP_MASK, UP_SHIFT),
+    (DOWN_MASK, DOWN_SHIFT),
+    (LEFT_MASK, LEFT_SHIFT),
+    (RIGHT_MASK, RIGHT_SHIFT),
+]
+DIAGONAL_TRANSFORMS = [
+    (UP_LEFT_MASK, UP_LEFT_SHIFT),
+    (UP_RIGHT_MASK, UP_RIGHT_SHIFT),
+    (DOWN_LEFT_MASK, DOWN_LEFT_SHIFT),
+    (DOWN_RIGHT_MASK, DOWN_RIGHT_SHIFT),
+]
+KNIGHT_TRANSFORMS = [
+    (KNIGHT_UP2_LEFT_MASK, KNIGHT_UP2_LEFT_SHIFT),
+    (KNIGHT_UP2_RIGHT_MASK, KNIGHT_UP2_RIGHT_SHIFT),
+    (KNIGHT_DOWN2_LEFT_MASK, KNIGHT_DOWN2_LEFT_SHIFT),
+    (KNIGHT_DOWN2_RIGHT_MASK, KNIGHT_DOWN2_RIGHT_SHIFT),
+    (KNIGHT_LEFT2_UP_MASK, KNIGHT_LEFT2_UP_SHIFT),
+    (KNIGHT_LEFT2_DOWN_MASK, KNIGHT_LEFT2_DOWN_SHIFT),
+    (KNIGHT_RIGHT2_UP_MASK, KNIGHT_RIGHT2_UP_SHIFT),
+    (KNIGHT_RIGHT2_DOWN_MASK, KNIGHT_RIGHT2_DOWN_SHIFT),
+]
 
 
 class Board:
@@ -87,7 +153,7 @@ class Board:
                     print("♖", end=" ")
                 elif (self._white_queen_squares & square) != 0:
                     print("♕", end=" ")
-                elif self._white_king_square == square:
+                elif self._white_king_square & square != 0:
                     print("♔", end=" ")
 
                 elif (self._black_pawn_squares & square) != 0:
@@ -100,7 +166,7 @@ class Board:
                     print("♜", end=" ")
                 elif (self._black_queen_squares & square) != 0:
                     print("♛", end=" ")
-                elif self._black_king_square == square:
+                elif self._black_king_square & square != 0:
                     print("♚", end=" ")
                 else:
                     print(".", end=" ")
@@ -164,7 +230,7 @@ class Board:
             return Rook(Color.WHITE)
         elif self._white_queen_squares & square != 0:
             return Queen(Color.WHITE)
-        elif self._white_king_square == square:
+        elif self._white_king_square & square != 0:
             return King(Color.WHITE)
 
         elif self._black_pawn_squares & square != 0:
@@ -177,7 +243,7 @@ class Board:
             return Rook(Color.BLACK)
         elif self._black_queen_squares & square != 0:
             return Queen(Color.BLACK)
-        elif self._black_king_square == square:
+        elif self._black_king_square & square != 0:
             return King(Color.BLACK)
 
         return None
@@ -243,14 +309,74 @@ class Board:
             or self._white_bishop_squares & square != 0
             or self._white_rook_squares & square != 0
             or self._white_queen_squares & square != 0
-            or self._white_king_square == square
+            or self._white_king_square & square != 0
             or self._black_pawn_squares & square != 0
             or self._black_knight_squares & square != 0
             or self._black_bishop_squares & square != 0
             or self._black_rook_squares & square != 0
             or self._black_queen_squares & square != 0
-            or self._black_king_square == square
+            or self._black_king_square & square != 0
         )
+
+    def calculate_attacker_squares(self, color: Color, target_square: int) -> int:
+        """Return a bitboard of all non-king pieces of the color attacking the target
+        square."""
+        if color == Color.WHITE:
+            pawn_transforms = PAWN_DOWN_TRANSFORMS
+            pawn_squares = self._white_pawn_squares
+            knight_squares = self._white_knight_squares
+            bishop_squares = self._white_bishop_squares
+            rook_squares = self._white_rook_squares
+            queen_squares = self._white_queen_squares
+        else:
+            pawn_transforms = PAWN_UP_TRANSFORMS
+            pawn_squares = self._black_pawn_squares
+            knight_squares = self._black_knight_squares
+            bishop_squares = self._black_bishop_squares
+            rook_squares = self._black_rook_squares
+            queen_squares = self._black_queen_squares
+
+        attacker_squares = 0
+
+        for mask, shift in pawn_transforms:
+            if target_square & mask != 0:
+                pawn_square = signed_shift(target_square, shift)
+                if pawn_squares & pawn_square:
+                    attacker_squares |= pawn_square
+
+        for mask, shift in KNIGHT_TRANSFORMS:
+            if target_square & mask != 0:
+                knight_square = signed_shift(target_square, shift)
+                if knight_squares & knight_square:
+                    attacker_squares |= knight_square
+
+        for mask, shift in DIAGONAL_TRANSFORMS:
+            diagonal_square = target_square
+            while diagonal_square & mask != 0:
+                diagonal_square = signed_shift(diagonal_square, shift)
+                if (
+                    bishop_squares & diagonal_square != 0
+                    or queen_squares & diagonal_square != 0
+                ):
+                    attacker_squares |= diagonal_square
+
+                if self.is_occupied(diagonal_square):
+                    break
+
+        for mask, shift in HORIZONTAL_TRANSFORMS:
+            horizontal_square = target_square
+            while horizontal_square & mask != 0:
+                horizontal_square = signed_shift(horizontal_square, shift)
+                if (
+                    rook_squares & horizontal_square != 0
+                    or queen_squares & horizontal_square != 0
+                ):
+                    attacker_squares |= horizontal_square
+
+                if self.is_occupied(horizontal_square):
+                    break
+
+        return attacker_squares
 
     def _calculate_mask(self, row_index: int, column_index: int) -> int:
         shift = row_index * self.size + column_index

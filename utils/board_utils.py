@@ -1,4 +1,4 @@
-from models.board import BOARD_SIZE
+from constants.board_constants import BOARD_SIZE
 from models.coordinate import Coordinate
 
 
