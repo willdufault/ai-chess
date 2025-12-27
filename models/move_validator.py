@@ -91,8 +91,8 @@ class MoveValidator:
         column_delta = (
             move.from_coordinate.column_index - move.to_coordinate.column_index
         )
-        is_horizontal = (row_delta, column_delta).count(0) == 1
-        return is_horizontal
+        is_orthogonal = (row_delta, column_delta).count(0) == 1
+        return is_orthogonal
 
     @classmethod
     def is_valid_queen_move(cls, move: Move) -> bool:

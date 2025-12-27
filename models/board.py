@@ -3,7 +3,51 @@ from enums.color import Color
 from models.coordinate import Coordinate
 from models.move import Move
 from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
-from utils.board_utils import calculate_mask, signed_shift
+from utils.board_utils import (
+    calculate_mask,
+    intersects,
+    is_diagonal,
+    is_orthogonal,
+    signed_shift,
+)
+
+WHITE_PAWN_INITIAL_BITBOARD = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000
+)
+WHITE_KNIGHT_INITIAL_BITBOARD = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010
+)
+WHITE_BISHOP_INITIAL_BITBOARD = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100
+)
+WHITE_ROOK_INITIAL_BITBOARD = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001
+)
+WHITE_QUEEN_INITIAL_BITBOARD = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000
+)
+WHITE_KING_INITIAL_BITBOARD = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000
+)
+
+BLACK_PAWN_INITIAL_BITBOARD = (
+    0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000
+)
+BLACK_ROOK_INITIAL_BITBOARD = (
+    0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+)
+BLACK_KNIGHT_INITIAL_BITBOARD = (
+    0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+)
+BLACK_BISHOP_INITIAL_BITBOARD = (
+    0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+)
+BLACK_QUEEN_INITIAL_BITBOARD = (
+    0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+)
+BLACK_KING_INITIAL_BITBOARD = (
+    0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+)
 
 UP_MASK = 0b00000000_11111111_11111111_11111111_11111111_11111111_11111111_11111111
 DOWN_MASK = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_00000000
@@ -53,7 +97,7 @@ PAWN_CAPTURE_DOWN_TRANSFORMS = [
 ]
 PAWN_MOVE_UP_TRANSFORMS = [(UP_MASK, UP_SHIFT)]
 PAWN_MOVE_DOWN_TRANSFORMS = [(DOWN_MASK, DOWN_SHIFT)]
-HORIZONTAL_TRANSFORMS = [
+ORTHOGONAL_TRANSFORMS = [
     (UP_MASK, UP_SHIFT),
     (DOWN_MASK, DOWN_SHIFT),
     (LEFT_MASK, LEFT_SHIFT),
@@ -91,58 +135,34 @@ class Board:
     def __init__(self) -> None:
         self.size = BOARD_SIZE
 
-        self._white_pawn_squares = 0
-        self._white_rook_squares = 0
-        self._white_knight_squares = 0
-        self._white_bishop_squares = 0
-        self._white_queen_squares = 0
-        self._white_king_squares = 0
+        self._white_pawn_bitboard = 0
+        self._white_knight_bitboard = 0
+        self._white_bishop_bitboard = 0
+        self._white_rook_bitboard = 0
+        self._white_queen_bitboard = 0
+        self._white_king_bitboard = 0
 
-        self._black_pawn_squares = 0
-        self._black_rook_squares = 0
-        self._black_knight_squares = 0
-        self._black_bishop_squares = 0
-        self._black_queen_squares = 0
-        self._black_king_squares = 0
+        self._black_pawn_bitboard = 0
+        self._black_knight_bitboard = 0
+        self._black_bishop_bitboard = 0
+        self._black_rook_bitboard = 0
+        self._black_queen_bitboard = 0
+        self._black_king_bitboard = 0
 
     def set_up_pieces(self) -> None:
-        self._white_pawn_squares = (
-            0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000
-        )
-        self._white_rook_squares = (
-            0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001
-        )
-        self._white_knight_squares = (
-            0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010
-        )
-        self._white_bishop_squares = (
-            0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100
-        )
-        self._white_queen_squares = (
-            0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000
-        )
-        self._white_king_squares = (
-            0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000
-        )
+        self._white_pawn_bitboard = WHITE_PAWN_INITIAL_BITBOARD
+        self._white_knight_bitboard = WHITE_KNIGHT_INITIAL_BITBOARD
+        self._white_bishop_bitboard = WHITE_BISHOP_INITIAL_BITBOARD
+        self._white_rook_bitboard = WHITE_ROOK_INITIAL_BITBOARD
+        self._white_queen_bitboard = WHITE_QUEEN_INITIAL_BITBOARD
+        self._white_king_bitboard = WHITE_KING_INITIAL_BITBOARD
 
-        self._black_pawn_squares = (
-            0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000
-        )
-        self._black_rook_squares = (
-            0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-        )
-        self._black_knight_squares = (
-            0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-        )
-        self._black_bishop_squares = (
-            0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-        )
-        self._black_queen_squares = (
-            0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-        )
-        self._black_king_squares = (
-            0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-        )
+        self._black_pawn_bitboard = BLACK_PAWN_INITIAL_BITBOARD
+        self._black_rook_bitboard = BLACK_ROOK_INITIAL_BITBOARD
+        self._black_knight_bitboard = BLACK_KNIGHT_INITIAL_BITBOARD
+        self._black_bishop_bitboard = BLACK_BISHOP_INITIAL_BITBOARD
+        self._black_queen_bitboard = BLACK_QUEEN_INITIAL_BITBOARD
+        self._black_king_bitboard = BLACK_KING_INITIAL_BITBOARD
 
     def print(self, color: Color) -> None:
         # Flip board based on team.
@@ -156,96 +176,103 @@ class Board:
 
         for row_index in row_indexes:
             for column_index in column_indexes:
-                square = calculate_mask(row_index, column_index)
+                square_mask = calculate_mask(row_index, column_index)
 
-                if (self._white_pawn_squares & square) != 0:
+                if intersects(self._white_pawn_bitboard, square_mask):
                     print("♙", end=" ")
-                elif (self._white_knight_squares & square) != 0:
+                elif intersects(self._white_knight_bitboard, square_mask):
                     print("♘", end=" ")
-                elif (self._white_bishop_squares & square) != 0:
+                elif intersects(self._white_bishop_bitboard, square_mask):
                     print("♗", end=" ")
-                elif (self._white_rook_squares & square) != 0:
+                elif intersects(self._white_rook_bitboard, square_mask):
                     print("♖", end=" ")
-                elif (self._white_queen_squares & square) != 0:
+                elif intersects(self._white_queen_bitboard, square_mask):
                     print("♕", end=" ")
-                elif self._white_king_squares & square != 0:
+                elif intersects(self._white_king_bitboard, square_mask):
                     print("♔", end=" ")
 
-                elif (self._black_pawn_squares & square) != 0:
+                elif intersects(self._black_pawn_bitboard, square_mask):
                     print("♟", end=" ")
-                elif (self._black_knight_squares & square) != 0:
+                elif intersects(self._black_knight_bitboard, square_mask):
                     print("♞", end=" ")
-                elif (self._black_bishop_squares & square) != 0:
+                elif intersects(self._black_bishop_bitboard, square_mask):
                     print("♝", end=" ")
-                elif (self._black_rook_squares & square) != 0:
+                elif intersects(self._black_rook_bitboard, square_mask):
                     print("♜", end=" ")
-                elif (self._black_queen_squares & square) != 0:
+                elif intersects(self._black_queen_bitboard, square_mask):
                     print("♛", end=" ")
-                elif self._black_king_squares & square != 0:
+                elif intersects(self._black_king_bitboard, square_mask):
                     print("♚", end=" ")
                 else:
                     print(".", end=" ")
             print()
 
-    # TODO: optimize
-    def move(self, move: Move) -> None:
-        self.set_piece(move.from_coordinate, None)
-        self.set_piece(move.to_coordinate, move.from_piece)
+    def get_piece(
+        self,
+        coordinate: Coordinate | None = None,
+        square_mask: int | None = None,
+    ) -> Piece | None:
+        if coordinate is None and square_mask is None:
+            raise ValueError("Must provide either coordinate or square_mask.")
 
-    # TODO: optimize
-    def undo_move(self, move: Move) -> None:
-        self.set_piece(move.from_coordinate, move.from_piece)
-        self.set_piece(move.to_coordinate, move.to_piece)
+        if coordinate is not None and square_mask is not None:
+            raise ValueError(
+                "Must provide exactly one of either coordinate or square_mask."
+            )
 
-    def get_piece_from_coordinate(self, coordinate: Coordinate) -> Piece | None:
-        square = calculate_mask(coordinate.row_index, coordinate.column_index)
-        return self.get_piece_from_square(square)
+        if coordinate is not None:
+            square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
 
-    def get_piece_from_square(self, square: int) -> Piece | None:
-        if self._white_pawn_squares & square != 0:
+        assert square_mask is not None
+
+        if intersects(self._white_pawn_bitboard, square_mask):
             return Pawn(Color.WHITE)
-        elif self._white_knight_squares & square != 0:
+        elif intersects(self._white_knight_bitboard, square_mask):
             return Knight(Color.WHITE)
-        elif self._white_bishop_squares & square != 0:
+        elif intersects(self._white_bishop_bitboard, square_mask):
             return Bishop(Color.WHITE)
-        elif self._white_rook_squares & square != 0:
+        elif intersects(self._white_rook_bitboard, square_mask):
             return Rook(Color.WHITE)
-        elif self._white_queen_squares & square != 0:
+        elif intersects(self._white_queen_bitboard, square_mask):
             return Queen(Color.WHITE)
-        elif self._white_king_squares & square != 0:
+        elif intersects(self._white_king_bitboard, square_mask):
             return King(Color.WHITE)
 
-        elif self._black_pawn_squares & square != 0:
+        elif intersects(self._black_pawn_bitboard, square_mask):
             return Pawn(Color.BLACK)
-        elif self._black_knight_squares & square != 0:
+        elif intersects(self._black_knight_bitboard, square_mask):
             return Knight(Color.BLACK)
-        elif self._black_bishop_squares & square != 0:
+        elif intersects(self._black_bishop_bitboard, square_mask):
             return Bishop(Color.BLACK)
-        elif self._black_rook_squares & square != 0:
+        elif intersects(self._black_rook_bitboard, square_mask):
             return Rook(Color.BLACK)
-        elif self._black_queen_squares & square != 0:
+        elif intersects(self._black_queen_bitboard, square_mask):
             return Queen(Color.BLACK)
-        elif self._black_king_squares & square != 0:
+        elif intersects(self._black_king_bitboard, square_mask):
             return King(Color.BLACK)
 
         return None
 
-    def set_piece(self, coordinate: Coordinate, piece: Piece | None) -> None:
-        mask = calculate_mask(coordinate.row_index, coordinate.column_index)
+    def set_piece(
+        self,
+        piece: Piece | None,
+        coordinate: Coordinate | None = None,
+        square_mask: int | None = None,
+    ) -> None:
+        if coordinate is None and square_mask is None:
+            raise ValueError("Must provide either coordinate or square_mask.")
 
-        self._white_pawn_squares &= ~mask
-        self._white_knight_squares &= ~mask
-        self._white_bishop_squares &= ~mask
-        self._white_rook_squares &= ~mask
-        self._white_queen_squares &= ~mask
-        self._white_king_squares &= ~mask
+        if coordinate is not None and square_mask is not None:
+            raise ValueError(
+                "Must provide exactly one of either coordinate or square_mask."
+            )
 
-        self._black_pawn_squares &= ~mask
-        self._black_knight_squares &= ~mask
-        self._black_bishop_squares &= ~mask
-        self._black_rook_squares &= ~mask
-        self._black_queen_squares &= ~mask
-        self._black_king_squares &= ~mask
+        if coordinate is not None:
+            square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
+
+        assert square_mask is not None
+
+        self._clear_square(square_mask)
 
         if piece is None:
             return
@@ -253,226 +280,245 @@ class Board:
         match piece:
             case Pawn():
                 if piece.color == Color.WHITE:
-                    self._white_pawn_squares |= mask
+                    self._white_pawn_bitboard |= square_mask
                 else:
-                    self._black_pawn_squares |= mask
+                    self._black_pawn_bitboard |= square_mask
             case Knight():
                 if piece.color == Color.WHITE:
-                    self._white_knight_squares |= mask
+                    self._white_knight_bitboard |= square_mask
                 else:
-                    self._black_knight_squares |= mask
+                    self._black_knight_bitboard |= square_mask
             case Bishop():
                 if piece.color == Color.WHITE:
-                    self._white_bishop_squares |= mask
+                    self._white_bishop_bitboard |= square_mask
                 else:
-                    self._black_bishop_squares |= mask
+                    self._black_bishop_bitboard |= square_mask
             case Rook():
                 if piece.color == Color.WHITE:
-                    self._white_rook_squares |= mask
+                    self._white_rook_bitboard |= square_mask
                 else:
-                    self._black_rook_squares |= mask
+                    self._black_rook_bitboard |= square_mask
             case Queen():
                 if piece.color == Color.WHITE:
-                    self._white_queen_squares |= mask
+                    self._white_queen_bitboard |= square_mask
                 else:
-                    self._black_queen_squares |= mask
+                    self._black_queen_bitboard |= square_mask
             case King():
                 if piece.color == Color.WHITE:
-                    self._white_king_squares |= mask
+                    self._white_king_bitboard |= square_mask
                 else:
-                    self._black_king_squares |= mask
+                    self._black_king_bitboard |= square_mask
             case _:
-                raise ValueError(f"Invalid piece type {piece}.")
+                raise ValueError(f"Invalid piece type: {piece}")
 
-    def is_occupied(self, square: int) -> bool:
-        return (
-            self._white_pawn_squares & square != 0
-            or self._white_knight_squares & square != 0
-            or self._white_bishop_squares & square != 0
-            or self._white_rook_squares & square != 0
-            or self._white_queen_squares & square != 0
-            or self._white_king_squares & square != 0
-            or self._black_pawn_squares & square != 0
-            or self._black_knight_squares & square != 0
-            or self._black_bishop_squares & square != 0
-            or self._black_rook_squares & square != 0
-            or self._black_queen_squares & square != 0
-            or self._black_king_squares & square != 0
+    def is_occupied(self, square_mask: int, color: Color | None = None) -> bool:
+        """Return whether the square is occupied by the color. Checks both colors
+        if not specified."""
+        is_occupied_by_white = (
+            intersects(self._white_pawn_bitboard, square_mask)
+            or intersects(self._white_knight_bitboard, square_mask)
+            or intersects(self._white_bishop_bitboard, square_mask)
+            or intersects(self._white_rook_bitboard, square_mask)
+            or intersects(self._white_queen_bitboard, square_mask)
+            or intersects(self._white_king_bitboard, square_mask)
+        )
+        is_occupied_by_black = (
+            intersects(self._black_pawn_bitboard, square_mask)
+            or intersects(self._black_knight_bitboard, square_mask)
+            or intersects(self._black_bishop_bitboard, square_mask)
+            or intersects(self._black_rook_bitboard, square_mask)
+            or intersects(self._black_queen_bitboard, square_mask)
+            or intersects(self._black_king_bitboard, square_mask)
         )
 
-    def calculate_attacker_squares(self, color: Color, target_square: int) -> int:
-        """Return a bitboard of all pieces of the color attacking the target square."""
+        if color == Color.WHITE:
+            return is_occupied_by_white
+
+        if color == Color.BLACK:
+            return is_occupied_by_black
+
+        return is_occupied_by_white or is_occupied_by_black
+
+    def make_move(self, move: Move) -> None:
+        self.set_piece(None, square_mask=move.from_square_mask)
+        self.set_piece(move.from_piece, square_mask=move.to_square_mask)
+
+    def undo_move(self, move: Move) -> None:
+        self.set_piece(move.from_piece, square_mask=move.from_square_mask)
+        self.set_piece(move.to_piece, square_mask=move.to_square_mask)
+
+    def calculate_attacker_squares_mask(
+        self, target_square_mask: int, color: Color
+    ) -> int:
+        """Return a mask of all pieces of the color attacking the target square."""
         if color == Color.WHITE:
             pawn_transforms = PAWN_CAPTURE_DOWN_TRANSFORMS
-            pawn_squares = self._white_pawn_squares
-            knight_squares = self._white_knight_squares
-            bishop_squares = self._white_bishop_squares
-            rook_squares = self._white_rook_squares
-            queen_squares = self._white_queen_squares
-            king_squares = self._white_king_squares
+            pawn_bitboard = self._white_pawn_bitboard
+            knight_bitboard = self._white_knight_bitboard
+            bishop_bitboard = self._white_bishop_bitboard
+            rook_bitboard = self._white_rook_bitboard
+            queen_bitboard = self._white_queen_bitboard
+            king_bitboard = self._white_king_bitboard
         else:
             pawn_transforms = PAWN_CAPTURE_UP_TRANSFORMS
-            pawn_squares = self._black_pawn_squares
-            knight_squares = self._black_knight_squares
-            bishop_squares = self._black_bishop_squares
-            rook_squares = self._black_rook_squares
-            queen_squares = self._black_queen_squares
-            king_squares = self._black_king_squares
+            pawn_bitboard = self._black_pawn_bitboard
+            knight_bitboard = self._black_knight_bitboard
+            bishop_bitboard = self._black_bishop_bitboard
+            rook_bitboard = self._black_rook_bitboard
+            queen_bitboard = self._black_queen_bitboard
+            king_bitboard = self._black_king_bitboard
 
-        attacker_squares = 0
+        attacker_squares_mask = 0
+        attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
+            target_square_mask, pawn_bitboard, pawn_transforms
+        )
+        attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
+            target_square_mask, knight_bitboard, KNIGHT_TRANSFORMS
+        )
+        attacker_squares_mask |= self._calculate_straight_attacker_squares_mask(
+            target_square_mask, [bishop_bitboard, queen_bitboard], DIAGONAL_TRANSFORMS
+        )
+        attacker_squares_mask |= self._calculate_straight_attacker_squares_mask(
+            target_square_mask, [rook_bitboard, queen_bitboard], ORTHOGONAL_TRANSFORMS
+        )
+        attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
+            target_square_mask, king_bitboard, KING_TRANSFORMS
+        )
+        return attacker_squares_mask
 
-        for mask, shift in pawn_transforms:
-            if target_square & mask != 0:
-                pawn_square = signed_shift(target_square, shift)
-                if pawn_squares & pawn_square != 0:
-                    attacker_squares |= pawn_square
-
-        for mask, shift in KNIGHT_TRANSFORMS:
-            if target_square & mask != 0:
-                knight_square = signed_shift(target_square, shift)
-                if knight_squares & knight_square != 0:
-                    attacker_squares |= knight_square
-
-        for mask, shift in DIAGONAL_TRANSFORMS:
-            diagonal_square = target_square
-            while diagonal_square & mask != 0:
-                diagonal_square = signed_shift(diagonal_square, shift)
-                if (
-                    bishop_squares & diagonal_square != 0
-                    or queen_squares & diagonal_square != 0
-                ):
-                    attacker_squares |= diagonal_square
-
-                if self.is_occupied(diagonal_square):
-                    break
-
-        for mask, shift in HORIZONTAL_TRANSFORMS:
-            horizontal_square = target_square
-            while horizontal_square & mask != 0:
-                horizontal_square = signed_shift(horizontal_square, shift)
-                if (
-                    rook_squares & horizontal_square != 0
-                    or queen_squares & horizontal_square != 0
-                ):
-                    attacker_squares |= horizontal_square
-
-                if self.is_occupied(horizontal_square):
-                    break
-
-        for mask, shift in KING_TRANSFORMS:
-            if target_square & mask != 0:
-                king_square = signed_shift(target_square, shift)
-                if king_square & king_squares != 0:
-                    attacker_squares |= king_square
-
-        return attacker_squares
-
-    def calculate_blocker_squares(self, color: Color, target_square: int) -> int:
-        """Return a bitboard of all non-king pieces of the color that can move to 
+    def calculate_blocker_squares(self, target_square_mask: int, color: Color) -> int:
+        """Return a bitboard of all non-king pieces of the color that can move to
         the empty target square."""
         if color == Color.WHITE:
             pawn_transforms = PAWN_MOVE_DOWN_TRANSFORMS
-            pawn_squares = self._white_pawn_squares
-            knight_squares = self._white_knight_squares
-            bishop_squares = self._white_bishop_squares
-            rook_squares = self._white_rook_squares
-            queen_squares = self._white_queen_squares
+            pawn_bitboard = self._white_pawn_bitboard
+            knight_bitboard = self._white_knight_bitboard
+            bishop_bitboard = self._white_bishop_bitboard
+            rook_bitboard = self._white_rook_bitboard
+            queen_bitboard = self._white_queen_bitboard
         else:
             pawn_transforms = PAWN_MOVE_UP_TRANSFORMS
-            pawn_squares = self._black_pawn_squares
-            knight_squares = self._black_knight_squares
-            bishop_squares = self._black_bishop_squares
-            rook_squares = self._black_rook_squares
-            queen_squares = self._black_queen_squares
+            pawn_bitboard = self._black_pawn_bitboard
+            knight_bitboard = self._black_knight_bitboard
+            bishop_bitboard = self._black_bishop_bitboard
+            rook_bitboard = self._black_rook_bitboard
+            queen_bitboard = self._black_queen_bitboard
 
-        attacker_squares = 0
+        attacker_squares_mask = 0
+        attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
+            target_square_mask, pawn_bitboard, pawn_transforms
+        )
+        attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
+            target_square_mask, knight_bitboard, KNIGHT_TRANSFORMS
+        )
+        attacker_squares_mask |= self._calculate_straight_attacker_squares_mask(
+            target_square_mask, [bishop_bitboard, queen_bitboard], DIAGONAL_TRANSFORMS
+        )
+        attacker_squares_mask |= self._calculate_straight_attacker_squares_mask(
+            target_square_mask, [rook_bitboard, queen_bitboard], ORTHOGONAL_TRANSFORMS
+        )
+        return attacker_squares_mask
 
-        for mask, shift in pawn_transforms:
-            if target_square & mask != 0:
-                pawn_square = signed_shift(target_square, shift)
-                if pawn_squares & pawn_square != 0:
-                    attacker_squares |= pawn_square
+    def calculate_escape_squares_mask(self, square_mask: int, color: Color) -> int:
+        """Return a mask of all squares surrounding the given square that are not
+        occupied by the color."""
+        escape_squares_mask = 0
+        for transform_mask, transform_shift in KING_TRANSFORMS:
+            if intersects(square_mask, transform_mask):
+                escape_square_mask = signed_shift(square_mask, transform_shift)
+                if not self.is_occupied(escape_square_mask, color):
+                    escape_squares_mask |= escape_square_mask
+        return escape_squares_mask
 
-        for mask, shift in KNIGHT_TRANSFORMS:
-            if target_square & mask != 0:
-                knight_square = signed_shift(target_square, shift)
-                if knight_squares & knight_square != 0:
-                    attacker_squares |= knight_square
+    def calculate_intermediate_squares_mask(
+        self, from_square_mask: int, to_square_mask: int
+    ) -> int:
+        """Return a mask of all squares between two squares in a orthogonal or diagonal
+        line."""
+        from_coordinate = Coordinate.from_mask(from_square_mask)
+        to_coordinate = Coordinate.from_mask(to_square_mask)
+        row_delta = to_coordinate.row_index - from_coordinate.row_index
+        column_delta = to_coordinate.column_index - from_coordinate.column_index
 
-        for mask, shift in DIAGONAL_TRANSFORMS:
-            diagonal_square = target_square
-            while diagonal_square & mask != 0:
-                diagonal_square = signed_shift(diagonal_square, shift)
-                if (
-                    bishop_squares & diagonal_square != 0
-                    or queen_squares & diagonal_square != 0
-                ):
-                    attacker_squares |= diagonal_square
-
-                if self.is_occupied(diagonal_square):
-                    break
-
-        for mask, shift in HORIZONTAL_TRANSFORMS:
-            horizontal_square = target_square
-            while horizontal_square & mask != 0:
-                horizontal_square = signed_shift(horizontal_square, shift)
-                if (
-                    rook_squares & horizontal_square != 0
-                    or queen_squares & horizontal_square != 0
-                ):
-                    attacker_squares |= horizontal_square
-
-                if self.is_occupied(horizontal_square):
-                    break
-
-        return attacker_squares
-
-    def calculate_escape_squares(self, king_square: int) -> int:
-        """Return a bitboard of all empty surrounding squares to the king."""
-        escape_squares = 0
-        for mask, shift in KING_TRANSFORMS:
-            if king_square & mask != 0:
-                escape_square = signed_shift(king_square, shift)
-                if not self.is_occupied(escape_square):
-                    escape_squares |= escape_square
-        return escape_squares
-
-    def calculate_intermediate_squares(self, from_square: int, to_square: int) -> int:
-        """Return a bitboard of all squares between two squares. Return 0 if the
-        two squares aren't in a straight line."""
-        from_row_index, from_column_index = divmod(from_square.bit_length() - 1, self.size)
-        to_row_index, to_column_index = divmod(to_square.bit_length() - 1, self.size)
-        row_delta = to_row_index - from_row_index
-        column_delta = to_column_index - from_column_index
-
-        # TODO: dupe logic with move_validator
-        is_horizontal = 0 in (row_delta, column_delta)
-        is_along_diagonal = abs(row_delta) == abs(column_delta)
-        if not (is_horizontal or is_along_diagonal):
+        if not (
+            is_orthogonal(row_delta, column_delta)
+            or is_diagonal(row_delta, column_delta)
+        ):
             return 0
 
-        row_step = row_delta // abs(row_delta) if row_delta != 0 else 0
-        column_step = column_delta // abs(column_delta) if column_delta != 0 else 0
-        if row_step == 0:
+        if row_delta == 0:
             row_shift = 0
-        if row_step == 1:
+        elif row_delta > 0:
             row_shift = UP_SHIFT
-        elif row_step == -1:
+        elif row_delta < 0:
             row_shift = DOWN_SHIFT
-        if column_step == 0:
+
+        if column_delta == 0:
             column_shift = 0
-        elif column_step == 1:
+        elif column_delta > 0:
             column_shift = RIGHT_SHIFT
-        elif column_step == -1:
+        elif column_delta < 0:
             column_shift = LEFT_SHIFT
 
-        intermediate_squares = 0
-        intermediate_square = signed_shift(
-            signed_shift(from_square, row_shift), column_shift
+        intermediate_squares_mask = 0
+        intermediate_square_mask = signed_shift(
+            signed_shift(from_square_mask, row_shift), column_shift
         )
-        while intermediate_square != to_square:
-            intermediate_squares |= intermediate_square
-            intermediate_square = signed_shift(
-                signed_shift(intermediate_square, row_shift), column_shift
+        while intermediate_square_mask != to_square_mask:
+            intermediate_squares_mask |= intermediate_square_mask
+            intermediate_square_mask = signed_shift(
+                signed_shift(intermediate_square_mask, row_shift), column_shift
             )
-        return intermediate_squares
+        return intermediate_squares_mask
+
+    def _clear_square(self, square_mask: int) -> None:
+        self._white_pawn_bitboard &= ~square_mask
+        self._white_knight_bitboard &= ~square_mask
+        self._white_bishop_bitboard &= ~square_mask
+        self._white_rook_bitboard &= ~square_mask
+        self._white_queen_bitboard &= ~square_mask
+        self._white_king_bitboard &= ~square_mask
+
+        self._black_pawn_bitboard &= ~square_mask
+        self._black_knight_bitboard &= ~square_mask
+        self._black_bishop_bitboard &= ~square_mask
+        self._black_rook_bitboard &= ~square_mask
+        self._black_queen_bitboard &= ~square_mask
+        self._black_king_bitboard &= ~square_mask
+
+    def _calculate_pattern_attacker_squares_mask(
+        self,
+        target_square_mask: int,
+        piece_bitboard: int,
+        piece_transforms: list[tuple[int, int]],
+    ) -> int:
+        piece_attacker_squares_mask = 0
+        for transform_mask, transform_shift in piece_transforms:
+            if intersects(target_square_mask, transform_mask):
+                piece_square_mask = signed_shift(target_square_mask, transform_shift)
+                if intersects(piece_bitboard, piece_square_mask):
+                    piece_attacker_squares_mask |= piece_square_mask
+        return piece_attacker_squares_mask
+
+    def _calculate_straight_attacker_squares_mask(
+        self,
+        target_square_mask: int,
+        piece_bitboards: list[int],
+        piece_transforms: list[tuple[int, int]],
+    ) -> int:
+        piece_attacker_squares_mask = 0
+        for transform_mask, transform_shift in piece_transforms:
+            piece_square_mask = target_square_mask
+            while intersects(piece_square_mask, transform_mask):
+                piece_square_mask = signed_shift(piece_square_mask, transform_shift)
+                if any(
+                    [
+                        intersects(piece_bitboard, piece_square_mask)
+                        for piece_bitboard in piece_bitboards
+                    ]
+                ):
+                    piece_attacker_squares_mask |= piece_square_mask
+
+                if self.is_occupied(piece_square_mask):
+                    break
+        return piece_attacker_squares_mask

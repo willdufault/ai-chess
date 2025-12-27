@@ -8,9 +8,8 @@ from utils.board_utils import print_bitboard
 
 def main() -> None:
     b = Board()
-    _1 = b.calculate_intermediate_squares(1,2)
-    _2 = b.calculate_intermediate_squares(1<<51,1<<27)
-    breakpoint()
+    b.set_up_pieces()
+    b.print(Color.BLACK)
 
 if __name__ == "__main__":
     main()
