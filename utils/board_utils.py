@@ -31,6 +31,15 @@ def is_diagonal(row_delta: int, column_delta: int) -> bool:
     return abs(row_delta) == abs(column_delta)
 
 
+def enumerate_mask(mask: int) -> list[int]:
+    bits = []
+    for shift in range(BOARD_SIZE**2):
+        bit = 1 << shift
+        if intersects(mask, bit):
+            bits.append(bit)
+    return bits
+
+
 def print_bitboard(bitboard: int) -> None:
     for row_index in reversed(range(BOARD_SIZE)):
         for column_index in range(BOARD_SIZE):

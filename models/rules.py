@@ -2,7 +2,7 @@ from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
 from models.move import Move
-from utils.board_utils import calculate_mask
+from utils.board_utils import calculate_mask, enumerate_mask
 
 
 class Rules:
@@ -17,6 +17,63 @@ class Rules:
 
     @classmethod
     def is_in_checkmate(cls, color: Color, board: Board) -> bool:
+        if not cls.is_in_check(color, board):
+            return False
+
+        king_square_mask = (
+            board._white_king_bitboard
+            if color == Color.WHITE
+            else board._black_king_bitboard
+        )
+
+        # King escapes.
+        escape_squares_mask = board.calculate_escape_squares_mask(
+            king_square_mask, color
+        )
+        for escape_square_mask in enumerate_mask(escape_squares_mask):
+            if not cls._is_in_check_after_move(
+                king_square_mask, escape_square_mask, color, board
+            ):
+                return False
+
+        # Multiple attackers.
+        attacker_squares_mask = board.calculate_attacker_squares_mask(
+            king_square_mask, color.opposite
+        )
+        is_impossible_to_block = attacker_squares_mask.bit_count() > 1
+        if is_impossible_to_block:
+            return True
+
+        # Capture attacker.
+        for attacker_square_mask in enumerate_mask(attacker_squares_mask):
+            defender_squares_mask = board.calculate_attacker_squares_mask(
+                attacker_square_mask, color
+            )
+            for defender_square_mask in enumerate_mask(defender_squares_mask):
+                if not cls._is_in_check_after_move(
+                    defender_square_mask, attacker_square_mask, color, board
+                ):
+                    return False
+
+        # Block attack.
+        for attacker_square_mask in enumerate_mask(attacker_squares_mask):
+            intermediate_squares_mask = board.calculate_intermediate_squares_mask(
+                attacker_square_mask, king_square_mask
+            )
+            for intermediate_square_mask in enumerate_mask(intermediate_squares_mask):
+                blocker_squares_mask = board.calculate_blocker_squares(
+                    intermediate_square_mask, color
+                )
+                for blocker_square_mask in enumerate_mask(blocker_squares_mask):
+                    if not cls._is_in_check_after_move(
+                        blocker_square_mask, intermediate_square_mask, color, board
+                    ):
+                        return False
+
+        return True
+
+    @classmethod
+    def is_in_checkmate2(cls, color: Color, board: Board) -> bool:
         if not cls.is_in_check(color, board):
             return False
 
@@ -139,89 +196,15 @@ class Rules:
 
         return True
 
-    # TODO: clean up
-    # @classmethod
-    # def is_in_checkmate1(cls, color: Color, board: Board) -> bool:
-    #     if not cls.is_in_check(color, board):
-    #         return False
-    #     king_square = (
-    #         board._white_king_bitboard
-    #         if color == Color.WHITE
-    #         else board._black_king_bitboard
-    #     )
-    #     king_row_index, king_column_index = divmod(king_square.bit_length(), board.size)
-    #     attacker_squares = board.calculate_attacker_squares_mask(color.opposite, king_square)
-    #     is_impossible_to_block = attacker_squares.bit_count() > 1
-    #     if is_impossible_to_block:
-    #         return True
-    #     # TODO: ADD CHECK HERE IF KING CAN ESCAPE, THEN CHECK CHECK
-    #     escape_squares = board.calculate_escape_squares_mask(king_square, color)
-    #     for escape_row_index in range(board.size):
-    #         for escape_column_index in range(board.size):
-    #             escape_square = calculate_mask(escape_row_index, escape_column_index)
-    #             if escape_square & escape_squares != 0:
-    #                 from_coordinate = Coordinate(king_row_index, king_column_index)
-    #                 to_coordinate = Coordinate(escape_row_index, escape_column_index)
-    #                 from_piece = board.get_piece(square_mask=king_square)
-    #                 to_piece = board.get_piece(square_mask=escape_square)
-    #                 move = Move.from_coordinates(
-    #                     from_coordinate,
-    #                     to_coordinate,
-    #                     from_piece,
-    #                     to_piece,
-    #                     color,
-    #                 )
-    #                 board.make_move(move)
-    #                 is_in_check = cls.is_in_check(color, board)
-    #                 board.undo_move(move)
-    #                 if not is_in_check:
-    #                     return False
-    #     for attacker_shift in range(board.size**2):
-    #         attacker_square = 1 << attacker_shift
-    #         if attacker_squares & attacker_square != 0:
-    #             intermediate_squares = board.calculate_intermediate_squares_mask(
-    #                 king_square, attacker_square
-    #             )
-    #             candidate_squares = intermediate_squares | attacker_square
-    #             # TODO: change to range(64) shift?
-    #             for candidate_row_index in range(board.size):
-    #                 for candidate_column_index in range(board.size):
-    #                     candidate_square = calculate_mask(
-    #                         candidate_row_index, candidate_column_index
-    #                     )
-    #                     if candidate_square & candidate_squares != 0:
-    #                         defender_squares = board.calculate_attacker_squares_mask(
-    #                             color, candidate_square
-    #                         )
-    #                         # TODO: will be slow, too much overhead
-    #                         for defender_row_index in range(board.size):
-    #                             for defender_column_index in range(board.size):
-    #                                 defender_square = calculate_mask(
-    #                                     defender_row_index, defender_column_index
-    #                                 )
-    #                                 if defender_square & defender_squares != 0:
-    #                                     from_coordinate = Coordinate(
-    #                                         defender_row_index, defender_column_index
-    #                                     )
-    #                                     to_coordinate = Coordinate(
-    #                                         candidate_row_index, candidate_column_index
-    #                                     )
-    #                                     from_piece = board.get_piece(square_mask=
-    #                                         defender_square
-    #                                     )
-    #                                     to_piece = board.get_piece(square_mask=
-    #                                         candidate_square
-    #                                     )
-    #                                     move = Move.from_coordinates(
-    #                                         from_coordinate,
-    #                                         to_coordinate,
-    #                                         from_piece,
-    #                                         to_piece,
-    #                                         color,
-    #                                     )
-    #                                     board.make_move(move)
-    #                                     is_in_check = cls.is_in_check(color, board)
-    #                                     board.undo_move(move)
-    #                                     if not is_in_check:
-    #                                         return False
-    #     return True
+    @classmethod
+    def _is_in_check_after_move(
+        cls, from_square_mask: int, to_square_mask: int, color: Color, board: Board
+    ) -> bool:
+        """Return whether the color is in check after the move."""
+        from_piece = board.get_piece(square_mask=from_square_mask)
+        to_piece = board.get_piece(square_mask=to_square_mask)
+        move = Move(from_square_mask, to_square_mask, from_piece, to_piece, color)
+        board.make_move(move)
+        is_in_check = cls.is_in_check(color, board)
+        board.undo_move(move)
+        return is_in_check

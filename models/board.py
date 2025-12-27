@@ -369,9 +369,12 @@ class Board:
             king_bitboard = self._black_king_bitboard
 
         attacker_squares_mask = 0
-        attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
-            target_square_mask, pawn_bitboard, pawn_transforms
-        )
+
+        if self.is_occupied(target_square_mask, color.opposite):
+            attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
+                target_square_mask, pawn_bitboard, pawn_transforms
+            )
+
         attacker_squares_mask |= self._calculate_pattern_attacker_squares_mask(
             target_square_mask, knight_bitboard, KNIGHT_TRANSFORMS
         )
