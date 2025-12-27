@@ -1,15 +1,11 @@
 from enums.color import Color
-from models.board import Board, Coordinate
-from models.move import Move
-from models.move_validator import MoveValidator
-from models.piece import Pawn
-from utils.board_utils import print_bitboard
+from models.board import Board
 
 
 def main() -> None:
     b = Board()
     b.set_up_pieces()
-    b.print(Color.BLACK)
+    b.print(Color.WHITE)
 
 if __name__ == "__main__":
     main()
