@@ -1,5 +1,6 @@
 from constants.board_constants import BOARD_SIZE
 from models.coordinate import Coordinate
+from utils.bit_utils import intersects
 
 
 # TODO: belongs in board?
@@ -13,14 +14,6 @@ def is_coordinate_in_bounds(coordinate: Coordinate) -> bool:
 def calculate_mask(row_index: int, column_index: int) -> int:
     shift = BOARD_SIZE * row_index + column_index
     return 1 << shift
-
-
-def signed_shift(base: int, shift: int) -> int:
-    return base << shift if shift > 0 else base >> -shift
-
-
-def intersects(value: int, mask: int) -> bool:
-    return (value & mask) != 0
 
 
 def is_orthogonal(row_delta: int, column_delta: int) -> bool:

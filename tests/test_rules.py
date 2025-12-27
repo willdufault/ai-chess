@@ -5,7 +5,6 @@ from models.board import Board
 from models.coordinate import Coordinate
 from models.piece import Bishop, King, Knight, Pawn, Queen, Rook
 from models.rules import Rules
-from utils.board_utils import print_bitboard as _pb
 
 
 @pytest.fixture
