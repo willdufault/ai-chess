@@ -36,9 +36,16 @@ class Rules:
             king_square_mask, color, board
         )
         for escape_square_mask in enumerate_mask(escape_squares_mask):
-            if not cls._is_in_check_after_move(
-                king_square_mask, escape_square_mask, color, board
-            ):
+            from_piece = board._get_piece(king_square_mask)
+            to_piece = board._get_piece(escape_square_mask)
+            move = Move(
+                king_square_mask,
+                escape_square_mask,
+                from_piece,
+                to_piece,
+                color,
+            )
+            if not cls.is_in_check_after_move(move, board):
                 return False
 
         # Multiple attackers.
@@ -55,9 +62,16 @@ class Rules:
                 attacker_square_mask, color, board
             )
             for defender_square_mask in enumerate_mask(defender_squares_mask):
-                if not cls._is_in_check_after_move(
-                    defender_square_mask, attacker_square_mask, color, board
-                ):
+                from_piece = board._get_piece(defender_square_mask)
+                to_piece = board._get_piece(attacker_square_mask)
+                move = Move(
+                    defender_square_mask,
+                    attacker_square_mask,
+                    from_piece,
+                    to_piece,
+                    color,
+                )
+                if not cls.is_in_check_after_move(move, board):
                     return False
 
         # Block attack.
@@ -72,22 +86,24 @@ class Rules:
                     intermediate_square_mask, color, board
                 )
                 for blocker_square_mask in enumerate_mask(blocker_squares_mask):
-                    if not cls._is_in_check_after_move(
-                        blocker_square_mask, intermediate_square_mask, color, board
-                    ):
+                    from_piece = board._get_piece(blocker_square_mask)
+                    to_piece = board._get_piece(intermediate_square_mask)
+                    move = Move(
+                        blocker_square_mask,
+                        intermediate_square_mask,
+                        from_piece,
+                        to_piece,
+                        color,
+                    )
+                    if not cls.is_in_check_after_move(move, board):
                         return False
 
         return True
 
     @classmethod
-    def _is_in_check_after_move(
-        cls, from_square_mask: int, to_square_mask: int, color: Color, board: Board
-    ) -> bool:
+    def is_in_check_after_move(cls, move: Move, board: Board) -> bool:
         """Return whether the color is in check after the move."""
-        from_piece = board._get_piece(from_square_mask)
-        to_piece = board._get_piece(to_square_mask)
-        move = Move(from_square_mask, to_square_mask, from_piece, to_piece, color)
         board.make_move(move)
-        is_in_check = cls.is_in_check(color, board)
+        is_in_check = cls.is_in_check(move.color, board)
         board.undo_move(move)
         return is_in_check

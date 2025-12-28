@@ -5,6 +5,9 @@ class Color(Enum):
     WHITE = auto()
     BLACK = auto()
 
+    def __str__(self) -> str:
+        return self.name.capitalize()
+    
     @property
     def opposite(self) -> Color:
         return Color.WHITE if self == Color.BLACK else Color.BLACK

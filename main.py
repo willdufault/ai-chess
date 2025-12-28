@@ -5,6 +5,7 @@ from models.game import Game
 
 def main() -> None:
     board = Board()
+    board.set_up_pieces()
     game = Game(board)
     game_controller = GameController(game)
     game_controller.configure()

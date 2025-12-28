@@ -3,11 +3,13 @@ from models.coordinate import Coordinate
 from utils.bit_utils import intersects
 
 
-# TODO: belongs in board?
+def is_index_in_bounds(index: int) -> bool:
+    return 0 <= index < BOARD_SIZE
+
+
 def is_coordinate_in_bounds(coordinate: Coordinate) -> bool:
-    return (
-        0 <= coordinate.row_index < BOARD_SIZE
-        and 0 <= coordinate.column_index < BOARD_SIZE
+    return is_index_in_bounds(coordinate.row_index) and is_index_in_bounds(
+        coordinate.column_index
     )
 
 
