@@ -84,8 +84,8 @@ class Rules:
         cls, from_square_mask: int, to_square_mask: int, color: Color, board: Board
     ) -> bool:
         """Return whether the color is in check after the move."""
-        from_piece = board.get_piece(square_mask=from_square_mask)
-        to_piece = board.get_piece(square_mask=to_square_mask)
+        from_piece = board._get_piece(from_square_mask)
+        to_piece = board._get_piece(to_square_mask)
         move = Move(from_square_mask, to_square_mask, from_piece, to_piece, color)
         board.make_move(move)
         is_in_check = cls.is_in_check(color, board)

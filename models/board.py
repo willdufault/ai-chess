@@ -78,24 +78,11 @@ class Board:
         self.black_queen_bitboard = BLACK_QUEEN_INITIAL_BITBOARD
         self.black_king_bitboard = BLACK_KING_INITIAL_BITBOARD
 
-    def get_piece(
-        self,
-        coordinate: Coordinate | None = None,
-        square_mask: int | None = None,
-    ) -> Piece | None:
-        if coordinate is None and square_mask is None:
-            raise ValueError("Must provide either coordinate or square_mask.")
+    def get_piece(self, coordinate: Coordinate) -> Piece | None:
+        square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
+        return self._get_piece(square_mask)
 
-        if coordinate is not None and square_mask is not None:
-            raise ValueError(
-                "Must provide exactly one of either coordinate or square_mask."
-            )
-
-        if coordinate is not None:
-            square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
-
-        assert square_mask is not None
-
+    def _get_piece(self, square_mask: int) -> Piece | None:
         if intersects(self.white_pawn_bitboard, square_mask):
             return Pawn(Color.WHITE)
         elif intersects(self.white_knight_bitboard, square_mask):
@@ -124,25 +111,11 @@ class Board:
 
         return None
 
-    def set_piece(
-        self,
-        piece: Piece | None,
-        coordinate: Coordinate | None = None,
-        square_mask: int | None = None,
-    ) -> None:
-        if coordinate is None and square_mask is None:
-            raise ValueError("Must provide either coordinate or square_mask.")
+    def set_piece(self, piece: Piece | None, coordinate: Coordinate) -> None:
+        square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
+        return self._set_piece(piece, square_mask)
 
-        if coordinate is not None and square_mask is not None:
-            raise ValueError(
-                "Must provide exactly one of either coordinate or square_mask."
-            )
-
-        if coordinate is not None:
-            square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
-
-        assert square_mask is not None
-
+    def _set_piece(self, piece: Piece | None, square_mask: int) -> None:
         self._clear_square(square_mask)
 
         if piece is None:
@@ -211,12 +184,12 @@ class Board:
         return is_occupied_by_white or is_occupied_by_black
 
     def make_move(self, move: Move) -> None:
-        self.set_piece(None, square_mask=move.from_square_mask)
-        self.set_piece(move.from_piece, square_mask=move.to_square_mask)
+        self._set_piece(None, move.from_square_mask)
+        self._set_piece(move.from_piece, move.to_square_mask)
 
     def undo_move(self, move: Move) -> None:
-        self.set_piece(move.from_piece, square_mask=move.from_square_mask)
-        self.set_piece(move.to_piece, square_mask=move.to_square_mask)
+        self._set_piece(move.from_piece, move.from_square_mask)
+        self._set_piece(move.to_piece, move.to_square_mask)
 
     def _clear_square(self, square_mask: int) -> None:
         self.white_pawn_bitboard &= ~square_mask
