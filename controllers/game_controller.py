@@ -28,14 +28,11 @@ class GameController:
 
     def _play_player_vs_player(self) -> None:
         while True:
-            # 1.1 print board
             BoardView.print(self._game._current_color, self._game._board)
 
-            # 1.2 tell if in check
             if Rules.is_in_check(self._game._current_color, self._game._board):
                 print("You are in check.")
 
-            # 2. prompt move
             while True:
                 move_input = GameView.prompt_move()
                 move_tuple = MoveParser.parse_input(move_input)
@@ -60,18 +57,17 @@ class GameController:
                     self._game._current_color,
                 )
 
-                # 3.1 valid move?
                 # TODO: check if valid move for that piece, this is validity or legality?
                 if not MoveValidator.is_valid_move(move):
                     print("Invalid move.")
                     continue
 
-                # 3.2 legal move?
-                
-
-                # 3.3 in check after?
-                if Rules.is_in_check_after_move(move, self._game._board):
+                if not MoveValidator.is_legal_move(move):
                     print("Illegal move.")
+                    continue
+
+                if Rules.is_in_check_after_move(move, self._game._board):
+                    print("Illegal move. You would be in check.")
                     continue
 
                 break
