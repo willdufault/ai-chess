@@ -1,0 +1,1 @@
+MAX_AI_DEPTH = 5

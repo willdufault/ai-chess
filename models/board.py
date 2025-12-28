@@ -78,49 +78,6 @@ class Board:
         self.black_queen_bitboard = BLACK_QUEEN_INITIAL_BITBOARD
         self.black_king_bitboard = BLACK_KING_INITIAL_BITBOARD
 
-    def print(self, color: Color) -> None:
-        # Flip board based on team.
-        if color == Color.WHITE:
-            row_indexes = reversed(range(self.size))
-            column_indexes = range(self.size)
-        else:
-            row_indexes = range(self.size)
-            # Must be a list to not exhaust the iterator.
-            column_indexes = list(reversed(range(self.size)))
-
-        for row_index in row_indexes:
-            for column_index in column_indexes:
-                square_mask = calculate_mask(row_index, column_index)
-
-                if intersects(self.white_pawn_bitboard, square_mask):
-                    print("♙", end=" ")
-                elif intersects(self.white_knight_bitboard, square_mask):
-                    print("♘", end=" ")
-                elif intersects(self.white_bishop_bitboard, square_mask):
-                    print("♗", end=" ")
-                elif intersects(self.white_rook_bitboard, square_mask):
-                    print("♖", end=" ")
-                elif intersects(self.white_queen_bitboard, square_mask):
-                    print("♕", end=" ")
-                elif intersects(self.white_king_bitboard, square_mask):
-                    print("♔", end=" ")
-
-                elif intersects(self.black_pawn_bitboard, square_mask):
-                    print("♟", end=" ")
-                elif intersects(self.black_knight_bitboard, square_mask):
-                    print("♞", end=" ")
-                elif intersects(self.black_bishop_bitboard, square_mask):
-                    print("♝", end=" ")
-                elif intersects(self.black_rook_bitboard, square_mask):
-                    print("♜", end=" ")
-                elif intersects(self.black_queen_bitboard, square_mask):
-                    print("♛", end=" ")
-                elif intersects(self.black_king_bitboard, square_mask):
-                    print("♚", end=" ")
-                else:
-                    print(".", end=" ")
-            print()
-
     def get_piece(
         self,
         coordinate: Coordinate | None = None,
