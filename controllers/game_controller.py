@@ -1,7 +1,6 @@
 from enums.game_mode import GameMode
 from models.game import Game
 from models.move import Move
-from models.move_generator import MoveGenerator
 from models.move_parser import MoveParser
 from models.move_validator import MoveValidator
 from models.rules import Rules
@@ -57,12 +56,11 @@ class GameController:
                     self._game._current_color,
                 )
 
-                # TODO: check if valid move for that piece, this is validity or legality?
                 if not MoveValidator.is_valid_move(move):
                     print("Invalid move.")
                     continue
 
-                if not MoveValidator.is_legal_move(move):
+                if not Rules.is_legal_move(move, self._game._board):
                     print("Illegal move.")
                     continue
 
