@@ -23,6 +23,7 @@ VALID_KING_MOVE_PATTERNS = [
 ]
 
 
+# TODO: mark necessary methods as private
 class MoveValidator:
     @staticmethod
     def is_valid_move(move: Move) -> bool:

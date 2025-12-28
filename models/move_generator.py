@@ -94,20 +94,20 @@ class MoveGenerator:
         """Return a mask of all pieces of the color attacking the target square."""
         if color == Color.WHITE:
             pawn_transforms = PAWN_CAPTURE_DOWN_TRANSFORMS
-            pawn_bitboard = board.white_pawn_bitboard
-            knight_bitboard = board.white_knight_bitboard
-            bishop_bitboard = board.white_bishop_bitboard
-            rook_bitboard = board.white_rook_bitboard
-            queen_bitboard = board.white_queen_bitboard
-            king_bitboard = board.white_king_bitboard
+            pawn_bitboard = board._white_pawn_bitboard
+            knight_bitboard = board._white_knight_bitboard
+            bishop_bitboard = board._white_bishop_bitboard
+            rook_bitboard = board._white_rook_bitboard
+            queen_bitboard = board._white_queen_bitboard
+            king_bitboard = board._white_king_bitboard
         else:
             pawn_transforms = PAWN_CAPTURE_UP_TRANSFORMS
-            pawn_bitboard = board.black_pawn_bitboard
-            knight_bitboard = board.black_knight_bitboard
-            bishop_bitboard = board.black_bishop_bitboard
-            rook_bitboard = board.black_rook_bitboard
-            queen_bitboard = board.black_queen_bitboard
-            king_bitboard = board.black_king_bitboard
+            pawn_bitboard = board._black_pawn_bitboard
+            knight_bitboard = board._black_knight_bitboard
+            bishop_bitboard = board._black_bishop_bitboard
+            rook_bitboard = board._black_rook_bitboard
+            queen_bitboard = board._black_queen_bitboard
+            king_bitboard = board._black_king_bitboard
 
         attacker_squares_mask = 0
 
@@ -144,18 +144,18 @@ class MoveGenerator:
         the empty target square."""
         if color == Color.WHITE:
             pawn_transforms = PAWN_MOVE_DOWN_TRANSFORMS
-            pawn_bitboard = board.white_pawn_bitboard
-            knight_bitboard = board.white_knight_bitboard
-            bishop_bitboard = board.white_bishop_bitboard
-            rook_bitboard = board.white_rook_bitboard
-            queen_bitboard = board.white_queen_bitboard
+            pawn_bitboard = board._white_pawn_bitboard
+            knight_bitboard = board._white_knight_bitboard
+            bishop_bitboard = board._white_bishop_bitboard
+            rook_bitboard = board._white_rook_bitboard
+            queen_bitboard = board._white_queen_bitboard
         else:
             pawn_transforms = PAWN_MOVE_UP_TRANSFORMS
-            pawn_bitboard = board.black_pawn_bitboard
-            knight_bitboard = board.black_knight_bitboard
-            bishop_bitboard = board.black_bishop_bitboard
-            rook_bitboard = board.black_rook_bitboard
-            queen_bitboard = board.black_queen_bitboard
+            pawn_bitboard = board._black_pawn_bitboard
+            knight_bitboard = board._black_knight_bitboard
+            bishop_bitboard = board._black_bishop_bitboard
+            rook_bitboard = board._black_rook_bitboard
+            queen_bitboard = board._black_queen_bitboard
 
         attacker_squares_mask = 0
         attacker_squares_mask |= cls._calculate_pattern_attacker_squares_mask(

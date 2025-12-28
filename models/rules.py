@@ -9,9 +9,9 @@ class Rules:
     @classmethod
     def is_in_check(cls, color: Color, board: Board) -> bool:
         king_square = (
-            board.white_king_bitboard
+            board._white_king_bitboard
             if color is Color.WHITE
-            else board.black_king_bitboard
+            else board._black_king_bitboard
         )
         return (
             MoveGenerator.calculate_attacker_squares_mask(
@@ -26,9 +26,9 @@ class Rules:
             return False
 
         king_square_mask = (
-            board.white_king_bitboard
+            board._white_king_bitboard
             if color == Color.WHITE
-            else board.black_king_bitboard
+            else board._black_king_bitboard
         )
 
         # King escapes.

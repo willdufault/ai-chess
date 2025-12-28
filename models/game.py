@@ -6,14 +6,14 @@ from models.board import Board
 class Game:
     # TODO: builder?
     def __init__(self, board: Board) -> None:
-        self.board = board
-        self.game_mode = GameMode.PLAYER_VS_PLAYER
-        self.ai_depth = 0
-        self.player_color = Color.WHITE
+        self._board = board
+        self._game_mode = GameMode.PLAYER_VS_PLAYER
+        self._ai_depth = 0
+        self._player_color = Color.WHITE
         self._current_color = Color.WHITE
         # TODO: track first move against ai
 
-    def play_player_vs_player(self) -> None:
+    def _play_player_vs_player(self) -> None:
         # 1.1 print board
         # 1.2 tell if in check
         # 2. prompt move
@@ -24,7 +24,7 @@ class Game:
         # 4. switch team, repeat
         pass
 
-    def play_player_vs_ai(self) -> None:
+    def _play_player_vs_ai(self) -> None:
         # 1.1 print board
         # 1.2 tell if in check
         # 2. prompt move

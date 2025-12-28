@@ -19,7 +19,7 @@ class GameView:
 
     @classmethod
     def prompt_player_color(cls) -> Color:
-        message = f"Choose a color to play as: (1) white, or (2) black."
+        message = f"Choose the player's color: (1) white, or (2) black."
         choices = [1, 2]
         choice = cls._prompt_choice(message, choices)
         return Color.WHITE if choice == 1 else Color.BLACK
