@@ -9,7 +9,7 @@ class Game:
     def __init__(self, board: Board) -> None:
         self._board = board
         self._current_color = Color.WHITE
-        self._game_mode = GameMode.PLAYER_VS_PLAYER
+        self._mode = GameMode.VS_PLAYER
         self._ai_depth = 0
         self._player_color = Color.WHITE
 

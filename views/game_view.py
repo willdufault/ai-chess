@@ -9,7 +9,7 @@ class GameView:
         message = "Choose a game mode: (1) player vs. player, or (2) player vs. AI."
         choices = ["1", "2"]
         choice = cls._prompt_choice(message, choices)
-        return GameMode.PLAYER_VS_PLAYER if choice == "1" else GameMode.PLAYER_VS_AI
+        return GameMode.VS_PLAYER if choice == "1" else GameMode.VS_AI
 
     @classmethod
     def prompt_ai_depth(cls) -> int:
@@ -22,7 +22,7 @@ class GameView:
         message = f"Choose your color: (1) white, or (2) black."
         choices = ["1", "2"]
         choice = cls._prompt_choice(message, choices)
-        return Color.WHITE if choice == 1 else Color.BLACK
+        return Color.WHITE if choice == "1" else Color.BLACK
 
     @staticmethod
     def prompt_move() -> str:

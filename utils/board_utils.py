@@ -13,6 +13,10 @@ def is_coordinate_in_bounds(coordinate: Coordinate) -> bool:
     )
 
 
+def calculate_shift(square_mask: int) -> int:
+    return square_mask.bit_length() - 1
+
+
 def calculate_mask(row_index: int, column_index: int) -> int:
     shift = BOARD_SIZE * row_index + column_index
     return 1 << shift
