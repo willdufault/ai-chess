@@ -233,7 +233,7 @@ class MoveGenerator:
                 signed_shift(intermediate_square_mask, row_shift), column_shift
             )
         return intermediate_squares_mask
-
+        
     @staticmethod
     def _calculate_pattern_attacker_squares_mask(
         target_square_mask: int,

@@ -1,6 +1,7 @@
 from constants.ai_constants import MAX_AI_DEPTH
 from enums.color import Color
 from enums.game_mode import GameMode
+from enums.promotion_piece import PromotionPiece
 
 
 class GameView:
@@ -29,6 +30,23 @@ class GameView:
         return input(
             'Enter a move in the format "rcrc" (row/column → row/column). ',
         )
+
+    @classmethod
+    def prompt_promotion(cls) -> PromotionPiece:
+        message = f"Choose a piece to promote to: (1) Knight, (2) Bishop, (3) Rook, or (4) Queen."
+        choices = ["1", "2", "3", "4"]
+        choice = cls._prompt_choice(message, choices)
+        match choice:
+            case "1":
+                return PromotionPiece.KNIGHT
+            case "2":
+                return PromotionPiece.BISHOP
+            case "3":
+                return PromotionPiece.ROOK
+            case "4":
+                return PromotionPiece.QUEEN
+            case _:
+                raise ValueError(f"Invalid promotion piece: {choice}")
 
     @staticmethod
     def _prompt_choice(message: str, choices: list[str]) -> str:

@@ -1,8 +1,10 @@
 from enums.game_mode import GameMode
+from enums.promotion_piece import PromotionPiece
 from models.game import Game
 from models.move import Move
 from models.move_parser import MoveParser
 from models.move_validator import MoveValidator
+from models.piece import Bishop, Knight, Queen, Rook
 from models.rules import Rules
 from utils.board_utils import calculate_mask
 from views.board_view import BoardView
@@ -68,23 +70,43 @@ class GameController:
                 self._game._current_color,
             )
 
-            if not MoveValidator.is_valid_move(move):
-                print("Invalid move.")
-                continue
+            ignoring_checks = move_input.endswith("!")
+            if not ignoring_checks:
+                if not MoveValidator.is_valid_move(move):
+                    print("Invalid move.")
+                    continue
 
-            if not Rules.is_legal_move(move, self._game._board):
-                print("Illegal move.")
-                continue
+                if not Rules.is_legal_move(move, self._game._board):
+                    print("Illegal move.")
+                    continue
 
-            if Rules.is_in_check_after_move(move, self._game._board):
-                print("Illegal move. You would be in check.")
-                continue
+                if Rules.is_in_check_after_move(move, self._game._board):
+                    print("Illegal move. You would be in check.")
+                    continue
 
             break
 
         self._game.make_move(move)
 
+        if Rules.can_promote(move):
+            promotion_piece = GameView.prompt_promotion()
+            self._promote_player(move, promotion_piece)
+
         # TODO: promotion + AI always queens?
+
+    def _promote_player(self, move: Move, promotion_piece: PromotionPiece) -> None:
+        match promotion_piece:
+            case PromotionPiece.KNIGHT:
+                piece = Knight(move.color)
+            case PromotionPiece.BISHOP:
+                piece = Bishop(move.color)
+            case PromotionPiece.ROOK:
+                piece = Rook(move.color)
+            case PromotionPiece.QUEEN:
+                piece = Queen(move.color)
+            case _:
+                raise ValueError(f"Invalid promotion piece: {promotion_piece}")
+        self._game._board._set_piece(piece, move.to_square_mask)
 
     def _take_ai_turn(self) -> None:
         # ai get best move

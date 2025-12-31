@@ -1,7 +1,10 @@
+from typing import TYPE_CHECKING
+
 from constants.board_constants import BOARD_SIZE
-from models.coordinate import Coordinate
 from utils.bit_utils import intersects
 
+if TYPE_CHECKING:
+    from models.coordinate import Coordinate
 
 def is_index_in_bounds(index: int) -> bool:
     return 0 <= index < BOARD_SIZE

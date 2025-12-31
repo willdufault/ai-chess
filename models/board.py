@@ -44,6 +44,13 @@ BLACK_KING_INITIAL_BITBOARD = (
     0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
 )
 
+FIRST_ROW_MASK = (
+    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_11111111
+)
+LAST_ROW_MASK = (
+    0b11111111_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+)
+
 
 class Board:
     def __init__(self) -> None:
@@ -121,6 +128,11 @@ class Board:
     def undo_move(self, move: Move) -> None:
         self._set_piece(move.from_piece, move.from_square_mask)
         self._set_piece(move.to_piece, move.to_square_mask)
+
+    @staticmethod
+    def moving_to_final_row(move: Move) -> bool:
+        final_row_mask = LAST_ROW_MASK if move.color == Color.WHITE else FIRST_ROW_MASK
+        return intersects(move.to_square_mask, final_row_mask)
 
     def _get_piece(self, square_mask: int) -> Piece | None:
         if intersects(self._white_pawn_bitboard, square_mask):
@@ -202,6 +214,9 @@ class Board:
         self._black_pawn_bitboard &= ~square_mask
         self._black_knight_bitboard &= ~square_mask
         self._black_bishop_bitboard &= ~square_mask
+        self._black_rook_bitboard &= ~square_mask
+        self._black_queen_bitboard &= ~square_mask
+        self._black_king_bitboard &= ~square_mask
         self._black_rook_bitboard &= ~square_mask
         self._black_queen_bitboard &= ~square_mask
         self._black_king_bitboard &= ~square_mask

@@ -123,6 +123,11 @@ class Rules:
 
         return True
 
+    # TODO: implement
+    @staticmethod
+    def is_in_stalemate() -> bool:
+        raise NotImplementedError
+
     @classmethod
     def is_in_check_after_move(cls, move: Move, board: Board) -> bool:
         """Return whether the color is in check after the move."""
@@ -237,3 +242,8 @@ class Rules:
         row_delta = from_coordinate.row_index - to_coordinate.row_index
         column_delta = from_coordinate.column_index - to_coordinate.column_index
         return (row_delta, column_delta) in LEGAL_KING_MOVE_PATTERNS
+
+    @staticmethod
+    def can_promote(move: Move) -> bool:
+        moved_pawn = isinstance(move.from_piece, Pawn)
+        return moved_pawn and Board.moving_to_final_row(move)
