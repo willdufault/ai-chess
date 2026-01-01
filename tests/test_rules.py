@@ -331,3 +331,17 @@ def test_is_legal_king_move(board: Board) -> None:
         Color.WHITE,
     )
     assert Rules.is_legal_move(move, board) == False
+
+
+def test_generate_legal_moves(board) -> None:
+    board.set_up_pieces()
+    board.set_piece(Rook(Color.BLACK), Coordinate(1, 4))
+    # fmt: off
+    legal_moves = [
+        Move.from_coordinates(Coordinate(0, 3), Coordinate(1, 4), Queen(Color.WHITE), Rook(Color.BLACK), Color.WHITE),
+        Move.from_coordinates(Coordinate(0, 4), Coordinate(1, 4), King(Color.WHITE), Rook(Color.BLACK), Color.WHITE),
+        Move.from_coordinates(Coordinate(0, 5), Coordinate(1, 4), Bishop(Color.WHITE), Rook(Color.BLACK), Color.WHITE),
+        Move.from_coordinates(Coordinate(0, 6), Coordinate(1, 4), Knight(Color.WHITE), Rook(Color.BLACK), Color.WHITE),
+    ]
+    # fmt: on
+    assert set(Rules.generate_legal_moves(Color.WHITE, board)) == set(legal_moves)

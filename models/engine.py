@@ -146,18 +146,17 @@ class Engine:
         """Return the sum of the values of all white pieces minus the sum of
         values of all black pieces."""
         material_score = 0
-        for row_index in range(board.size):
-            for column_index in range(board.size):
-                square_mask = calculate_mask(row_index, column_index)
-                if not board.is_occupied(square_mask):
-                    continue
+        for square_shift in range(board.size**2):
+            square_mask = 1 << square_shift
+            if not board.is_occupied(square_mask):
+                continue
 
-                piece = board._get_piece(square_mask)
-                assert piece is not None
-                if piece.color == Color.WHITE:
-                    material_score += piece.VALUE
-                else:
-                    material_score -= piece.VALUE
+            piece = board._get_piece(square_mask)
+            assert piece is not None
+            if piece.color == Color.WHITE:
+                material_score += piece.VALUE
+            else:
+                material_score -= piece.VALUE
         return material_score
 
     @classmethod
@@ -166,38 +165,35 @@ class Engine:
         sum of the placement scores of all black pieces."""
         positional_score = 0
         is_in_endgame = cls._is_in_endgame(board)
-        for row_index in range(board.size):
-            for column_index in range(board.size):
-                square_mask = calculate_mask(row_index, column_index)
-                if not board.is_occupied(square_mask):
-                    continue
+        for square_shift in range(board.size**2):
+            square_mask = 1 << square_shift
+            if not board.is_occupied(square_mask):
+                continue
 
-                piece = board._get_piece(square_mask)
-                assert piece is not None
-                placement_score = (
-                    cls._calculate_placement_score_endgame(piece, square_mask)
-                    if is_in_endgame
-                    else cls._calculate_placement_score_middlegame(piece, square_mask)
-                )
-                if piece.color == Color.WHITE:
-                    positional_score += placement_score
-                else:
-                    positional_score -= placement_score
+            piece = board._get_piece(square_mask)
+            assert piece is not None
+            placement_score = (
+                cls._calculate_placement_score_endgame(piece, square_mask)
+                if is_in_endgame
+                else cls._calculate_placement_score_middlegame(piece, square_mask)
+            )
+            if piece.color == Color.WHITE:
+                positional_score += placement_score
+            else:
+                positional_score -= placement_score
         return positional_score
 
     @staticmethod
     def _is_in_endgame(board: Board) -> bool:
         """Return whether there are no queens left on the board."""
-        for row_index in range(board.size):
-            for column_index in range(board.size):
-                current_coordinate = Coordinate(row_index, column_index)
-                square_mask = calculate_mask(row_index, column_index)
-                if not board.is_occupied(square_mask):
-                    continue
+        for square_shift in range(board.size**2):
+            square_mask = 1 << square_shift
+            if not board.is_occupied(square_mask):
+                continue
 
-                piece = board.get_piece(current_coordinate)
-                if isinstance(piece, Queen):
-                    return False
+            piece = board._get_piece(square_mask)
+            if isinstance(piece, Queen):
+                return False
         return True
 
     @staticmethod
@@ -236,15 +232,16 @@ class Engine:
         )
         match piece:
             case Pawn():
-                placement_score = _PLACEMENT_SCORES_PAWN_ENDGAME[placement_index]
+                return _PLACEMENT_SCORES_PAWN_ENDGAME[placement_index]
             case Knight():
-                placement_score = _PLACEMENT_SCORES_KNIGHT_ENDGAME[placement_index]
+                return _PLACEMENT_SCORES_KNIGHT_ENDGAME[placement_index]
             case Bishop():
-                placement_score = _PLACEMENT_SCORES_BISHOP_ENDGAME[placement_index]
+                return _PLACEMENT_SCORES_BISHOP_ENDGAME[placement_index]
             case Rook():
-                placement_score = _PLACEMENT_SCORES_ROOK_ENDGAME[placement_index]
+                return _PLACEMENT_SCORES_ROOK_ENDGAME[placement_index]
             case Queen():
-                placement_score = _PLACEMENT_SCORES_QUEEN_ENDGAME[placement_index]
+                return _PLACEMENT_SCORES_QUEEN_ENDGAME[placement_index]
             case King():
-                placement_score = _PLACEMENT_SCORES_KING_ENDGAME[placement_index]
-        return placement_score if piece.color == Color.WHITE else -int(placement_score)
+                return _PLACEMENT_SCORES_KING_ENDGAME[placement_index]
+            case _:
+                raise ValueError(f"Invalid piece type: {piece}")

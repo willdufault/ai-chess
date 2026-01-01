@@ -52,6 +52,7 @@ LAST_ROW_MASK = (
 )
 
 
+# TODO: impl hash (zobrist hash?)
 class Board:
     def __init__(self) -> None:
         self.size = BOARD_SIZE
@@ -94,7 +95,7 @@ class Board:
         return self._set_piece(piece, square_mask)
 
     def is_occupied(self, square_mask: int, color: Color | None = None) -> bool:
-        """Return whether the square is occupied by the color. Checks both colors
+        """Return whether the square is occupied by the color. Check both colors
         if not specified."""
         is_occupied_by_white = (
             intersects(self._white_pawn_bitboard, square_mask)
@@ -120,6 +121,33 @@ class Board:
             return is_occupied_by_black
 
         return is_occupied_by_white or is_occupied_by_black
+
+    def get_mask(self, color: Color | None = None):
+        """Return a mask with all pieces of the color. Check both colors if not
+        specified."""
+        white_mask = (
+            self._white_pawn_bitboard
+            | self._white_knight_bitboard
+            | self._white_bishop_bitboard
+            | self._white_rook_bitboard
+            | self._white_queen_bitboard
+            | self._white_king_bitboard
+        )
+        black_mask = (
+            self._black_pawn_bitboard
+            | self._black_knight_bitboard
+            | self._black_bishop_bitboard
+            | self._black_rook_bitboard
+            | self._black_queen_bitboard
+            | self._black_king_bitboard
+        )
+
+        if color == Color.WHITE:
+            return white_mask
+        elif color == Color.BLACK:
+            return black_mask
+        else:
+            return white_mask | black_mask
 
     def make_move(self, move: Move) -> None:
         self._set_piece(None, move.from_square_mask)

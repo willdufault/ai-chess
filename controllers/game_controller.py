@@ -92,8 +92,6 @@ class GameController:
             promotion_piece = GameView.prompt_promotion()
             self._promote_player(move, promotion_piece)
 
-        # TODO: promotion + AI always queens?
-
     def _promote_player(self, move: Move, promotion_piece: PromotionPiece) -> None:
         match promotion_piece:
             case PromotionPiece.KNIGHT:
@@ -111,4 +109,5 @@ class GameController:
     def _take_ai_turn(self) -> None:
         # ai get best move
         # make move
+        # promo queen?
         pass

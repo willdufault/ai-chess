@@ -4,6 +4,7 @@ from models.coordinate import Coordinate
 from models.move import Move
 from models.move_generator import MoveGenerator
 from models.piece import Bishop, King, Knight, Pawn, Queen, Rook
+from utils.bit_utils import intersects
 from utils.board_utils import enumerate_mask, is_diagonal, is_orthogonal
 
 LEGAL_KNIGHT_MOVE_PATTERNS = [
@@ -204,9 +205,9 @@ class Rules:
         intermediate_squares_mask = MoveGenerator.calculate_intermediate_squares_mask(
             move.from_square_mask, move.to_square_mask
         )
-        for intermediate_square_mask in enumerate_mask(intermediate_squares_mask):
-            if board.is_occupied(intermediate_square_mask):
-                return False
+        board_mask = board.get_mask()
+        if intersects(intermediate_squares_mask, board_mask):
+            return False
 
         return True
 
@@ -223,9 +224,9 @@ class Rules:
         intermediate_squares_mask = MoveGenerator.calculate_intermediate_squares_mask(
             move.from_square_mask, move.to_square_mask
         )
-        for intermediate_square_mask in enumerate_mask(intermediate_squares_mask):
-            if board.is_occupied(intermediate_square_mask):
-                return False
+        board_mask = board.get_mask()
+        if intersects(intermediate_squares_mask, board_mask):
+            return False
 
         return True
 
@@ -242,6 +243,18 @@ class Rules:
         row_delta = from_coordinate.row_index - to_coordinate.row_index
         column_delta = from_coordinate.column_index - to_coordinate.column_index
         return (row_delta, column_delta) in LEGAL_KING_MOVE_PATTERNS
+
+    @staticmethod
+    def generate_legal_moves(color: Color, board: Board) -> list[Move]:
+        legal_moves = []
+        candidate_moves = MoveGenerator.generate_candidate_moves(color, board)
+        for move in candidate_moves:
+            board.make_move(move)
+            is_in_check = Rules.is_in_check(color, board)
+            board.undo_move(move)
+            if not is_in_check:
+                legal_moves.append(move)
+        return legal_moves
 
     @staticmethod
     def can_promote(move: Move) -> bool:

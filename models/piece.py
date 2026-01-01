@@ -5,7 +5,7 @@ from typing import ClassVar
 from enums.color import Color
 
 
-@dataclass
+@dataclass(frozen=True)
 class Piece(ABC):
     VALUE: ClassVar[int] = 0
     color: Color

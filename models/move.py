@@ -6,7 +6,7 @@ from models.piece import Piece
 from utils.board_utils import calculate_mask
 
 
-@dataclass
+@dataclass(frozen=True)
 class Move:
     from_square_mask: int
     to_square_mask: int

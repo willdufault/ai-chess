@@ -1,4 +1,4 @@
-from constants.ai_constants import MAX_AI_DEPTH
+from constants.ai_constants import MAX_AI_DEPTH, MIN_AI_DEPTH
 from enums.color import Color
 from enums.game_mode import GameMode
 from enums.promotion_piece import PromotionPiece
@@ -14,8 +14,8 @@ class GameView:
 
     @classmethod
     def prompt_ai_depth(cls) -> int:
-        message = f"Choose an AI depth from 0 to {MAX_AI_DEPTH} (higher = smarter but slower)."
-        choices = list(map(str, range(MAX_AI_DEPTH + 1)))
+        message = f"Choose an AI depth from {MIN_AI_DEPTH} to {MAX_AI_DEPTH} (higher = smarter but slower)."
+        choices = list(map(str, range(MIN_AI_DEPTH, MAX_AI_DEPTH + 1)))
         return int(cls._prompt_choice(message, choices))
 
     @classmethod

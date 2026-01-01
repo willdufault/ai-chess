@@ -1,8 +1,10 @@
 from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
+from models.move import Move
+from models.piece import Pawn
 from utils.bit_utils import intersects, signed_shift
-from utils.board_utils import is_diagonal, is_orthogonal
+from utils.board_utils import enumerate_mask, is_diagonal, is_orthogonal
 
 UP_MASK = 0b00000000_11111111_11111111_11111111_11111111_11111111_11111111_11111111
 DOWN_MASK = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_00000000
@@ -233,7 +235,68 @@ class MoveGenerator:
                 signed_shift(intermediate_square_mask, row_shift), column_shift
             )
         return intermediate_squares_mask
-        
+
+    @classmethod
+    def generate_candidate_moves(cls, color: Color, board: Board) -> list[Move]:
+        if color == Color.WHITE:
+            pawn_move_transforms = PAWN_MOVE_UP_TRANSFORMS
+            pawn_capture_transforms = PAWN_CAPTURE_UP_TRANSFORMS
+            pawn_bitboard = board._white_pawn_bitboard
+            knight_bitboard = board._white_knight_bitboard
+            bishop_bitboard = board._white_bishop_bitboard
+            rook_bitboard = board._white_rook_bitboard
+            queen_bitboard = board._white_queen_bitboard
+            king_bitboard = board._white_king_bitboard
+        else:
+            pawn_move_transforms = PAWN_MOVE_DOWN_TRANSFORMS
+            pawn_capture_transforms = PAWN_CAPTURE_DOWN_TRANSFORMS
+            pawn_bitboard = board._black_pawn_bitboard
+            knight_bitboard = board._black_knight_bitboard
+            bishop_bitboard = board._black_bishop_bitboard
+            rook_bitboard = board._black_rook_bitboard
+            queen_bitboard = board._black_queen_bitboard
+            king_bitboard = board._black_king_bitboard
+
+        candidate_moves = []
+        candidate_moves.extend(
+            cls._generate_pawn_candidate_moves(
+                pawn_bitboard,
+                pawn_move_transforms,
+                pawn_capture_transforms,
+                color,
+                board,
+            )
+        )
+        candidate_moves.extend(
+            cls._generate_pattern_candidate_moves(
+                knight_bitboard, KNIGHT_TRANSFORMS, color, board
+            )
+        )
+        candidate_moves.extend(
+            cls._generate_straight_candidate_moves(
+                bishop_bitboard, DIAGONAL_TRANSFORMS, color, board
+            )
+        )
+        candidate_moves.extend(
+            cls._generate_straight_candidate_moves(
+                rook_bitboard, ORTHOGONAL_TRANSFORMS, color, board
+            )
+        )
+        candidate_moves.extend(
+            cls._generate_straight_candidate_moves(
+                queen_bitboard,
+                DIAGONAL_TRANSFORMS + ORTHOGONAL_TRANSFORMS,
+                color,
+                board,
+            )
+        )
+        candidate_moves.extend(
+            cls._generate_pattern_candidate_moves(
+                king_bitboard, KING_TRANSFORMS, color, board
+            )
+        )
+        return candidate_moves
+
     @staticmethod
     def _calculate_pattern_attacker_squares_mask(
         target_square_mask: int,
@@ -271,3 +334,102 @@ class MoveGenerator:
                 if board.is_occupied(piece_square_mask):
                     break
         return piece_attacker_squares_mask
+
+    @staticmethod
+    def _generate_pawn_candidate_moves(
+        pawn_bitboard: int,
+        pawn_move_transforms: list[tuple[int, int]],
+        pawn_capture_transforms: list[tuple[int, int]],
+        color: Color,
+        board: Board,
+    ) -> list[Move]:
+        candidate_moves = []
+        for from_square_mask in enumerate_mask(pawn_bitboard):
+            for transform_mask, transform_shift in pawn_move_transforms:
+                if intersects(from_square_mask, transform_mask):
+                    to_square_mask = signed_shift(from_square_mask, transform_shift)
+                    if not board.is_occupied(to_square_mask):
+                        move = Move(
+                            from_square_mask, to_square_mask, Pawn(color), None, color
+                        )
+                        candidate_moves.append(move)
+
+        for from_square_mask in enumerate_mask(pawn_bitboard):
+            for transform_mask, transform_shift in pawn_capture_transforms:
+                if intersects(from_square_mask, transform_mask):
+                    to_square_mask = signed_shift(from_square_mask, transform_shift)
+                    if board.is_occupied(to_square_mask, color.opposite):
+                        to_piece = board._get_piece(to_square_mask)
+                        move = Move(
+                            from_square_mask,
+                            to_square_mask,
+                            Pawn(color),
+                            to_piece,
+                            color,
+                        )
+                        candidate_moves.append(move)
+        return candidate_moves
+
+    @classmethod
+    def _generate_pattern_candidate_moves(
+        cls,
+        piece_bitboard: int,
+        piece_transforms: list[tuple[int, int]],
+        color: Color,
+        board: Board,
+    ) -> list[Move]:
+        candidate_moves = []
+        for from_square_mask in enumerate_mask(piece_bitboard):
+            from_piece = board._get_piece(from_square_mask)
+            for transform_mask, transform_shift in piece_transforms:
+                if intersects(from_square_mask, transform_mask):
+                    to_square_mask = signed_shift(from_square_mask, transform_shift)
+                    if not board.is_occupied(to_square_mask, color):
+                        to_piece = board._get_piece(to_square_mask)
+                        move = Move(
+                            from_square_mask,
+                            to_square_mask,
+                            from_piece,
+                            to_piece,
+                            color,
+                        )
+                        candidate_moves.append(move)
+        return candidate_moves
+
+    @classmethod
+    def _generate_straight_candidate_moves(
+        cls,
+        piece_bitboard: int,
+        piece_transforms: list[tuple[int, int]],
+        color: Color,
+        board: Board,
+    ) -> list[Move]:
+        candidate_moves = []
+        for from_square_mask in enumerate_mask(piece_bitboard):
+            from_piece = board._get_piece(from_square_mask)
+            for transform_mask, transform_shift in piece_transforms:
+                current_square_mask = from_square_mask
+                while intersects(current_square_mask, transform_mask):
+                    to_square_mask = signed_shift(current_square_mask, transform_shift)
+                    to_piece = board._get_piece(to_square_mask)
+                    capturing_ally_piece = (
+                        to_piece is not None and color == to_piece.color
+                    )
+                    if capturing_ally_piece:
+                        break
+
+                    move = Move(
+                        from_square_mask,
+                        to_square_mask,
+                        from_piece,
+                        to_piece,
+                        color,
+                    )
+                    candidate_moves.append(move)
+
+                    capturing_opponent_piece = to_piece is not None
+                    if capturing_opponent_piece:
+                        break
+
+                    current_square_mask = to_square_mask
+        return candidate_moves

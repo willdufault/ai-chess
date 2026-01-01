@@ -4,7 +4,7 @@ from constants.board_constants import BOARD_SIZE
 from utils.board_utils import calculate_shift
 
 
-@dataclass
+@dataclass(frozen=True)
 class Coordinate:
     row_index: int
     column_index: int
