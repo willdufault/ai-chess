@@ -49,10 +49,9 @@ class GameController:
                 self._game.status = GameStatus.CHECKMATE
                 break
 
-            # TODO: impl
-            # if Rules.is_in_stalemate():
-            #     self._game.status = GameStatus.STALEMATE
-            #     break
+            if Rules.is_in_stalemate(self._game.current_color, self._game.board):
+                self._game.status = GameStatus.STALEMATE
+                break
 
             self._game.current_color = self._game.current_color.opposite
 
