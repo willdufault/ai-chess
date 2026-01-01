@@ -8,7 +8,7 @@ _MAX_SCORE = 1_000_000
 _MIN_SCORE = -1_000_000
 
 
-class AI:
+class Ai:
     def __init__(self, depth: int) -> None:
         self._depth = depth
         self._transposition_table = {}
