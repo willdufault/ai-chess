@@ -1,3 +1,6 @@
+from concurrent.futures import ThreadPoolExecutor
+from copy import copy
+
 from enums.color import Color
 from models.board import Board
 from models.engine import Engine
@@ -9,13 +12,10 @@ _MAX_SCORE = 1_000_000
 _MIN_SCORE = -1_000_000
 
 
-# TODO: optimize as much as possible, THEN add multithreading (thread safe dict)
 class Ai:
     def __init__(self, depth: int) -> None:
         self._depth = depth
-        self._transposition_table = {}
-        self._hits = 0
-        self._total = 0
+        self._cache = {}
 
     def calculate_best_move(self, color: Color, board: Board) -> Move:
         moves = list(Rules.generate_legal_moves(color, board))
@@ -23,8 +23,6 @@ class Ai:
         best_score = max(scores) if color == Color.WHITE else min(scores)
         best_index = scores.index(best_score)
         best_move = moves[best_index]
-        print(f"hits:", self._hits)
-        print(f"total:", self._total)
         return best_move
 
     def _calculate_move_scores(self, moves: list[Move], board: Board) -> list[int]:
@@ -49,13 +47,16 @@ class Ai:
         elif Rules.is_in_stalemate(color, board):
             return 0
 
-        self._total += 1
         board_hash = hash(board)
-        if board_hash in self._transposition_table:
-            cached_depth, cached_score = self._transposition_table[board_hash]
+        if board_hash in self._cache:
+            cached_depth, cached_score = self._cache[board_hash]
             if cached_depth >= depth:
-                self._hits += 1
                 return cached_score
+        else:
+            self._cache[board_hash] = (
+                depth,
+                _MIN_SCORE if color == Color.WHITE else _MAX_SCORE,
+            )
 
         moves = Rules.generate_legal_moves(color, board)
         best_score = _MIN_SCORE if color == Color.WHITE else _MAX_SCORE
@@ -76,5 +77,5 @@ class Ai:
             if alpha >= beta:
                 break
 
-        self._transposition_table[board_hash] = depth, best_score
+        self._cache[board_hash] = depth, best_score
         return best_score

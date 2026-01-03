@@ -1,113 +1,118 @@
    Ordered by: cumulative time
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-     31/1    0.001    0.000   61.118   61.118 {built-in method builtins.exec}
-        1    0.000    0.000   61.118   61.118 main.py:1(<module>)
-        1    0.000    0.000   61.091   61.091 main.py:7(main)
-        1    0.000    0.000   61.090   61.090 game_controller.py:35(play)
-        3    0.000    0.000   61.070   20.357 game_controller.py:133(_take_ai_turn)
-        3    0.000    0.000   61.070   20.357 ai.py:20(calculate_best_move)
-        3    0.000    0.000   61.064   20.355 ai.py:30(_calculate_move_scores)
- 94369/49    0.338    0.000   61.064    1.246 ai.py:41(_minimax)
-    84353    0.084    0.000   46.830    0.001 engine.py:86(evaluate)
-    84353    2.932    0.000   39.789    0.000 engine.py:108(_get_positional_score)
-  2687443    6.603    0.000   25.477    0.000 engine.py:125(_is_in_endgame)
- 13512844   13.081    0.000   19.942    0.000 board.py:180(_get_piece)
-   142468    0.177    0.000   10.544    0.000 rules.py:170(generate_legal_moves)
- 82740901    9.655    0.000    9.655    0.000 bit_utils.py:5(intersects)
-   137069    0.109    0.000    8.605    0.000 rules.py:41(is_in_check)
-   137069    0.356    0.000    8.468    0.000 move_generator.py:94(calculate_attacker_squares_mask)
-    84353    1.371    0.000    6.957    0.000 engine.py:94(_get_material_score)
-   274138    1.573    0.000    5.561    0.000 move_generator.py:302(_calculate_straight_attacker_squares_mask)
-  2687443    2.635    0.000    5.480    0.000 engine.py:135(_calculate_placement_score_endgame)
-  8130984    2.301    0.000    4.890    0.000 {built-in method builtins.isinstance}
-  1320152    2.962    0.000    4.516    0.000 board.py:112(is_occupied)
-  9327029    2.079    0.000    4.514    0.000 <frozen abc>:117(__instancecheck__)
- 16785271    4.210    0.000    4.210    0.000 board_utils.py:33(enumerate_mask)
-  9327029    2.435    0.000    2.435    0.000 {built-in method _abc._abc_instancecheck}
-   411207    1.232    0.000    1.971    0.000 move_generator.py:288(_calculate_pattern_attacker_squares_mask)
-   845516    0.540    0.000    1.834    0.000 board.py:209(_set_piece)
-   145045    0.075    0.000    1.791    0.000 move_generator.py:241(generate_candidate_moves)
-  2866173    1.753    0.000    1.753    0.000 board.py:140(get_mask)
-    20058    0.009    0.000    1.750    0.000 {built-in method builtins.next}
-    10029    0.028    0.000    1.529    0.000 rules.py:181(is_in_checkmate)
-    10029    0.026    0.000    1.495    0.000 rules.py:186(is_in_stalemate)
-  3007461    0.815    0.000    1.241    0.000 bit_utils.py:9(get_shift)
-   211376    0.150    0.000    1.093    0.000 board.py:171(undo_move)
-   845516    1.091    0.000    1.091    0.000 board.py:249(_clear_square)
-    95154    0.284    0.000    1.056    0.000 move_generator.py:326(_generate_pawn_candidate_moves)
-   211382    0.141    0.000    1.032    0.000 board.py:167(make_move)
-    10023    0.008    0.000    0.940    0.000 {built-in method builtins.hash}
-    10023    0.005    0.000    0.933    0.000 board.py:86(__hash__)
-    10023    0.509    0.000    0.928    0.000 board.py:268(_calculate_zobrist_hash)
-  3007461    0.426    0.000    0.426    0.000 {method 'bit_length' of 'int' objects}
-  2770509    0.407    0.000    0.407    0.000 bit_utils.py:1(signed_shift)
-    32383    0.083    0.000    0.397    0.000 move_generator.py:359(_generate_pattern_candidate_moves)
-    32495    0.091    0.000    0.288    0.000 move_generator.py:383(_generate_straight_candidate_moves)
+     33/1    0.001    0.000   60.644   60.644 {built-in method builtins.exec}
+        1    0.000    0.000   60.644   60.644 main.py:1(<module>)
+        1    0.000    0.000   60.607   60.607 main.py:7(main)
+        1    0.000    0.000   60.606   60.606 game_controller.py:35(play)
+        3    0.000    0.000   60.584   20.195 game_controller.py:133(_take_ai_turn)
+        3    0.000    0.000   60.584   20.195 ai.py:21(calculate_best_move)
+        3    0.000    0.000   60.579   20.193 ai.py:29(_calculate_move_scores)
+ 94369/49    0.342    0.000   60.579    1.236 ai.py:40(_minimax)
+    84353    0.086    0.000   46.381    0.001 engine.py:86(evaluate)
+    84353    2.931    0.000   39.443    0.000 engine.py:108(_get_positional_score)
+  2687443    6.613    0.000   25.229    0.000 engine.py:125(_is_in_endgame)
+ 13512844   12.840    0.000   19.509    0.000 board.py:180(_get_piece)
+   142468    0.176    0.000   10.493    0.000 rules.py:170(generate_legal_moves)
+ 82740901    9.409    0.000    9.409    0.000 bit_utils.py:5(intersects)
+   137069    0.114    0.000    8.550    0.000 rules.py:41(is_in_check)
+   137069    0.358    0.000    8.408    0.000 move_generator.py:95(calculate_attacker_squares_mask)
+    84353    1.376    0.000    6.852    0.000 engine.py:94(_get_material_score)
+   274138    1.562    0.000    5.512    0.000 move_generator.py:303(_calculate_straight_attacker_squares_mask)
+  2687443    2.633    0.000    5.479    0.000 engine.py:135(_calculate_placement_score_endgame)
+  8130994    2.290    0.000    4.887    0.000 {built-in method builtins.isinstance}
+  9327029    2.065    0.000    4.516    0.000 <frozen abc>:117(__instancecheck__)
+  1320152    2.956    0.000    4.476    0.000 board.py:112(is_occupied)
+ 16785271    4.163    0.000    4.163    0.000 board_utils.py:33(enumerate_mask)
+  9327029    2.452    0.000    2.452    0.000 {built-in method _abc._abc_instancecheck}
+   411207    1.231    0.000    1.963    0.000 move_generator.py:289(_calculate_pattern_attacker_squares_mask)
+   845516    0.539    0.000    1.840    0.000 board.py:209(_set_piece)
+   145045    0.076    0.000    1.782    0.000 move_generator.py:242(generate_candidate_moves)
+  2866173    1.765    0.000    1.765    0.000 board.py:140(get_mask)
+    20058    0.009    0.000    1.746    0.000 {built-in method builtins.next}
+    10029    0.027    0.000    1.522    0.000 rules.py:181(is_in_checkmate)
+    10029    0.026    0.000    1.487    0.000 rules.py:186(is_in_stalemate)
+  3007461    0.825    0.000    1.249    0.000 bit_utils.py:9(get_shift)
+   845516    1.097    0.000    1.097    0.000 board.py:249(_clear_square)
+   211376    0.150    0.000    1.096    0.000 board.py:171(undo_move)
+    95154    0.287    0.000    1.051    0.000 move_generator.py:327(_generate_pawn_candidate_moves)
+   211382    0.140    0.000    1.033    0.000 board.py:167(make_move)
+    10023    0.008    0.000    0.934    0.000 {built-in method builtins.hash}
+    10023    0.005    0.000    0.926    0.000 board.py:86(__hash__)
+    10023    0.504    0.000    0.921    0.000 board.py:268(_calculate_zobrist_hash)
+  3007461    0.425    0.000    0.425    0.000 {method 'bit_length' of 'int' objects}
+  2770509    0.406    0.000    0.406    0.000 bit_utils.py:1(signed_shift)
+    32383    0.085    0.000    0.394    0.000 move_generator.py:360(_generate_pattern_candidate_moves)
+    32495    0.091    0.000    0.285    0.000 move_generator.py:384(_generate_straight_candidate_moves)
    991660    0.147    0.000    0.147    0.000 {built-in method builtins.any}
-    94326    0.050    0.000    0.129    0.000 rules.py:36(can_promote)
-   445338    0.085    0.000    0.085    0.000 color.py:11(opposite)
-   171199    0.031    0.000    0.031    0.000 {built-in method builtins.max}
+    94326    0.050    0.000    0.128    0.000 rules.py:36(can_promote)
+   445338    0.083    0.000    0.083    0.000 color.py:11(opposite)
+     40/1    0.000    0.000    0.036    0.036 <frozen importlib._bootstrap>:1360(_find_and_load)
+     40/1    0.000    0.000    0.036    0.036 <frozen importlib._bootstrap>:1308(_find_and_load_unlocked)
+     81/3    0.000    0.000    0.036    0.012 <frozen importlib._bootstrap>:483(_call_with_frames_removed)
+     40/2    0.000    0.000    0.035    0.018 <frozen importlib._bootstrap>:914(_load_unlocked)
+     29/1    0.000    0.000    0.035    0.035 <frozen importlib._bootstrap_external>:753(exec_module)
+        1    0.000    0.000    0.035    0.035 game_controller.py:1(<module>)
+   171203    0.031    0.000    0.031    0.000 {built-in method builtins.max}
     67125    0.028    0.000    0.028    0.000 <string>:2(__init__)
     45694    0.020    0.000    0.027    0.000 board.py:175(moving_to_final_row)
-     37/1    0.000    0.000    0.027    0.027 <frozen importlib._bootstrap>:1360(_find_and_load)
-     37/1    0.000    0.000    0.027    0.027 <frozen importlib._bootstrap>:1308(_find_and_load_unlocked)
-     75/3    0.000    0.000    0.026    0.009 <frozen importlib._bootstrap>:483(_call_with_frames_removed)
-     37/2    0.000    0.000    0.026    0.013 <frozen importlib._bootstrap>:914(_load_unlocked)
-     27/1    0.000    0.000    0.026    0.026 <frozen importlib._bootstrap_external>:753(exec_module)
-        1    0.000    0.000    0.025    0.025 game_controller.py:1(<module>)
-        1    0.000    0.000    0.015    0.015 ai.py:1(<module>)
+       29    0.000    0.000    0.017    0.001 <frozen importlib._bootstrap_external>:826(get_code)
+        1    0.000    0.000    0.016    0.016 ai.py:1(<module>)
+        7    0.002    0.000    0.015    0.002 board_view.py:10(print)
+    10023    0.011    0.000    0.015    0.000 concurrent_transposition_table.py:17(contains)
         1    0.000    0.000    0.013    0.013 board.py:1(<module>)
-        7    0.001    0.000    0.010    0.001 board_view.py:10(print)
-     1329    0.010    0.000    0.010    0.000 {built-in method builtins.print}
-       27    0.000    0.000    0.008    0.000 <frozen importlib._bootstrap_external>:826(get_code)
-        1    0.000    0.000    0.008    0.008 move.py:1(<module>)
-       37    0.000    0.000    0.008    0.000 <frozen importlib._bootstrap>:1243(_find_spec)
-       33    0.000    0.000    0.007    0.000 <frozen importlib._bootstrap_external>:1284(find_spec)
-       33    0.000    0.000    0.007    0.000 <frozen importlib._bootstrap_external>:1255(_get_spec)
-       72    0.001    0.000    0.007    0.000 <frozen importlib._bootstrap_external>:1357(find_spec)
+     1323    0.013    0.000    0.013    0.000 {built-in method builtins.print}
+       30    0.000    0.000    0.012    0.000 <frozen importlib._bootstrap_external>:947(get_data)
+     7980    0.008    0.000    0.012    0.000 concurrent_transposition_table.py:13(set)
+       30    0.011    0.000    0.011    0.000 {built-in method _io.open_code}
+       40    0.000    0.000    0.008    0.000 <frozen importlib._bootstrap>:1243(_find_spec)
+       35    0.000    0.000    0.008    0.000 <frozen importlib._bootstrap_external>:1284(find_spec)
+       35    0.000    0.000    0.008    0.000 <frozen importlib._bootstrap_external>:1255(_get_spec)
+        1    0.000    0.000    0.007    0.007 move.py:1(<module>)
+       77    0.001    0.000    0.007    0.000 <frozen importlib._bootstrap_external>:1357(find_spec)
         1    0.000    0.000    0.006    0.006 piece.py:1(<module>)
-       65    0.001    0.000    0.004    0.000 {built-in method builtins.__build_class__}
+    20108    0.005    0.000    0.005    0.000 {method '__enter__' of '_thread.lock' objects}
+    20108    0.004    0.000    0.004    0.000 {method '__exit__' of '_thread.lock' objects}
+      221    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:145(_path_stat)
         6    0.000    0.000    0.004    0.001 {built-in method builtins.__import__}
-        1    0.000    0.000    0.004    0.004 typing.py:1(<module>)
-      212    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:145(_path_stat)
-       28    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:947(get_data)
-      212    0.004    0.000    0.004    0.000 {built-in method nt.stat}
+      221    0.004    0.000    0.004    0.000 {built-in method nt.stat}
     17507    0.004    0.000    0.004    0.000 {built-in method builtins.min}
+        1    0.002    0.002    0.004    0.004 typing.py:1(<module>)
         3    0.000    0.000    0.003    0.001 dataclasses.py:1431(wrap)
         3    0.000    0.000    0.003    0.001 dataclasses.py:986(_process_class)
-      432    0.002    0.000    0.003    0.000 <frozen importlib._bootstrap_external>:101(_path_join)
-       28    0.002    0.000    0.002    0.000 {built-in method _io.open_code}
+      457    0.002    0.000    0.003    0.000 <frozen importlib._bootstrap_external>:101(_path_join)
+       78    0.001    0.000    0.003    0.000 {built-in method builtins.__build_class__}
+     2104    0.002    0.000    0.002    0.000 concurrent_transposition_table.py:9(get)
         1    0.000    0.000    0.002    0.002 coordinate.py:1(<module>)
-      106    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap_external>:155(_path_is_mode_type)
-       26    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap_external>:509(_compile_bytecode)
-       26    0.001    0.000    0.001    0.000 {built-in method marshal.loads}
-        1    0.001    0.001    0.001    0.001 typing.py:3493(IO)
-       87    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:164(_path_isfile)
-        3    0.000    0.000    0.001    0.000 dataclasses.py:478(add_fns_to_class)
-        7    0.001    0.000    0.001    0.000 {built-in method builtins.input}
+       28    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap_external>:509(_compile_bytecode)
+       28    0.002    0.000    0.002    0.000 {built-in method marshal.loads}
+      108    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap_external>:155(_path_is_mode_type)
+       89    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap_external>:164(_path_isfile)
         4    0.000    0.000    0.001    0.000 game_controller.py:70(_take_player_turn)
+        3    0.000    0.000    0.001    0.000 dataclasses.py:478(add_fns_to_class)
+       40    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:809(module_from_spec)
         1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:971(_cache_bytecode)
-        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:976(set_data)
-        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:200(_write_atomic)
-        1    0.000    0.000    0.001    0.001 game_controller.py:28(configure)
+       58    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:239(cache_from_source)
+        7    0.001    0.000    0.001    0.000 {built-in method builtins.input}
         1    0.000    0.000    0.001    0.001 random.py:1(<module>)
-        3    0.000    0.000    0.001    0.000 game_view.py:51(_prompt_choice)
-       28    0.001    0.000    0.001    0.000 {method 'read' of '_io.BufferedReader' objects}
-       37    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:809(module_from_spec)
-       54    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:239(cache_from_source)
+        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:976(set_data)
         1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:818(source_to_code)
+       30    0.001    0.000    0.001    0.000 {method 'read' of '_io.BufferedReader' objects}
         1    0.001    0.001    0.001    0.001 {built-in method builtins.compile}
-       37    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:736(_init_module_attrs)
-    95/75    0.000    0.000    0.001    0.000 {built-in method __new__ of type object at 0x00007FFAA15A47D0}
-       37    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:419(__enter__)
-       55    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:304(acquire)
-        1    0.001    0.001    0.001    0.001 {built-in method nt.replace}
-       54    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:635(cached)
-       27    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:966(path_stats)
-       27    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:369(_get_cached)
+        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:200(_write_atomic)
+       40    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:736(_init_module_attrs)
+       40    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:419(__enter__)
+    98/78    0.000    0.000    0.001    0.000 {built-in method __new__ of type object at 0x00007FFAA15A47D0}
+       58    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:304(acquire)
+        1    0.000    0.000    0.001    0.001 game_controller.py:28(configure)
+        3    0.000    0.000    0.001    0.000 game_view.py:51(_prompt_choice)
+       31    0.001    0.000    0.001    0.000 {method '__exit__' of '_io._IOBase' objects}
+       58    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:635(cached)
+       29    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:966(path_stats)
+       29    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:369(_get_cached)
        17    0.000    0.000    0.000    0.000 <frozen abc>:105(__new__)
         1    0.000    0.000    0.000    0.000 rules.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 {built-in method nt.replace}
         3    0.000    0.000    0.000    0.000 inspect.py:3318(signature)
         3    0.000    0.000    0.000    0.000 inspect.py:3031(from_callable)
         9    0.000    0.000    0.000    0.000 typing.py:1977(__new__)
@@ -115,449 +120,485 @@
       9/3    0.000    0.000    0.000    0.000 inspect.py:2412(_signature_from_callable)
        36    0.000    0.000    0.000    0.000 typing.py:1541(__init__)
         6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1408(_fill_cache)
-       81    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1233(_path_importer_cache)
+       87    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1233(_path_importer_cache)
       298    0.000    0.000    0.000    0.000 typing.py:1286(__setattr__)
-        1    0.000    0.000    0.000    0.000 game_view.py:1(<module>)
-       29    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
         3    0.000    0.000    0.000    0.000 dataclasses.py:1329(_add_slots)
-        5    0.000    0.000    0.000    0.000 __init__.py:330(_compile)
-        1    0.000    0.000    0.000    0.000 game_view.py:8(prompt_game_mode)
+        1    0.000    0.000    0.000    0.000 threading.py:1(<module>)
         3    0.000    0.000    0.000    0.000 inspect.py:3254(__str__)
+        5    0.000    0.000    0.000    0.000 __init__.py:330(_compile)
         3    0.000    0.000    0.000    0.000 inspect.py:3257(format)
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:162(__enter__)
         6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1220(_path_hooks)
-        1    0.000    0.000    0.000    0.000 game_view.py:21(prompt_player_color)
+        1    0.000    0.000    0.000    0.000 game_view.py:1(<module>)
        19    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:169(_path_isdir)
         6    0.000    0.000    0.000    0.000 {built-in method nt.listdir}
-        2    0.000    0.000    0.000    0.000 _compiler.py:757(compile)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:162(__enter__)
         8    0.000    0.000    0.000    0.000 inspect.py:2769(_format)
-       11    0.000    0.000    0.000    0.000 inspect.py:1338(formatannotation)
-       18    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:466(_lock_unlock_module)
-        1    0.000    0.000    0.000    0.000 game_view.py:15(prompt_ai_depth)
-       35    0.000    0.000    0.000    0.000 enum.py:341(__setitem__)
-        1    0.000    0.000    0.000    0.000 color.py:1(<module>)
-       42    0.000    0.000    0.000    0.000 typing.py:1225(__init__)
-        2    0.000    0.000    0.000    0.000 __init__.py:183(sub)
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1352(_get_spec)
-        3    0.000    0.000    0.000    0.000 rules.py:55(is_in_check_after_move)
+        2    0.000    0.000    0.000    0.000 _compiler.py:757(compile)
         1    0.000    0.000    0.000    0.000 board.py:63(__init__)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:124(setdefault)
-     1621    0.000    0.000    0.000    0.000 {method 'endswith' of 'str' objects}
-        8    0.000    0.000    0.000    0.000 typing.py:2128(__init_subclass__)
-        1    0.000    0.000    0.000    0.000 {built-in method nt.open}
-     1350    0.000    0.000    0.000    0.000 {method 'rstrip' of 'str' objects}
+       11    0.000    0.000    0.000    0.000 inspect.py:1338(formatannotation)
+        1    0.000    0.000    0.000    0.000 color.py:1(<module>)
+       18    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:466(_lock_unlock_module)
         4    0.000    0.000    0.000    0.000 game_view.py:28(prompt_move)
-     1404    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:124(setdefault)
+       35    0.000    0.000    0.000    0.000 enum.py:341(__setitem__)
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1352(_get_spec)
+        1    0.000    0.000    0.000    0.000 game_view.py:8(prompt_game_mode)
+       42    0.000    0.000    0.000    0.000 typing.py:1225(__init__)
+        3    0.000    0.000    0.000    0.000 rules.py:55(is_in_check_after_move)
+        2    0.000    0.000    0.000    0.000 __init__.py:183(sub)
+     1429    0.000    0.000    0.000    0.000 {method 'rstrip' of 'str' objects}
+     1708    0.000    0.000    0.000    0.000 {method 'endswith' of 'str' objects}
+       59    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:137(_path_split)
+        8    0.000    0.000    0.000    0.000 typing.py:2128(__init_subclass__)
+     1460    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}
         1    0.000    0.000    0.000    0.000 promotion_piece.py:1(<module>)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:137(_path_split)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:429(_get_module_lock)
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:560(spec_from_file_location)
-        1    0.000    0.000    0.000    0.000 game_status.py:1(<module>)
-      850    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
-        8    0.000    0.000    0.000    0.000 {method '__init_subclass__' of 'object' objects}
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:372(release)
+        1    0.000    0.000    0.000    0.000 {built-in method nt.open}
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:560(spec_from_file_location)
+        1    0.000    0.000    0.000    0.000 game_view.py:15(prompt_ai_depth)
+  653/650    0.000    0.000    0.000    0.000 {built-in method builtins.getattr}
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:372(release)
+      887    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:429(_get_module_lock)
         6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1449(path_hook_for_FileFinder)
-  635/632    0.000    0.000    0.000    0.000 {built-in method builtins.getattr}
-1381/1377    0.000    0.000    0.000    0.000 {built-in method builtins.len}
-      553    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}
+        8    0.000    0.000    0.000    0.000 {method '__init_subclass__' of 'object' objects}
+        1    0.000    0.000    0.000    0.000 game_view.py:21(prompt_player_color)
+1451/1447    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+        1    0.000    0.000    0.000    0.000 game_status.py:1(<module>)
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:423(__exit__)
         3    0.000    0.000    0.000    0.000 inspect.py:2306(_signature_from_function)
+      582    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}
+        3    0.000    0.000    0.000    0.000 move_parser.py:8(parse_input)
         2    0.000    0.000    0.000    0.000 _parser.py:963(parse)
         1    0.000    0.000    0.000    0.000 game_mode.py:1(<module>)
        11    0.000    0.000    0.000    0.000 enum.py:238(__set_name__)
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:423(__exit__)
       308    0.000    0.000    0.000    0.000 typing.py:1212(_is_dunder)
-        3    0.000    0.000    0.000    0.000 move_parser.py:8(parse_input)
-        2    0.000    0.000    0.000    0.000 _parser.py:452(_parse_sub)
-        4    0.000    0.000    0.000    0.000 typing.py:396(inner)
-        3    0.000    0.000    0.000    0.000 __init__.py:169(fullmatch)
-        8    0.000    0.000    0.000    0.000 typing.py:385(decorator)
-       33    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:190(_path_abspath)
-        1    0.000    0.000    0.000    0.000 typing.py:2912(<generic parameters of SupportsAbs>)
-        2    0.000    0.000    0.000    0.000 _compiler.py:590(_code)
-        6    0.000    0.000    0.000    0.000 <frozen zipimport>:67(__init__)
-        6    0.000    0.000    0.000    0.000 typing.py:1341(__init__)
-       85    0.000    0.000    0.000    0.000 inspect.py:662(unwrap)
-       19    0.000    0.000    0.000    0.000 <frozen abc>:121(__subclasscheck__)
-      768    0.000    0.000    0.000    0.000 {method 'getrandbits' of '_random.Random' objects}
-     16/9    0.000    0.000    0.000    0.000 annotationlib.py:898(get_annotations)
-       33    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:177(_path_isabs)
-       12    0.000    0.000    0.000    0.000 typing.py:1174(_generic_init_subclass)
-        1    0.000    0.000    0.000    0.000 typing.py:2923(<generic parameters of SupportsRound>)
-        8    0.000    0.000    0.000    0.000 typing.py:380(_tp_cache)
       454    0.000    0.000    0.000    0.000 board_utils.py:20(get_mask)
-     16/9    0.000    0.000    0.000    0.000 annotationlib.py:1122(_get_dunder_annotations)
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:424(_classify_pyc)
-        3    0.000    0.000    0.000    0.000 typing.py:1113(_generic_class_getitem)
-       19    0.000    0.000    0.000    0.000 {built-in method _abc._abc_subclasscheck}
-        2    0.000    0.000    0.000    0.000 _parser.py:512(_parse)
-        9    0.000    0.000    0.000    0.000 inspect.py:1909(_signature_get_user_defined_method)
-       24    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1131(__iter__)
-        6    0.000    0.000    0.000    0.000 game.py:13(make_move)
+        3    0.000    0.000    0.000    0.000 __init__.py:169(fullmatch)
+      768    0.000    0.000    0.000    0.000 {method 'getrandbits' of '_random.Random' objects}
+        8    0.000    0.000    0.000    0.000 typing.py:385(decorator)
+        2    0.000    0.000    0.000    0.000 _parser.py:452(_parse_sub)
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:424(_classify_pyc)
+       35    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:190(_path_abspath)
+        4    0.000    0.000    0.000    0.000 typing.py:396(inner)
+        1    0.000    0.000    0.000    0.000 typing.py:2912(<generic parameters of SupportsAbs>)
+        6    0.000    0.000    0.000    0.000 <frozen zipimport>:67(__init__)
+       85    0.000    0.000    0.000    0.000 inspect.py:662(unwrap)
+        2    0.000    0.000    0.000    0.000 _compiler.py:590(_code)
+       86    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:89(_unpack_uint32)
+     16/9    0.000    0.000    0.000    0.000 annotationlib.py:898(get_annotations)
+        6    0.000    0.000    0.000    0.000 typing.py:1341(__init__)
+       35    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:177(_path_isabs)
+        8    0.000    0.000    0.000    0.000 typing.py:380(_tp_cache)
+        1    0.000    0.000    0.000    0.000 typing.py:2923(<generic parameters of SupportsRound>)
         4    0.000    0.000    0.000    0.000 enum.py:465(__prepare__)
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:985(find_spec)
-       17    0.000    0.000    0.000    0.000 functools.py:35(update_wrapper)
-       80    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:89(_unpack_uint32)
-      172    0.000    0.000    0.000    0.000 {built-in method builtins.setattr}
-        9    0.000    0.000    0.000    0.000 typing.py:1996(__init__)
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:457(_validate_timestamp_pyc)
-        1    0.000    0.000    0.000    0.000 color.py:4(Color)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:74(__new__)
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:985(find_spec)
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:74(__new__)
+     16/9    0.000    0.000    0.000    0.000 annotationlib.py:1122(_get_dunder_annotations)
+       25    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1131(__iter__)
+       12    0.000    0.000    0.000    0.000 typing.py:1174(_generic_init_subclass)
+        2    0.000    0.000    0.000    0.000 _parser.py:512(_parse)
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:457(_validate_timestamp_pyc)
         9    0.000    0.000    0.000    0.000 dataclasses.py:825(_get_field)
+        3    0.000    0.000    0.000    0.000 rules.py:63(is_legal_move)
+        3    0.000    0.000    0.000    0.000 typing.py:1113(_generic_class_getitem)
+       17    0.000    0.000    0.000    0.000 functools.py:35(update_wrapper)
+        9    0.000    0.000    0.000    0.000 typing.py:1996(__init__)
+      173    0.000    0.000    0.000    0.000 {built-in method builtins.setattr}
+        1    0.000    0.000    0.000    0.000 color.py:4(Color)
+      177    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:139(<genexpr>)
+        9    0.000    0.000    0.000    0.000 inspect.py:1909(_signature_get_user_defined_method)
+      239    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
         1    0.000    0.000    0.000    0.000 promotion_piece.py:4(PromotionPiece)
         6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1331(__init__)
-      248    0.000    0.000    0.000    0.000 {method 'rpartition' of 'str' objects}
-      165    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:139(<genexpr>)
-        3    0.000    0.000    0.000    0.000 rules.py:63(is_legal_move)
-      228    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
-       24    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1117(_recalculate)
+       25    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1117(_recalculate)
+      265    0.000    0.000    0.000    0.000 {method 'rpartition' of 'str' objects}
+      438    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:494(_verbose_message)
         1    0.000    0.000    0.000    0.000 bisect.py:1(<module>)
-       11    0.000    0.000    0.000    0.000 typing.py:260(_collect_type_parameters)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:82(remove)
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:448(cb)
-        1    0.000    0.000    0.000    0.000 game_status.py:4(GameStatus)
-        9    0.000    0.000    0.000    0.000 typing.py:1842(_get_protocol_attrs)
-      410    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:494(_verbose_message)
-      4/2    0.000    0.000    0.000    0.000 _compiler.py:39(_compile)
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:992(create_module)
         9    0.000    0.000    0.000    0.000 functools.py:593(decorating_function)
-        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:992(create_module)
-       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1113(_get_parent_path)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:79(__init__)
+       11    0.000    0.000    0.000    0.000 typing.py:260(_collect_type_parameters)
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:448(cb)
+        9    0.000    0.000    0.000    0.000 typing.py:1842(_get_protocol_attrs)
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:82(remove)
+        1    0.000    0.000    0.000    0.000 game_status.py:4(GameStatus)
+       31    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1113(_get_parent_path)
+      4/2    0.000    0.000    0.000    0.000 _compiler.py:39(_compile)
+        5    0.000    0.000    0.000    0.000 {built-in method _imp.create_builtin}
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:79(__init__)
+       40    0.000    0.000    0.000    0.000 {built-in method _imp.is_builtin}
+       19    0.000    0.000    0.000    0.000 <frozen abc>:121(__subclasscheck__)
+      240    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 threading.py:1393(__init__)
         3    0.000    0.000    0.000    0.000 dataclasses.py:670(_init_fn)
-      229    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
-       18    0.000    0.000    0.000    0.000 dataclasses.py:446(add_fn)
-        6    0.000    0.000    0.000    0.000 inspect.py:1724(getattr_static)
-        1    0.000    0.000    0.000    0.000 game_mode.py:4(GameMode)
-        4    0.000    0.000    0.000    0.000 {built-in method _imp.create_builtin}
-       11    0.000    0.000    0.000    0.000 inspect.py:2679(__init__)
-       37    0.000    0.000    0.000    0.000 {built-in method _imp.is_builtin}
-      103    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1229(__exit__)
-       35    0.000    0.000    0.000    0.000 {built-in method builtins.delattr}
+      110    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1229(__exit__)
         1    0.000    0.000    0.000    0.000 move_generator.py:1(<module>)
-       33    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1131(find_spec)
-       11    0.000    0.000    0.000    0.000 enum.py:1040(_add_member_)
-       17    0.000    0.000    0.000    0.000 {built-in method _abc._abc_init}
+       11    0.000    0.000    0.000    0.000 inspect.py:2679(__init__)
+       35    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1131(find_spec)
         3    0.000    0.000    0.000    0.000 move_validator.py:7(is_valid_move)
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:232(__init__)
-        3    0.000    0.000    0.000    0.000 inspect.py:2030(_signature_bound_method)
-        6    0.000    0.000    0.000    0.000 inspect.py:1685(_check_class)
-        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:381(_calc_mode)
-       35    0.000    0.000    0.000    0.000 dataclasses.py:1283(_update_func_cell_for__class__)
-      103    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1225(__enter__)
-        6    0.000    0.000    0.000    0.000 inspect.py:2971(__init__)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:728(_frozen_get_del_attr)
-        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
-       14    0.000    0.000    0.000    0.000 coordinate.py:12(from_mask)
-        2    0.000    0.000    0.000    0.000 _compiler.py:525(_compile_info)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:541(__annotate__)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:173(__exit__)
-        1    0.000    0.000    0.000    0.000 engine.py:1(<module>)
-        8    0.000    0.000    0.000    0.000 enum.py:927(_get_mixins_)
         1    0.000    0.000    0.000    0.000 rules.py:118(is_legal_bishop_move)
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:401(_check_name_wrapper)
-        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:522(_code_to_timestamp_pyc)
-       33    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:48(_new_module)
+       18    0.000    0.000    0.000    0.000 dataclasses.py:446(add_fn)
+        1    0.000    0.000    0.000    0.000 game_mode.py:4(GameMode)
+       11    0.000    0.000    0.000    0.000 enum.py:1040(_add_member_)
+       35    0.000    0.000    0.000    0.000 {built-in method builtins.delattr}
+       19    0.000    0.000    0.000    0.000 {built-in method _abc._abc_subclasscheck}
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:232(__init__)
+       35    0.000    0.000    0.000    0.000 dataclasses.py:1283(_update_func_cell_for__class__)
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:401(_check_name_wrapper)
+      110    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1225(__enter__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:381(_calc_mode)
+       14    0.000    0.000    0.000    0.000 coordinate.py:12(from_mask)
+       17    0.000    0.000    0.000    0.000 {built-in method _abc._abc_init}
+        3    0.000    0.000    0.000    0.000 dataclasses.py:541(__annotate__)
+        6    0.000    0.000    0.000    0.000 inspect.py:2971(__init__)
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:173(__exit__)
+        3    0.000    0.000    0.000    0.000 inspect.py:2030(_signature_bound_method)
+       35    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:48(_new_module)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:728(_frozen_get_del_attr)
         7    0.000    0.000    0.000    0.000 {built-in method builtins.round}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        6    0.000    0.000    0.000    0.000 game.py:13(make_move)
+        2    0.000    0.000    0.000    0.000 _compiler.py:525(_compile_info)
+        8    0.000    0.000    0.000    0.000 enum.py:927(_get_mixins_)
+        6    0.000    0.000    0.000    0.000 inspect.py:1724(getattr_static)
         1    0.000    0.000    0.000    0.000 typing.py:526(_SpecialForm)
-      110    0.000    0.000    0.000    0.000 {method '__enter__' of '_thread.RLock' objects}
-       35    0.000    0.000    0.000    0.000 enum.py:77(_is_private)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:522(_code_to_timestamp_pyc)
+      117    0.000    0.000    0.000    0.000 {method '__enter__' of '_thread.RLock' objects}
         1    0.000    0.000    0.000    0.000 piece.py:8(__annotate__)
+       35    0.000    0.000    0.000    0.000 enum.py:77(_is_private)
        30    0.000    0.000    0.000    0.000 {method 'extend' of 'list' objects}
-      195    0.000    0.000    0.000    0.000 {built-in method _imp.release_lock}
+      208    0.000    0.000    0.000    0.000 {built-in method _imp.release_lock}
+      208    0.000    0.000    0.000    0.000 {built-in method _imp.acquire_lock}
+        2    0.000    0.000    0.000    0.000 {method 'sub' of 're.Pattern' objects}
         1    0.000    0.000    0.000    0.000 typing.py:564(__getitem__)
-       21    0.000    0.000    0.000    0.000 dataclasses.py:922(_set_new_attribute)
-      195    0.000    0.000    0.000    0.000 {built-in method _imp.acquire_lock}
+      117    0.000    0.000    0.000    0.000 {method '__exit__' of '_thread.RLock' objects}
+       35    0.000    0.000    0.000    0.000 {built-in method nt._path_splitroot}
        35    0.000    0.000    0.000    0.000 enum.py:745(__delattr__)
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:648(parent)
         1    0.000    0.000    0.000    0.000 typing.py:699(ClassVar)
-      110    0.000    0.000    0.000    0.000 {method '__exit__' of '_thread.RLock' objects}
-       72    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:67(_relax_case)
-       33    0.000    0.000    0.000    0.000 {built-in method nt._path_splitroot}
-        1    0.000    0.000    0.000    0.000 board_utils.py:1(<module>)
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:648(parent)
-        1    0.000    0.000    0.000    0.000 random.py:119(__init__)
-       55    0.000    0.000    0.000    0.000 {built-in method _weakref._remove_dead_weakref}
-       80    0.000    0.000    0.000    0.000 {built-in method from_bytes}
-        3    0.000    0.000    0.000    0.000 inspect.py:3049(replace)
-        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:665(spec_from_loader)
+       77    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:67(_relax_case)
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:665(spec_from_loader)
+        9    0.000    0.000    0.000    0.000 dataclasses.py:391(field)
+        6    0.000    0.000    0.000    0.000 inspect.py:1685(_check_class)
+        1    0.000    0.000    0.000    0.000 move_generator.py:200(calculate_intermediate_squares_mask)
+      118    0.000    0.000    0.000    0.000 {method 'rfind' of 'str' objects}
+       21    0.000    0.000    0.000    0.000 dataclasses.py:922(_set_new_attribute)
+       86    0.000    0.000    0.000    0.000 {built-in method from_bytes}
+        1    0.000    0.000    0.000    0.000 engine.py:1(<module>)
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1000(exec_module)
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1096(__init__)
+       31    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1103(_find_parent_path_names)
+        7    0.000    0.000    0.000    0.000 typing.py:2258(runtime_checkable)
        40    0.000    0.000    0.000    0.000 {method 'update' of 'dict' objects}
         8    0.000    0.000    0.000    0.000 enum.py:968(_find_data_type_)
-        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1096(__init__)
-       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1103(_find_parent_path_names)
-      110    0.000    0.000    0.000    0.000 {method 'rfind' of 'str' objects}
+       90    0.000    0.000    0.000    0.000 {method 'pop' of 'list' objects}
+        3    0.000    0.000    0.000    0.000 <frozen abc>:146(update_abstractmethods)
+       58    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
        15    0.000    0.000    0.000    0.000 enum.py:810(__setattr__)
-        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1000(exec_module)
-       86    0.000    0.000    0.000    0.000 {method 'pop' of 'list' objects}
-       10    0.000    0.000    0.000    0.000 typing.py:1276(__getattr__)
-        7    0.000    0.000    0.000    0.000 typing.py:2258(runtime_checkable)
+        1    0.000    0.000    0.000    0.000 threading.py:880(__init__)
+      116    0.000    0.000    0.000    0.000 {built-in method _thread.get_ident}
+        1    0.000    0.000    0.000    0.000 random.py:119(__init__)
+        3    0.000    0.000    0.000    0.000 inspect.py:3049(replace)
         1    0.000    0.000    0.000    0.000 {built-in method _io.open}
-      110    0.000    0.000    0.000    0.000 {built-in method _thread.get_ident}
-       55    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
-        1    0.000    0.000    0.000    0.000 {built-in method marshal.dumps}
+       10    0.000    0.000    0.000    0.000 typing.py:1276(__getattr__)
         4    0.000    0.000    0.000    0.000 enum.py:995(_find_new_)
+        1    0.000    0.000    0.000    0.000 {built-in method marshal.dumps}
+       58    0.000    0.000    0.000    0.000 {built-in method _weakref._remove_dead_weakref}
+        1    0.000    0.000    0.000    0.000 move_parser.py:1(<module>)
+        5    0.000    0.000    0.000    0.000 {built-in method _imp.exec_builtin}
+       52    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:602(__init__)
+        1    0.000    0.000    0.000    0.000 board_view.py:1(<module>)
        31    0.000    0.000    0.000    0.000 enum.py:46(_is_dunder)
        35    0.000    0.000    0.000    0.000 enum.py:57(_is_sunder)
-        7    0.000    0.000    0.000    0.000 dataclasses.py:751(_is_classvar)
-        1    0.000    0.000    0.000    0.000 board_view.py:1(<module>)
-       49    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:602(__init__)
-        1    0.000    0.000    0.000    0.000 move_validator.py:1(<module>)
-       12    0.000    0.000    0.000    0.000 enum.py:676(__call__)
-       55    0.000    0.000    0.000    0.000 {method 'remove' of 'list' objects}
-        1    0.000    0.000    0.000    0.000 typing.py:1315(_GenericAlias)
-        5    0.000    0.000    0.000    0.000 typing.py:1026(_is_unpacked_typevartuple)
-        1    0.000    0.000    0.000    0.000 game.py:1(<module>)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:943(_hash_add)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:1304(_create_slots)
-        1    0.000    0.000    0.000    0.000 move_generator.py:199(calculate_intermediate_squares_mask)
-        1    0.000    0.000    0.000    0.000 typing.py:1540(_SpecialGenericAlias)
-       81    0.000    0.000    0.000    0.000 {built-in method nt.fspath}
-       42    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
-        1    0.000    0.000    0.000    0.000 move_parser.py:1(<module>)
-        1    0.000    0.000    0.000    0.000 random.py:128(seed)
-        1    0.000    0.000    0.000    0.000 typing.py:1632(_CallableType)
-        4    0.000    0.000    0.000    0.000 {built-in method _imp.exec_builtin}
-        1    0.000    0.000    0.000    0.000 typing.py:1601(__init__)
-       29    0.000    0.000    0.000    0.000 {method '__enter__' of '_io._IOBase' objects}
-        7    0.000    0.000    0.000    0.000 inspect.py:1711(_shadowed_dict)
         1    0.000    0.000    0.000    0.000 ai_factory.py:1(<module>)
-        1    0.000    0.000    0.000    0.000 ai_factory.py:5(get_ai)
-        2    0.000    0.000    0.000    0.000 {method 'sub' of 're.Pattern' objects}
-        2    0.000    0.000    0.000    0.000 _compiler.py:248(_optimize_charset)
+       58    0.000    0.000    0.000    0.000 {method 'remove' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 typing.py:1315(_GenericAlias)
+       12    0.000    0.000    0.000    0.000 enum.py:676(__call__)
+        1    0.000    0.000    0.000    0.000 move_validator.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 typing.py:1540(_SpecialGenericAlias)
+        1    0.000    0.000    0.000    0.000 game.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 random.py:128(seed)
+        5    0.000    0.000    0.000    0.000 typing.py:1026(_is_unpacked_typevartuple)
+        1    0.000    0.000    0.000    0.000 typing.py:3493(IO)
+        1    0.000    0.000    0.000    0.000 concurrent_transposition_table.py:1(<module>)
+       44    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
+        3    0.000    0.000    0.000    0.000 dataclasses.py:1304(_create_slots)
+       31    0.000    0.000    0.000    0.000 {method '__enter__' of '_io._IOBase' objects}
+        1    0.000    0.000    0.000    0.000 typing.py:1632(_CallableType)
+        7    0.000    0.000    0.000    0.000 inspect.py:1711(_shadowed_dict)
+        7    0.000    0.000    0.000    0.000 dataclasses.py:751(_is_classvar)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:943(_hash_add)
         1    0.000    0.000    0.000    0.000 typing.py:1665(_TupleType)
-       13    0.000    0.000    0.000    0.000 enum.py:36(_is_descriptor)
-       11    0.000    0.000    0.000    0.000 enum.py:1234(_generate_next_value_)
+       87    0.000    0.000    0.000    0.000 {built-in method nt.fspath}
+        1    0.000    0.000    0.000    0.000 typing.py:1601(__init__)
         3    0.000    0.000    0.000    0.000 dataclasses.py:415(_fields_in_init_order)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:1445(fields)
-        9    0.000    0.000    0.000    0.000 dataclasses.py:391(field)
-       36    0.000    0.000    0.000    0.000 {method 'index' of 'tuple' objects}
         3    0.000    0.000    0.000    0.000 cp1252.py:22(decode)
-       30    0.000    0.000    0.000    0.000 {method 'partition' of 'str' objects}
-        8    0.000    0.000    0.000    0.000 dataclasses.py:591(_field_init)
-        3    0.000    0.000    0.000    0.000 inspect.py:2056(_signature_is_builtin)
-        3    0.000    0.000    0.000    0.000 <frozen abc>:146(update_abstractmethods)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:1445(fields)
+       36    0.000    0.000    0.000    0.000 {method 'index' of 'tuple' objects}
+       11    0.000    0.000    0.000    0.000 enum.py:1234(_generate_next_value_)
+       35    0.000    0.000    0.000    0.000 {built-in method _imp.find_frozen}
+        1    0.000    0.000    0.000    0.000 threading.py:869(Thread)
+        2    0.000    0.000    0.000    0.000 _compiler.py:248(_optimize_charset)
+       13    0.000    0.000    0.000    0.000 enum.py:36(_is_descriptor)
        49    0.000    0.000    0.000    0.000 {method 'get' of 'mappingproxy' objects}
-        3    0.000    0.000    0.000    0.000 reprlib.py:12(decorating_function)
+        1    0.000    0.000    0.000    0.000 rules.py:110(is_legal_knight_move)
+       56    0.000    0.000    0.000    0.000 {method 'add' of 'set' objects}
        91    0.000    0.000    0.000    0.000 {built-in method builtins.id}
-        7    0.000    0.000    0.000    0.000 typing.py:2483(get_origin)
-       54    0.000    0.000    0.000    0.000 {method 'add' of 'set' objects}
-       33    0.000    0.000    0.000    0.000 {built-in method _imp.find_frozen}
-        1    0.000    0.000    0.000    0.000 random.py:103(Random)
-       22    0.000    0.000    0.000    0.000 enum.py:413(<genexpr>)
-        4    0.000    0.000    0.000    0.000 typing.py:3827(__getattr__)
-      4/2    0.000    0.000    0.000    0.000 _parser.py:178(getwidth)
+        1    0.000    0.000    0.000    0.000 threading.py:630(set)
+        3    0.000    0.000    0.000    0.000 inspect.py:2056(_signature_is_builtin)
+       28    0.000    0.000    0.000    0.000 {built-in method _imp._fix_co_filename}
+        3    0.000    0.000    0.000    0.000 reprlib.py:12(decorating_function)
+        1    0.000    0.000    0.000    0.000 ai_factory.py:5(get_ai)
        16    0.000    0.000    0.000    0.000 _parser.py:168(__getitem__)
-       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:158(__init__)
-       85    0.000    0.000    0.000    0.000 {built-in method sys.getrecursionlimit}
-        1    0.000    0.000    0.000    0.000 {function Random.seed at 0x000005D63C86A200}
-       37    0.000    0.000    0.000    0.000 {built-in method _thread.allocate_lock}
+        8    0.000    0.000    0.000    0.000 dataclasses.py:591(_field_init)
         1    0.000    0.000    0.000    0.000 rules.py:35(Rules)
+       40    0.000    0.000    0.000    0.000 {built-in method _thread.allocate_lock}
+       58    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:158(__init__)
+       22    0.000    0.000    0.000    0.000 enum.py:413(<genexpr>)
+       10    0.000    0.000    0.000    0.000 {built-in method nt.getcwd}
+       35    0.000    0.000    0.000    0.000 <frozen abc>:7(abstractmethod)
+        1    0.000    0.000    0.000    0.000 {function Random.seed at 0x0000038DA2F40F00}
+       31    0.000    0.000    0.000    0.000 {method 'partition' of 'str' objects}
+        7    0.000    0.000    0.000    0.000 typing.py:2483(get_origin)
+       56    0.000    0.000    0.000    0.000 {method 'lower' of 'str' objects}
         2    0.000    0.000    0.000    0.000 typing.py:184(_type_check)
-        1    0.000    0.000    0.000    0.000 game_view.py:7(GameView)
-        6    0.000    0.000    0.000    0.000 board_utils.py:13(is_coordinate_in_bounds)
-       54    0.000    0.000    0.000    0.000 {method 'lower' of 'str' objects}
+       85    0.000    0.000    0.000    0.000 {built-in method sys.getrecursionlimit}
+        4    0.000    0.000    0.000    0.000 typing.py:3827(__getattr__)
+        1    0.000    0.000    0.000    0.000 random.py:103(Random)
+        1    0.000    0.000    0.000    0.000 enum.py:1593(__and__)
+       14    0.000    0.000    0.000    0.000 {method 'format' of 'str' objects}
        48    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1337(<genexpr>)
         1    0.000    0.000    0.000    0.000 functools.py:726(cache)
-        1    0.000    0.000    0.000    0.000 move_generator.py:93(MoveGenerator)
-        9    0.000    0.000    0.000    0.000 {built-in method nt.getcwd}
-       13    0.000    0.000    0.000    0.000 {built-in method builtins.repr}
-       35    0.000    0.000    0.000    0.000 <frozen abc>:7(abstractmethod)
        45    0.000    0.000    0.000    0.000 {built-in method builtins.issubclass}
-        1    0.000    0.000    0.000    0.000 enum.py:1593(__and__)
-        4    0.000    0.000    0.000    0.000 enum.py:917(_check_for_existing_members_)
-        1    0.000    0.000    0.000    0.000 <string>:1(__create_fn__)
-       14    0.000    0.000    0.000    0.000 {method 'format' of 'str' objects}
-       26    0.000    0.000    0.000    0.000 {built-in method _imp._fix_co_filename}
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:415(__init__)
-        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:504(_requires_builtin_wrapper)
-       11    0.000    0.000    0.000    0.000 dataclasses.py:733(<genexpr>)
-        5    0.000    0.000    0.000    0.000 typing.py:1517(__mro_entries__)
-        9    0.000    0.000    0.000    0.000 functools.py:553(lru_cache)
-        1    0.000    0.000    0.000    0.000 rules.py:82(is_legal_pawn_move)
-        1    0.000    0.000    0.000    0.000 typing.py:3606(TextIO)
-       14    0.000    0.000    0.000    0.000 inspect.py:3026(<genexpr>)
-        3    0.000    0.000    0.000    0.000 inspect.py:2403(_descriptor_get)
-        1    0.000    0.000    0.000    0.000 rules.py:110(is_legal_knight_move)
-        2    0.000    0.000    0.000    0.000 _parser.py:312(_class_escape)
-       17    0.000    0.000    0.000    0.000 typing.py:529(__init__)
-        4    0.000    0.000    0.000    0.000 enum.py:333(__init__)
+        1    0.000    0.000    0.000    0.000 move_generator.py:94(MoveGenerator)
         4    0.000    0.000    0.000    0.000 inspect.py:1342(repl)
-       11    0.000    0.000    0.000    0.000 enum.py:68(_is_internal_class)
-        8    0.000    0.000    0.000    0.000 _parser.py:261(get)
-       16    0.000    0.000    0.000    0.000 typing.py:2133(<genexpr>)
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:917(__init__)
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:504(_requires_builtin_wrapper)
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:415(__init__)
+      4/2    0.000    0.000    0.000    0.000 _parser.py:178(getwidth)
+        6    0.000    0.000    0.000    0.000 board_utils.py:13(is_coordinate_in_bounds)
+        9    0.000    0.000    0.000    0.000 functools.py:553(lru_cache)
+        1    0.000    0.000    0.000    0.000 threading.py:602(__init__)
+        4    0.000    0.000    0.000    0.000 enum.py:917(_check_for_existing_members_)
+       11    0.000    0.000    0.000    0.000 _parser.py:256(match)
+        1    0.000    0.000    0.000    0.000 board_utils.py:1(<module>)
+       13    0.000    0.000    0.000    0.000 {built-in method builtins.repr}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1401(_handle_fromlist)
+       17    0.000    0.000    0.000    0.000 typing.py:529(__init__)
+        1    0.000    0.000    0.000    0.000 game_view.py:7(GameView)
+        1    0.000    0.000    0.000    0.000 rules.py:82(is_legal_pawn_move)
+       14    0.000    0.000    0.000    0.000 inspect.py:3026(<genexpr>)
+        5    0.000    0.000    0.000    0.000 typing.py:1517(__mro_entries__)
+       11    0.000    0.000    0.000    0.000 dataclasses.py:733(<genexpr>)
+        1    0.000    0.000    0.000    0.000 typing.py:3606(TextIO)
        11    0.000    0.000    0.000    0.000 _parser.py:240(__next)
+        3    0.000    0.000    0.000    0.000 inspect.py:2403(_descriptor_get)
+        8    0.000    0.000    0.000    0.000 _parser.py:261(get)
+        4    0.000    0.000    0.000    0.000 enum.py:333(__init__)
+        1    0.000    0.000    0.000    0.000 <string>:1(__create_fn__)
+        2    0.000    0.000    0.000    0.000 _parser.py:312(_class_escape)
         3    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:79(_pack_uint32)
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:917(__init__)
+        1    0.000    0.000    0.000    0.000 threading.py:438(notify_all)
         3    0.000    0.000    0.000    0.000 {method 'fullmatch' of 're.Pattern' objects}
-        7    0.000    0.000    0.000    0.000 {method 'rjust' of 'str' objects}
-        8    0.000    0.000    0.000    0.000 dataclasses.py:579(_field_assign)
-        1    0.000    0.000    0.000    0.000 board.py:62(Board)
         1    0.000    0.000    0.000    0.000 engine.py:85(Engine)
+        1    0.000    0.000    0.000    0.000 board.py:62(Board)
         2    0.000    0.000    0.000    0.000 _parser.py:231(__init__)
+       40    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:656(has_location)
+        7    0.000    0.000    0.000    0.000 {method 'rjust' of 'str' objects}
+       11    0.000    0.000    0.000    0.000 enum.py:68(_is_internal_class)
         3    0.000    0.000    0.000    0.000 inspect.py:2070(_signature_is_functionlike)
-       37    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:656(has_location)
-        1    0.000    0.000    0.000    0.000 {method 'write' of '_io.BufferedWriter' objects}
-       15    0.000    0.000    0.000    0.000 {method 'setdefault' of 'dict' objects}
-        6    0.000    0.000    0.000    0.000 typing.py:1127(<genexpr>)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:424(_tuple_str)
-       24    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
+       16    0.000    0.000    0.000    0.000 typing.py:2133(<genexpr>)
         2    0.000    0.000    0.000    0.000 board_utils.py:29(is_diagonal)
+        1    0.000    0.000    0.000    0.000 board_utils.py:25(is_orthogonal)
+       15    0.000    0.000    0.000    0.000 {method 'setdefault' of 'dict' objects}
+        8    0.000    0.000    0.000    0.000 functools.py:65(wraps)
+        1    0.000    0.000    0.000    0.000 ai.py:17(__init__)
+        1    0.000    0.000    0.000    0.000 threading.py:290(__init__)
+        1    0.000    0.000    0.000    0.000 {method 'write' of '_io.BufferedWriter' objects}
+        8    0.000    0.000    0.000    0.000 dataclasses.py:579(_field_assign)
+        1    0.000    0.000    0.000    0.000 threading.py:685(Barrier)
+        6    0.000    0.000    0.000    0.000 typing.py:1127(<genexpr>)
+       25    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
         3    0.000    0.000    0.000    0.000 {built-in method sys._clear_type_descriptors}
         2    0.000    0.000    0.000    0.000 _compiler.py:221(_compile_charset)
-        8    0.000    0.000    0.000    0.000 functools.py:65(wraps)
-        2    0.000    0.000    0.000    0.000 _compiler.py:412(_simple)
-        6    0.000    0.000    0.000    0.000 typing.py:1355(__eq__)
-        1    0.000    0.000    0.000    0.000 ai.py:14(__init__)
-        7    0.000    0.000    0.000    0.000 {built-in method builtins.sorted}
         1    0.000    0.000    0.000    0.000 {built-in method math.exp}
-       12    0.000    0.000    0.000    0.000 enum.py:1145(__new__)
-        1    0.000    0.000    0.000    0.000 coordinate.py:7(Coordinate)
-        9    0.000    0.000    0.000    0.000 inspect.py:184(isclass)
-        9    0.000    0.000    0.000    0.000 inspect.py:267(isfunction)
-       11    0.000    0.000    0.000    0.000 _parser.py:256(match)
-        9    0.000    0.000    0.000    0.000 {method 'values' of 'mappingproxy' objects}
-       22    0.000    0.000    0.000    0.000 {built-in method builtins.callable}
-        4    0.000    0.000    0.000    0.000 enum.py:946(_find_data_repr_)
-        2    0.000    0.000    0.000    0.000 _compiler.py:450(_get_literal_prefix)
-       11    0.000    0.000    0.000    0.000 dataclasses.py:1460(<genexpr>)
-        5    0.000    0.000    0.000    0.000 _parser.py:293(tell)
-        3    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
-       11    0.000    0.000    0.000    0.000 {method '__contains__' of 'frozenset' objects}
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:942(get_filename)
+        2    0.000    0.000    0.000    0.000 _compiler.py:412(_simple)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:424(_tuple_str)
+        7    0.000    0.000    0.000    0.000 {built-in method builtins.sorted}
         3    0.000    0.000    0.000    0.000 annotationlib.py:1105(_get_and_call_annotate)
-        8    0.000    0.000    0.000    0.000 _parser.py:164(__len__)
-        1    0.000    0.000    0.000    0.000 typing.py:3752(<generic parameters of override>)
-        1    0.000    0.000    0.000    0.000 board_utils.py:25(is_orthogonal)
-        9    0.000    0.000    0.000    0.000 dataclasses.py:294(__init__)
-        1    0.000    0.000    0.000    0.000 inspect.py:1692(_shadowed_dict_from_weakref_mro_tuple)
-        5    0.000    0.000    0.000    0.000 typing.py:175(_type_convert)
-        3    0.000    0.000    0.000    0.000 {method 'index' of 'list' objects}
-       27    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:750(create_module)
-        1    0.000    0.000    0.000    0.000 bit_utils.py:1(<module>)
-       30    0.000    0.000    0.000    0.000 inspect.py:2744(kind)
-        1    0.000    0.000    0.000    0.000 move.py:9(__annotate__)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:536(_make_annotate_function)
-        1    0.000    0.000    0.000    0.000 typing.py:2144(_AnnotatedAlias)
-        3    0.000    0.000    0.000    0.000 enum.py:1575(_get_value)
-       12    0.000    0.000    0.000    0.000 typing.py:1345(<genexpr>)
         1    0.000    0.000    0.000    0.000 game_controller.py:19(GameController)
-        1    0.000    0.000    0.000    0.000 move.py:9(Move)
-        1    0.000    0.000    0.000    0.000 typing.py:3592(BinaryIO)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:437(__init__)
+        9    0.000    0.000    0.000    0.000 {method 'values' of 'mappingproxy' objects}
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:942(get_filename)
+        6    0.000    0.000    0.000    0.000 typing.py:1355(__eq__)
+        2    0.000    0.000    0.000    0.000 {method 'setter' of 'property' objects}
+       22    0.000    0.000    0.000    0.000 {built-in method builtins.callable}
+       12    0.000    0.000    0.000    0.000 enum.py:1145(__new__)
+        1    0.000    0.000    0.000    0.000 threading.py:146(_RLock)
+       11    0.000    0.000    0.000    0.000 dataclasses.py:1460(<genexpr>)
+        9    0.000    0.000    0.000    0.000 inspect.py:184(isclass)
+       30    0.000    0.000    0.000    0.000 inspect.py:2744(kind)
+        5    0.000    0.000    0.000    0.000 typing.py:175(_type_convert)
+        8    0.000    0.000    0.000    0.000 _parser.py:164(__len__)
+        3    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
+        4    0.000    0.000    0.000    0.000 enum.py:946(_find_data_repr_)
+        1    0.000    0.000    0.000    0.000 coordinate.py:7(Coordinate)
+       29    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:750(create_module)
+        9    0.000    0.000    0.000    0.000 inspect.py:267(isfunction)
         8    0.000    0.000    0.000    0.000 dataclasses.py:756(_is_initvar)
-        1    0.000    0.000    0.000    0.000 typing.py:2857(SupportsInt)
-        9    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
-       12    0.000    0.000    0.000    0.000 {method 'values' of 'dict' objects}
-        2    0.000    0.000    0.000    0.000 typing.py:310(_check_generic_specialization)
-       14    0.000    0.000    0.000    0.000 {built-in method builtins.divmod}
-        3    0.000    0.000    0.000    0.000 inspect.py:196(ismethoddescriptor)
-        1    0.000    0.000    0.000    0.000 dataclasses.py:1260(_get_slots)
-        1    0.000    0.000    0.000    0.000 typing.py:3423(NewType)
-        1    0.000    0.000    0.000    0.000 typing.py:3660(_IdentityCallable)
-        2    0.000    0.000    0.000    0.000 {built-in method _sre.compile}
-        1    0.000    0.000    0.000    0.000 _parser.py:449(_uniq)
-       12    0.000    0.000    0.000    0.000 board_utils.py:9(is_index_in_bounds)
-       11    0.000    0.000    0.000    0.000 {method 'isidentifier' of 'str' objects}
-        1    0.000    0.000    0.000    0.000 board_view.py:9(BoardView)
-        2    0.000    0.000    0.000    0.000 {built-in method math.log}
-       11    0.000    0.000    0.000    0.000 dataclasses.py:419(<genexpr>)
+       11    0.000    0.000    0.000    0.000 {method '__contains__' of 'frozenset' objects}
+        2    0.000    0.000    0.000    0.000 _compiler.py:450(_get_literal_prefix)
+        9    0.000    0.000    0.000    0.000 dataclasses.py:294(__init__)
+        1    0.000    0.000    0.000    0.000 random.py:888(SystemRandom)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:536(_make_annotate_function)
         1    0.000    0.000    0.000    0.000 move_parser.py:7(MoveParser)
+        1    0.000    0.000    0.000    0.000 typing.py:2144(_AnnotatedAlias)
+       12    0.000    0.000    0.000    0.000 {method 'values' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 inspect.py:1692(_shadowed_dict_from_weakref_mro_tuple)
+        1    0.000    0.000    0.000    0.000 threading.py:408(notify)
+        5    0.000    0.000    0.000    0.000 _parser.py:293(tell)
+       11    0.000    0.000    0.000    0.000 {method 'isidentifier' of 'str' objects}
+        3    0.000    0.000    0.000    0.000 enum.py:1575(_get_value)
+        9    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
+        3    0.000    0.000    0.000    0.000 {method 'index' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 threading.py:1361(Timer)
+        1    0.000    0.000    0.000    0.000 move.py:9(__annotate__)
+        1    0.000    0.000    0.000    0.000 _parser.py:449(_uniq)
+       14    0.000    0.000    0.000    0.000 {built-in method builtins.divmod}
        13    0.000    0.000    0.000    0.000 typing.py:501(__init_subclass__)
+        1    0.000    0.000    0.000    0.000 _weakrefset.py:12(__init__)
+       12    0.000    0.000    0.000    0.000 typing.py:1345(<genexpr>)
+        2    0.000    0.000    0.000    0.000 {built-in method math.log}
+        3    0.000    0.000    0.000    0.000 inspect.py:196(ismethoddescriptor)
+        1    0.000    0.000    0.000    0.000 move.py:9(Move)
+        1    0.000    0.000    0.000    0.000 board_view.py:9(BoardView)
        19    0.000    0.000    0.000    0.000 inspect.py:2732(name)
-        1    0.000    0.000    0.000    0.000 typing.py:1215(_BaseGenericAlias)
-        1    0.000    0.000    0.000    0.000 move_validator.py:6(MoveValidator)
+        4    0.000    0.000    0.000    0.000 _compiler.py:587(isstring)
+       11    0.000    0.000    0.000    0.000 dataclasses.py:419(<genexpr>)
+        1    0.000    0.000    0.000    0.000 typing.py:2901(SupportsIndex)
         8    0.000    0.000    0.000    0.000 dataclasses.py:651(_init_param)
-       11    0.000    0.000    0.000    0.000 dataclasses.py:1233(<genexpr>)
+        1    0.000    0.000    0.000    0.000 ai_factory.py:4(AiFactory)
+        1    0.000    0.000    0.000    0.000 move_validator.py:6(MoveValidator)
+        1    0.000    0.000    0.000    0.000 typing.py:3592(BinaryIO)
+        1    0.000    0.000    0.000    0.000 dataclasses.py:1260(_get_slots)
         1    0.000    0.000    0.000    0.000 random.py:225(__init_subclass__)
+       12    0.000    0.000    0.000    0.000 board_utils.py:9(is_index_in_bounds)
+        2    0.000    0.000    0.000    0.000 typing.py:310(_check_generic_specialization)
+        1    0.000    0.000    0.000    0.000 typing.py:1679(_UnionGenericAliasMeta)
+        1    0.000    0.000    0.000    0.000 typing.py:3660(_IdentityCallable)
+        3    0.000    0.000    0.000    0.000 reprlib.py:9(recursive_repr)
+        9    0.000    0.000    0.000    0.000 dataclasses.py:762(_is_kw_only)
+        1    0.000    0.000    0.000    0.000 concurrent_transposition_table.py:5(__init__)
+        1    0.000    0.000    0.000    0.000 typing.py:2857(SupportsInt)
+        1    0.000    0.000    0.000    0.000 game.py:8(__init__)
+       11    0.000    0.000    0.000    0.000 enum.py:235(__init__)
+       11    0.000    0.000    0.000    0.000 dataclasses.py:1233(<genexpr>)
+        1    0.000    0.000    0.000    0.000 typing.py:1215(_BaseGenericAlias)
+        1    0.000    0.000    0.000    0.000 concurrent_transposition_table.py:4(ConcurrentTranspositionTable)
+        1    0.000    0.000    0.000    0.000 threading.py:313(__enter__)
+        1    0.000    0.000    0.000    0.000 threading.py:278(Condition)
+        2    0.000    0.000    0.000    0.000 _compiler.py:481(_get_charset_prefix)
+        1    0.000    0.000    0.000    0.000 _weakrefset.py:45(add)
+        1    0.000    0.000    0.000    0.000 typing.py:2868(SupportsFloat)
+        1    0.000    0.000    0.000    0.000 {built-in method _thread._get_main_thread_ident}
+       11    0.000    0.000    0.000    0.000 dataclasses.py:1344(<genexpr>)
+       11    0.000    0.000    0.000    0.000 dataclasses.py:1169(<genexpr>)
+        1    0.000    0.000    0.000    0.000 game_controller.py:20(__init__)
+        1    0.000    0.000    0.000    0.000 ai.py:16(Ai)
         1    0.000    0.000    0.000    0.000 typing.py:1791(_UnpackGenericAlias)
         1    0.000    0.000    0.000    0.000 typing.py:2923(SupportsRound)
-        4    0.000    0.000    0.000    0.000 _compiler.py:587(isstring)
-        1    0.000    0.000    0.000    0.000 typing.py:2912(SupportsAbs)
-        1    0.000    0.000    0.000    0.000 ai_factory.py:4(AiFactory)
-        1    0.000    0.000    0.000    0.000 typing.py:2868(SupportsFloat)
-        1    0.000    0.000    0.000    0.000 typing.py:2879(SupportsComplex)
-       11    0.000    0.000    0.000    0.000 enum.py:235(__init__)
-        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1401(_handle_fromlist)
-        1    0.000    0.000    0.000    0.000 random.py:888(SystemRandom)
-       11    0.000    0.000    0.000    0.000 dataclasses.py:1344(<genexpr>)
-        1    0.000    0.000    0.000    0.000 ai.py:13(Ai)
-        2    0.000    0.000    0.000    0.000 copyreg.py:12(pickle)
-        4    0.000    0.000    0.000    0.000 {method 'find' of 'bytearray' objects}
         2    0.000    0.000    0.000    0.000 {method '__typing_prepare_subst__' of 'typing.TypeVar' objects}
-        2    0.000    0.000    0.000    0.000 typing.py:1136(<genexpr>)
-        3    0.000    0.000    0.000    0.000 inspect.py:431(isbuiltin)
-        2    0.000    0.000    0.000    0.000 _parser.py:947(fix_flags)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:1414(dataclass)
-       11    0.000    0.000    0.000    0.000 dataclasses.py:1169(<genexpr>)
+        1    0.000    0.000    0.000    0.000 threading.py:328(_is_owned)
+        2    0.000    0.000    0.000    0.000 copyreg.py:12(pickle)
         1    0.000    0.000    0.000    0.000 typing.py:2890(SupportsBytes)
-        1    0.000    0.000    0.000    0.000 typing.py:2901(SupportsIndex)
-        4    0.000    0.000    0.000    0.000 {method 'extend' of 'bytearray' objects}
-        3    0.000    0.000    0.000    0.000 <frozen codecs>:284(getstate)
-        9    0.000    0.000    0.000    0.000 dataclasses.py:762(_is_kw_only)
-        2    0.000    0.000    0.000    0.000 _compiler.py:481(_get_charset_prefix)
-        1    0.000    0.000    0.000    0.000 typing.py:3138(_TypedDictMeta)
-       11    0.000    0.000    0.000    0.000 enum.py:167(__init__)
-        1    0.000    0.000    0.000    0.000 typing.py:1600(_DeprecatedGenericAlias)
-        4    0.000    0.000    0.000    0.000 _parser.py:83(groups)
-        1    0.000    0.000    0.000    0.000 {built-in method math.sqrt}
-        1    0.000    0.000    0.000    0.000 _parser.py:372(_escape)
-        1    0.000    0.000    0.000    0.000 game_controller.py:20(__init__)
-        1    0.000    0.000    0.000    0.000 game.py:8(__init__)
-        2    0.000    0.000    0.000    0.000 _parser.py:176(append)
-        1    0.000    0.000    0.000    0.000 typing.py:1679(_UnionGenericAliasMeta)
-        1    0.000    0.000    0.000    0.000 typing.py:1974(_ProtocolMeta)
-        1    0.000    0.000    0.000    0.000 game.py:7(Game)
-        4    0.000    0.000    0.000    0.000 {method 'group' of 're.Match' objects}
-        4    0.000    0.000    0.000    0.000 {method 'items' of 'mappingproxy' objects}
-        4    0.000    0.000    0.000    0.000 _parser.py:113(__init__)
-        1    0.000    0.000    0.000    0.000 typing.py:2091(Protocol)
-        1    0.000    0.000    0.000    0.000 typing.py:3641(<generic parameters of reveal_type>)
-        3    0.000    0.000    0.000    0.000 {method 'to_bytes' of 'int' objects}
-        3    0.000    0.000    0.000    0.000 reprlib.py:9(recursive_repr)
-        1    0.000    0.000    0.000    0.000 typing.py:165(_LazyAnnotationLib)
+        1    0.000    0.000    0.000    0.000 typing.py:2912(SupportsAbs)
+        1    0.000    0.000    0.000    0.000 threading.py:1054(_set_native_id)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:1414(dataclass)
+        3    0.000    0.000    0.000    0.000 inspect.py:431(isbuiltin)
         1    0.000    0.000    0.000    0.000 board.py:89(set_up_pieces)
+        2    0.000    0.000    0.000    0.000 typing.py:1136(<genexpr>)
+        1    0.000    0.000    0.000    0.000 typing.py:3423(NewType)
+        4    0.000    0.000    0.000    0.000 {method 'items' of 'mappingproxy' objects}
         4    0.000    0.000    0.000    0.000 {method 'removeprefix' of 'str' objects}
-        1    0.000    0.000    0.000    0.000 coordinate.py:7(__annotate__)
-        1    0.000    0.000    0.000    0.000 piece.py:8(Piece)
-        1    0.000    0.000    0.000    0.000 piece.py:14(Pawn)
-        6    0.000    0.000    0.000    0.000 inspect.py:3041(parameters)
+       11    0.000    0.000    0.000    0.000 enum.py:167(__init__)
+        1    0.000    0.000    0.000    0.000 _parser.py:372(_escape)
+        1    0.000    0.000    0.000    0.000 threading.py:591(Event)
+        4    0.000    0.000    0.000    0.000 _parser.py:83(groups)
+        1    0.000    0.000    0.000    0.000 typing.py:2879(SupportsComplex)
+        2    0.000    0.000    0.000    0.000 {built-in method _sre.compile}
+        1    0.000    0.000    0.000    0.000 {built-in method math.sqrt}
+        4    0.000    0.000    0.000    0.000 {method 'find' of 'bytearray' objects}
+        2    0.000    0.000    0.000    0.000 _parser.py:947(fix_flags)
+        1    0.000    0.000    0.000    0.000 threading.py:459(Semaphore)
+        1    0.000    0.000    0.000    0.000 game.py:7(Game)
+        2    0.000    0.000    0.000    0.000 _parser.py:176(append)
+        1    0.000    0.000    0.000    0.000 threading.py:316(__exit__)
+        1    0.000    0.000    0.000    0.000 threading.py:1438(_DummyThread)
+        1    0.000    0.000    0.000    0.000 typing.py:1720(_LiteralGenericAlias)
+        4    0.000    0.000    0.000    0.000 {method 'extend' of 'bytearray' objects}
+        3    0.000    0.000    0.000    0.000 {method 'to_bytes' of 'int' objects}
+        1    0.000    0.000    0.000    0.000 bit_utils.py:1(<module>)
+        3    0.000    0.000    0.000    0.000 <frozen codecs>:284(getstate)
+        1    0.000    0.000    0.000    0.000 threading.py:1308(_make_invoke_excepthook)
+        4    0.000    0.000    0.000    0.000 _parser.py:113(__init__)
         3    0.000    0.000    0.000    0.000 dataclasses.py:359(__init__)
-        3    0.000    0.000    0.000    0.000 dataclasses.py:420(<genexpr>)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:437(__init__)
+        4    0.000    0.000    0.000    0.000 {method 'group' of 're.Match' objects}
         3    0.000    0.000    0.000    0.000 {built-in method from_iterable}
-        3    0.000    0.000    0.000    0.000 {method 'has_default' of 'typing.TypeVar' objects}
+        1    0.000    0.000    0.000    0.000 coordinate.py:7(__annotate__)
         1    0.000    0.000    0.000    0.000 typing.py:424(_Sentinel)
         1    0.000    0.000    0.000    0.000 typing.py:496(_Final)
+        1    0.000    0.000    0.000    0.000 typing.py:1600(_DeprecatedGenericAlias)
+        1    0.000    0.000    0.000    0.000 typing.py:1974(_ProtocolMeta)
+        1    0.000    0.000    0.000    0.000 typing.py:2091(Protocol)
+        1    0.000    0.000    0.000    0.000 typing.py:3138(_TypedDictMeta)
+        3    0.000    0.000    0.000    0.000 {method 'keys' of 'dict' objects}
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1172(exec_module)
+        1    0.000    0.000    0.000    0.000 threading.py:546(BoundedSemaphore)
+        1    0.000    0.000    0.000    0.000 piece.py:8(Piece)
+        1    0.000    0.000    0.000    0.000 piece.py:14(Pawn)
+        1    0.000    0.000    0.000    0.000 typing.py:165(_LazyAnnotationLib)
+        1    0.000    0.000    0.000    0.000 typing.py:3641(<generic parameters of reveal_type>)
+        3    0.000    0.000    0.000    0.000 {method 'has_default' of 'typing.TypeVar' objects}
+        1    0.000    0.000    0.000    0.000 threading.py:1409(_DeleteDummyThreadOnDel)
+        6    0.000    0.000    0.000    0.000 inspect.py:3045(return_annotation)
+        1    0.000    0.000    0.000    0.000 threading.py:126(RLock)
+        2    0.000    0.000    0.000    0.000 _parser.py:77(__init__)
+        3    0.000    0.000    0.000    0.000 dataclasses.py:420(<genexpr>)
         1    0.000    0.000    0.000    0.000 typing.py:576(_AnyMeta)
         1    0.000    0.000    0.000    0.000 typing.py:588(Any)
-        8    0.000    0.000    0.000    0.000 inspect.py:2736(default)
-        2    0.000    0.000    0.000    0.000 _parser.py:77(__init__)
-        2    0.000    0.000    0.000    0.000 _parser.py:172(__setitem__)
-        1    0.000    0.000    0.000    0.000 typing.py:1701(_UnionGenericAlias)
-        1    0.000    0.000    0.000    0.000 {built-in method fromkeys}
-        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1172(exec_module)
-        1    0.000    0.000    0.000    0.000 piece.py:18(Knight)
-        1    0.000    0.000    0.000    0.000 typing.py:1033(_is_typevar_like)
         1    0.000    0.000    0.000    0.000 typing.py:1615(_CallableGenericAlias)
-        1    0.000    0.000    0.000    0.000 typing.py:1720(_LiteralGenericAlias)
         1    0.000    0.000    0.000    0.000 typing.py:1731(_ConcatenateGenericAlias)
+        1    0.000    0.000    0.000    0.000 typing.py:3752(<generic parameters of override>)
         4    0.000    0.000    0.000    0.000 {built-in method builtins.abs}
-        1    0.000    0.000    0.000    0.000 color.py:15(forward_row_delta)
-        1    0.000    0.000    0.000    0.000 piece.py:30(Queen)
-        1    0.000    0.000    0.000    0.000 piece.py:34(King)
-        1    0.000    0.000    0.000    0.000 typing.py:543(__repr__)
-        1    0.000    0.000    0.000    0.000 typing.py:569(_TypedCacheSpecialForm)
-        6    0.000    0.000    0.000    0.000 inspect.py:3045(return_annotation)
+        1    0.000    0.000    0.000    0.000 threading.py:1391(_MainThread)
+        8    0.000    0.000    0.000    0.000 inspect.py:2736(default)
+        6    0.000    0.000    0.000    0.000 inspect.py:3041(parameters)
+        2    0.000    0.000    0.000    0.000 _parser.py:172(__setitem__)
+        4    0.000    0.000    0.000    0.000 _compiler.py:442(_get_iscased)
         1    0.000    0.000    0.000    0.000 <string>:1(<module>)
         1    0.000    0.000    0.000    0.000 typing.py:2964(NamedTupleMeta)
-        3    0.000    0.000    0.000    0.000 {method 'keys' of 'dict' objects}
-        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1017(is_package)
-        1    0.000    0.000    0.000    0.000 piece.py:22(Bishop)
-        1    0.000    0.000    0.000    0.000 piece.py:26(Rook)
-        1    0.000    0.000    0.000    0.000 typing.py:506(_NotIterable)
-        4    0.000    0.000    0.000    0.000 _compiler.py:442(_get_iscased)
-        1    0.000    0.000    0.000    0.000 typing.py:3661(<generic parameters of __call__>)
-        1    0.000    0.000    0.000    0.000 {method 'count' of 'tuple' objects}
+        1    0.000    0.000    0.000    0.000 {built-in method _thread._make_thread_handle}
+        1    0.000    0.000    0.000    0.000 {built-in method fromkeys}
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:1017(is_package)
+        1    0.000    0.000    0.000    0.000 piece.py:18(Knight)
         1    0.000    0.000    0.000    0.000 board_constants.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 typing.py:569(_TypedCacheSpecialForm)
+        1    0.000    0.000    0.000    0.000 typing.py:1033(_is_typevar_like)
+        1    0.000    0.000    0.000    0.000 typing.py:1701(_UnionGenericAlias)
+        1    0.000    0.000    0.000    0.000 {method 'count' of 'tuple' objects}
+        1    0.000    0.000    0.000    0.000 color.py:15(forward_row_delta)
+        1    0.000    0.000    0.000    0.000 piece.py:26(Rook)
+        1    0.000    0.000    0.000    0.000 piece.py:22(Bishop)
+        1    0.000    0.000    0.000    0.000 piece.py:30(Queen)
+        1    0.000    0.000    0.000    0.000 piece.py:34(King)
+        1    0.000    0.000    0.000    0.000 typing.py:506(_NotIterable)
+        1    0.000    0.000    0.000    0.000 typing.py:543(__repr__)
+        1    0.000    0.000    0.000    0.000 {method 'acquire' of '_thread.lock' objects}
+        1    0.000    0.000    0.000    0.000 typing.py:3661(<generic parameters of __call__>)
+        1    0.000    0.000    0.000    0.000 {built-in method _thread.get_native_id}
         1    0.000    0.000    0.000    0.000 ai_constants.py:1(<module>)
-        1    0.000    0.000    0.000    0.000 typing.py:1820(_TypingEllipsis)
+        1    0.000    0.000    0.000    0.000 threading.py:848(BrokenBarrierError)
         1    0.000    0.000    0.000    0.000 piece_constants.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 typing.py:1820(_TypingEllipsis)
         1    0.000    0.000    0.000    0.000 {built-in method builtins.ord}
 
 
