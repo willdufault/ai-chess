@@ -1,4 +1,3 @@
-from functools import cache
 from typing import Generator
 
 from enums.color import Color

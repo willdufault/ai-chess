@@ -111,22 +111,8 @@ class Board:
     def is_occupied(self, square_mask: int, color: Color | None = None) -> bool:
         """Return whether the square is occupied by the color. Check both colors
         if not specified."""
-        is_occupied_by_white = (
-            intersects(self._white_pawn_bitboard, square_mask)
-            or intersects(self._white_knight_bitboard, square_mask)
-            or intersects(self._white_bishop_bitboard, square_mask)
-            or intersects(self._white_rook_bitboard, square_mask)
-            or intersects(self._white_queen_bitboard, square_mask)
-            or intersects(self._white_king_bitboard, square_mask)
-        )
-        is_occupied_by_black = (
-            intersects(self._black_pawn_bitboard, square_mask)
-            or intersects(self._black_knight_bitboard, square_mask)
-            or intersects(self._black_bishop_bitboard, square_mask)
-            or intersects(self._black_rook_bitboard, square_mask)
-            or intersects(self._black_queen_bitboard, square_mask)
-            or intersects(self._black_king_bitboard, square_mask)
-        )
+        is_occupied_by_white = intersects(square_mask, self.get_mask(Color.WHITE))
+        is_occupied_by_black = intersects(square_mask, self.get_mask(Color.BLACK))
 
         if color == Color.WHITE:
             return is_occupied_by_white

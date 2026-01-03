@@ -35,7 +35,10 @@ class GameController:
     def play(self) -> None:
         while self._game.status == GameStatus.ACTIVE:
             score = Engine.evaluate(self._game._board)
-            BoardView.print(self._game._current_color, self._game._board, score)
+            if self._game_mode == GameMode.VS_PLAYER:
+                BoardView.print(self._game._current_color, self._game._board, score)
+            else:
+                BoardView.print(self._player_color, self._game._board, score)
 
             if (
                 self._game_mode == GameMode.VS_PLAYER
@@ -43,6 +46,7 @@ class GameController:
             ):
                 self._take_player_turn()
             else:
+                print("Bot thinking...")
                 self._take_ai_turn()
 
             if Rules.is_in_checkmate(

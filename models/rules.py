@@ -7,7 +7,7 @@ from models.move import Move
 from models.move_generator import MoveGenerator
 from models.piece import Bishop, King, Knight, Pawn, Queen, Rook
 from utils.bit_utils import intersects
-from utils.board_utils import enumerate_mask, is_diagonal, is_orthogonal
+from utils.board_utils import is_diagonal, is_orthogonal
 
 LEGAL_KNIGHT_MOVE_PATTERNS = [
     (1, 2),
@@ -31,7 +31,6 @@ LEGAL_KING_MOVE_PATTERNS = [
 ]
 
 
-# TODO: cache check/checkmate/stalemate/cand_moves/legal_moves?
 class Rules:
     @staticmethod
     def can_promote(move: Move) -> bool:
@@ -177,7 +176,6 @@ class Rules:
             if not is_in_check:
                 yield move
 
-    # TODO: optimize gen_legal_moves and gen_cand_moves with generators
     @classmethod
     def is_in_checkmate(cls, color: Color, board: Board) -> bool:
         has_no_legal_moves = next(cls.generate_legal_moves(color, board), None) is None

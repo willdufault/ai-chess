@@ -1,7 +1,7 @@
 from constants.board_constants import BOARD_LEN
 from enums.color import Color
 from models.board import Board
-from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
+from models.piece import Bishop, King, Knight, Pawn, Queen, Rook
 from utils.bit_utils import get_shift
 from utils.board_utils import enumerate_mask
 
@@ -79,7 +79,7 @@ _PLACEMENT_SCORES_KING_ENDGAME = (
 )
 # fmt: on
 
-_POSITIONAL_SCORE_WEIGHT = 1 / 40
+_POSITIONAL_SCORE_WEIGHT = 1 / 50
 
 
 class Engine:
@@ -96,13 +96,19 @@ class Engine:
         """Return the sum of the values of all white pieces minus the sum of
         values of all black pieces."""
         material_score = 0
-        for square_mask in enumerate_mask(board.get_mask()):
-            piece = board._get_piece(square_mask)
-            assert piece is not None
-            if piece.color == Color.WHITE:
-                material_score += piece.VALUE
-            else:
-                material_score -= piece.VALUE
+        material_score += Pawn.VALUE * board._white_pawn_bitboard.bit_count()
+        material_score += Knight.VALUE * board._white_knight_bitboard.bit_count()
+        material_score += Bishop.VALUE * board._white_bishop_bitboard.bit_count()
+        material_score += Rook.VALUE * board._white_rook_bitboard.bit_count()
+        material_score += Queen.VALUE * board._white_queen_bitboard.bit_count()
+        material_score += King.VALUE * board._white_king_bitboard.bit_count()
+
+        material_score -= Pawn.VALUE * board._black_pawn_bitboard.bit_count()
+        material_score -= Knight.VALUE * board._black_knight_bitboard.bit_count()
+        material_score -= Bishop.VALUE * board._black_bishop_bitboard.bit_count()
+        material_score -= Rook.VALUE * board._black_rook_bitboard.bit_count()
+        material_score -= Queen.VALUE * board._black_queen_bitboard.bit_count()
+        material_score -= King.VALUE * board._black_king_bitboard.bit_count()
         return material_score
 
     @classmethod
@@ -110,53 +116,74 @@ class Engine:
         """Return the sum of the placement scores of all white pieces minus the
         sum of the placement scores of all black pieces."""
         positional_score = 0
-        for square_mask in enumerate_mask(board.get_mask()):
-            piece = board._get_piece(square_mask)
-            assert piece is not None
-            placement_score = cls._calculate_placement_score_endgame(
-                piece, square_mask, cls._is_in_endgame(board)
-            )
-            if piece.color == Color.WHITE:
-                positional_score += placement_score
-            else:
-                positional_score -= placement_score
+        is_in_endgame = cls._is_in_endgame(board)
+
+        positional_score += cls._get_piece_placement_score(
+            board._white_pawn_bitboard, Color.WHITE, _PLACEMENT_SCORES_PAWN
+        )
+        positional_score += cls._get_piece_placement_score(
+            board._white_knight_bitboard, Color.WHITE, _PLACEMENT_SCORES_KNIGHT
+        )
+        positional_score += cls._get_piece_placement_score(
+            board._white_bishop_bitboard, Color.WHITE, _PLACEMENT_SCORES_BISHOP
+        )
+        positional_score += cls._get_piece_placement_score(
+            board._white_rook_bitboard, Color.WHITE, _PLACEMENT_SCORES_ROOK
+        )
+        positional_score += cls._get_piece_placement_score(
+            board._white_queen_bitboard, Color.WHITE, _PLACEMENT_SCORES_QUEEN
+        )
+        positional_score += cls._get_piece_placement_score(
+            board._white_king_bitboard,
+            Color.WHITE,
+            (
+                _PLACEMENT_SCORES_KING_ENDGAME
+                if is_in_endgame
+                else _PLACEMENT_SCORES_KING_MIDDLEGAME
+            ),
+        )
+
+        positional_score -= cls._get_piece_placement_score(
+            board._black_pawn_bitboard, Color.BLACK, _PLACEMENT_SCORES_PAWN
+        )
+        positional_score -= cls._get_piece_placement_score(
+            board._black_knight_bitboard, Color.BLACK, _PLACEMENT_SCORES_KNIGHT
+        )
+        positional_score -= cls._get_piece_placement_score(
+            board._black_bishop_bitboard, Color.BLACK, _PLACEMENT_SCORES_BISHOP
+        )
+        positional_score -= cls._get_piece_placement_score(
+            board._black_rook_bitboard, Color.BLACK, _PLACEMENT_SCORES_ROOK
+        )
+        positional_score -= cls._get_piece_placement_score(
+            board._black_queen_bitboard, Color.BLACK, _PLACEMENT_SCORES_QUEEN
+        )
+        positional_score -= cls._get_piece_placement_score(
+            board._black_king_bitboard,
+            Color.BLACK,
+            (
+                _PLACEMENT_SCORES_KING_ENDGAME
+                if is_in_endgame
+                else _PLACEMENT_SCORES_KING_MIDDLEGAME
+            ),
+        )
+
         return positional_score
+
+    @staticmethod
+    def _get_piece_placement_score(
+        piece_bitboard: int, color: Color, piece_placement_scores: tuple[int, ...]
+    ) -> int:
+        placement_score = 0
+        for square_mask in enumerate_mask(piece_bitboard):
+            square_shift = get_shift(square_mask)
+            placement_index = (
+                BOARD_LEN - 1 - square_shift if color == Color.WHITE else square_shift
+            )
+            placement_score += piece_placement_scores[placement_index]
+        return placement_score
 
     @staticmethod
     def _is_in_endgame(board: Board) -> bool:
         """Return whether there are no queens left on the board."""
-        for square_mask in enumerate_mask(board.get_mask()):
-            piece = board._get_piece(square_mask)
-            assert piece is not None
-            if isinstance(piece, Queen):
-                return False
-        return True
-
-    @staticmethod
-    def _calculate_placement_score_endgame(
-        piece: Piece, square_mask: int, is_in_endgame: bool
-    ) -> int:
-        """Return the placement score for the piece during the endgame."""
-        square_shift = get_shift(square_mask)
-        placement_index = (
-            BOARD_LEN - 1 - square_shift if piece.color == Color.WHITE else square_shift
-        )
-        match piece:
-            case Pawn():
-                return _PLACEMENT_SCORES_PAWN[placement_index]
-            case Knight():
-                return _PLACEMENT_SCORES_KNIGHT[placement_index]
-            case Bishop():
-                return _PLACEMENT_SCORES_BISHOP[placement_index]
-            case Rook():
-                return _PLACEMENT_SCORES_ROOK[placement_index]
-            case Queen():
-                return _PLACEMENT_SCORES_QUEEN[placement_index]
-            case King():
-                return (
-                    _PLACEMENT_SCORES_KING_ENDGAME[placement_index]
-                    if is_in_endgame
-                    else _PLACEMENT_SCORES_KING_MIDDLEGAME[placement_index]
-                )
-            case _:
-                raise ValueError(f"Invalid piece type: {piece}")
+        return board._white_queen_bitboard == 0 and board._black_queen_bitboard == 0

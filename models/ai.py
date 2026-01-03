@@ -1,6 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
-from copy import copy
-
 from enums.color import Color
 from models.board import Board
 from models.engine import Engine
@@ -19,11 +16,21 @@ class Ai:
 
     def calculate_best_move(self, color: Color, board: Board) -> Move:
         moves = list(Rules.generate_legal_moves(color, board))
+        moves = self._sort_moves(moves)
         scores = self._calculate_move_scores(moves, board)
         best_score = max(scores) if color == Color.WHITE else min(scores)
         best_index = scores.index(best_score)
         best_move = moves[best_index]
         return best_move
+
+    def _sort_moves(self, moves: list[Move]) -> list[Move]:
+        """Return the moves in LVA-MVV order."""
+        return sorted(moves, key=self._compare_move)
+
+    def _compare_move(self, move: Move) -> tuple[int, int]:
+        from_piece_value = getattr(move.from_piece, "VALUE", 0)
+        to_piece_value = getattr(move.to_piece, "VALUE", 0)
+        return from_piece_value, -to_piece_value
 
     def _calculate_move_scores(self, moves: list[Move], board: Board) -> list[int]:
         scores = []
