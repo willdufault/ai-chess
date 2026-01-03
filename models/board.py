@@ -1,61 +1,68 @@
-from constants.board_constants import BOARD_SIZE
+import random
+
+from constants.board_constants import BOARD_LEN, BOARD_SIZE
+from constants.piece_constants import PIECE_TYPE_COUNT
 from enums.color import Color
 from models.coordinate import Coordinate
 from models.move import Move
 from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
-from utils.bit_utils import intersects
-from utils.board_utils import calculate_mask
+from utils.bit_utils import get_shift, intersects
+from utils.board_utils import enumerate_mask, get_mask
 
-WHITE_PAWN_INITIAL_BITBOARD = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000
-)
-WHITE_KNIGHT_INITIAL_BITBOARD = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010
-)
-WHITE_BISHOP_INITIAL_BITBOARD = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100
-)
-WHITE_ROOK_INITIAL_BITBOARD = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001
-)
-WHITE_QUEEN_INITIAL_BITBOARD = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000
-)
-WHITE_KING_INITIAL_BITBOARD = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000
-)
+# fmt: off
+WHITE_PAWN_INITIAL_BITBOARD = 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000
+WHITE_KNIGHT_INITIAL_BITBOARD = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010
+WHITE_BISHOP_INITIAL_BITBOARD = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100
+WHITE_ROOK_INITIAL_BITBOARD = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001
+WHITE_QUEEN_INITIAL_BITBOARD = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000
+WHITE_KING_INITIAL_BITBOARD = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000
 
-BLACK_PAWN_INITIAL_BITBOARD = (
-    0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000
-)
-BLACK_ROOK_INITIAL_BITBOARD = (
-    0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-)
-BLACK_KNIGHT_INITIAL_BITBOARD = (
-    0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-)
-BLACK_BISHOP_INITIAL_BITBOARD = (
-    0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-)
-BLACK_QUEEN_INITIAL_BITBOARD = (
-    0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-)
-BLACK_KING_INITIAL_BITBOARD = (
-    0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-)
+BLACK_PAWN_INITIAL_BITBOARD = 0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000
+BLACK_ROOK_INITIAL_BITBOARD = 0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+BLACK_KNIGHT_INITIAL_BITBOARD = 0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+BLACK_BISHOP_INITIAL_BITBOARD = 0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+BLACK_QUEEN_INITIAL_BITBOARD = 0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+BLACK_KING_INITIAL_BITBOARD = 0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000
 
-FIRST_ROW_MASK = (
-    0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_11111111
-)
-LAST_ROW_MASK = (
-    0b11111111_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-)
+FIRST_ROW_MASK = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_11111111
+LAST_ROW_MASK = 0b11111111_00000000_00000000_00000000_00000000_00000000_00000000_00000000
+# fmt: on
+
+_WHITE_PAWN = Pawn(Color.WHITE)
+_WHITE_KNIGHT = Knight(Color.WHITE)
+_WHITE_BISHOP = Bishop(Color.WHITE)
+_WHITE_ROOK = Rook(Color.WHITE)
+_WHITE_QUEEN = Queen(Color.WHITE)
+_WHITE_KING = King(Color.WHITE)
+
+_BLACK_PAWN = Pawn(Color.BLACK)
+_BLACK_KNIGHT = Knight(Color.BLACK)
+_BLACK_BISHOP = Bishop(Color.BLACK)
+_BLACK_ROOK = Rook(Color.BLACK)
+_BLACK_QUEEN = Queen(Color.BLACK)
+_BLACK_KING = King(Color.BLACK)
+
+_ZOBRIST_INDEX_WHITE_PAWN = 0
+_ZOBRIST_INDEX_WHITE_KNIGHT = 1
+_ZOBRIST_INDEX_WHITE_BISHOP = 2
+_ZOBRIST_INDEX_WHITE_ROOK = 3
+_ZOBRIST_INDEX_WHITE_QUEEN = 4
+_ZOBRIST_INDEX_WHITE_KING = 5
+
+_ZOBRIST_INDEX_BLACK_PAWN = 6
+_ZOBRIST_INDEX_BLACK_KNIGHT = 7
+_ZOBRIST_INDEX_BLACK_BISHOP = 8
+_ZOBRIST_INDEX_BLACK_ROOK = 9
+_ZOBRIST_INDEX_BLACK_QUEEN = 10
+_ZOBRIST_INDEX_BLACK_KING = 11
+
+_ZOBRIST_HASH_BITS = 64
 
 
-# TODO: impl hash (zobrist hash?)
 class Board:
     def __init__(self) -> None:
         self.size = BOARD_SIZE
+        self.len = BOARD_LEN
 
         self._white_pawn_bitboard = 0
         self._white_knight_bitboard = 0
@@ -70,6 +77,14 @@ class Board:
         self._black_rook_bitboard = 0
         self._black_queen_bitboard = 0
         self._black_king_bitboard = 0
+
+        self._zobrist_matrix = [
+            [random.getrandbits(_ZOBRIST_HASH_BITS) for _ in range(PIECE_TYPE_COUNT)]
+            for _ in range(BOARD_LEN)
+        ]
+
+    def __hash__(self) -> int:
+        return self._calculate_zobrist_hash()
 
     def set_up_pieces(self) -> None:
         self._white_pawn_bitboard = WHITE_PAWN_INITIAL_BITBOARD
@@ -87,11 +102,11 @@ class Board:
         self._black_king_bitboard = BLACK_KING_INITIAL_BITBOARD
 
     def get_piece(self, coordinate: Coordinate) -> Piece | None:
-        square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
+        square_mask = get_mask(coordinate.row_index, coordinate.column_index)
         return self._get_piece(square_mask)
 
     def set_piece(self, piece: Piece | None, coordinate: Coordinate) -> None:
-        square_mask = calculate_mask(coordinate.row_index, coordinate.column_index)
+        square_mask = get_mask(coordinate.row_index, coordinate.column_index)
         return self._set_piece(piece, square_mask)
 
     def is_occupied(self, square_mask: int, color: Color | None = None) -> bool:
@@ -164,30 +179,30 @@ class Board:
 
     def _get_piece(self, square_mask: int) -> Piece | None:
         if intersects(self._white_pawn_bitboard, square_mask):
-            return Pawn(Color.WHITE)
+            return _WHITE_PAWN
         elif intersects(self._white_knight_bitboard, square_mask):
-            return Knight(Color.WHITE)
+            return _WHITE_KNIGHT
         elif intersects(self._white_bishop_bitboard, square_mask):
-            return Bishop(Color.WHITE)
+            return _WHITE_BISHOP
         elif intersects(self._white_rook_bitboard, square_mask):
-            return Rook(Color.WHITE)
+            return _WHITE_ROOK
         elif intersects(self._white_queen_bitboard, square_mask):
-            return Queen(Color.WHITE)
+            return _WHITE_QUEEN
         elif intersects(self._white_king_bitboard, square_mask):
-            return King(Color.WHITE)
+            return _WHITE_KING
 
         elif intersects(self._black_pawn_bitboard, square_mask):
-            return Pawn(Color.BLACK)
+            return _BLACK_PAWN
         elif intersects(self._black_knight_bitboard, square_mask):
-            return Knight(Color.BLACK)
+            return _BLACK_KNIGHT
         elif intersects(self._black_bishop_bitboard, square_mask):
-            return Bishop(Color.BLACK)
+            return _BLACK_BISHOP
         elif intersects(self._black_rook_bitboard, square_mask):
-            return Rook(Color.BLACK)
+            return _BLACK_ROOK
         elif intersects(self._black_queen_bitboard, square_mask):
-            return Queen(Color.BLACK)
+            return _BLACK_QUEEN
         elif intersects(self._black_king_bitboard, square_mask):
-            return King(Color.BLACK)
+            return _BLACK_KING
 
         return None
 
@@ -248,3 +263,36 @@ class Board:
         self._black_rook_bitboard &= ~square_mask
         self._black_queen_bitboard &= ~square_mask
         self._black_king_bitboard &= ~square_mask
+        self._black_king_bitboard &= ~square_mask
+
+    def _calculate_zobrist_hash(self) -> int:
+        value = 0
+        for square_mask in enumerate_mask(self.get_mask()):
+            shift = get_shift(square_mask)
+
+            if intersects(square_mask, self._white_pawn_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_WHITE_PAWN]
+            elif intersects(square_mask, self._white_knight_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_WHITE_KNIGHT]
+            elif intersects(square_mask, self._white_bishop_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_WHITE_BISHOP]
+            elif intersects(square_mask, self._white_rook_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_WHITE_ROOK]
+            elif intersects(square_mask, self._white_queen_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_WHITE_QUEEN]
+            elif intersects(square_mask, self._white_king_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_WHITE_KING]
+
+            elif intersects(square_mask, self._black_pawn_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_BLACK_PAWN]
+            elif intersects(square_mask, self._black_knight_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_BLACK_KNIGHT]
+            elif intersects(square_mask, self._black_bishop_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_BLACK_BISHOP]
+            elif intersects(square_mask, self._black_rook_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_BLACK_ROOK]
+            elif intersects(square_mask, self._black_queen_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_BLACK_QUEEN]
+            elif intersects(square_mask, self._black_king_bitboard):
+                value ^= self._zobrist_matrix[shift][_ZOBRIST_INDEX_BLACK_KING]
+        return value

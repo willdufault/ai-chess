@@ -1,1 +1,2 @@
 BOARD_SIZE = 8
+BOARD_LEN = 64

@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from enums.color import Color
 from models.coordinate import Coordinate
 from models.piece import Piece
-from utils.board_utils import calculate_mask
+from utils.board_utils import get_mask
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Move:
     from_square_mask: int
     to_square_mask: int
@@ -23,10 +23,10 @@ class Move:
         to_piece: Piece | None,
         color: Color,
     ) -> Move:
-        from_square_mask = calculate_mask(
+        from_square_mask = get_mask(
             from_coordinate.row_index, from_coordinate.column_index
         )
-        to_square_mask = calculate_mask(
+        to_square_mask = get_mask(
             to_coordinate.row_index, to_coordinate.column_index
         )
         return cls(from_square_mask, to_square_mask, from_piece, to_piece, color)

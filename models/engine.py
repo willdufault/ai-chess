@@ -1,10 +1,9 @@
-from constants.board_constants import BOARD_SIZE
+from constants.board_constants import BOARD_LEN
 from enums.color import Color
 from models.board import Board
-from models.coordinate import Coordinate
-from models.move import Move
 from models.piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
-from utils.board_utils import calculate_mask, calculate_shift
+from utils.bit_utils import get_shift
+from utils.board_utils import enumerate_mask
 
 # Tables from https://www.chessprogramming.org/Simplified_Evaluation_Function.
 # fmt: off
@@ -80,6 +79,8 @@ _PLACEMENT_SCORES_KING_ENDGAME = (
 )
 # fmt: on
 
+_POSITIONAL_SCORE_WEIGHT = 1 / 40
+
 
 class Engine:
     @classmethod
@@ -88,18 +89,14 @@ class Engine:
         lower = black)."""
         material_score = cls._get_material_score(board)
         positional_score = cls._get_positional_score(board)
-        return material_score + positional_score / 40
+        return material_score + _POSITIONAL_SCORE_WEIGHT * positional_score
 
     @staticmethod
     def _get_material_score(board: Board) -> int:
         """Return the sum of the values of all white pieces minus the sum of
         values of all black pieces."""
         material_score = 0
-        for square_shift in range(board.size**2):
-            square_mask = 1 << square_shift
-            if not board.is_occupied(square_mask):
-                continue
-
+        for square_mask in enumerate_mask(board.get_mask()):
             piece = board._get_piece(square_mask)
             assert piece is not None
             if piece.color == Color.WHITE:
@@ -113,11 +110,7 @@ class Engine:
         """Return the sum of the placement scores of all white pieces minus the
         sum of the placement scores of all black pieces."""
         positional_score = 0
-        for square_shift in range(board.size**2):
-            square_mask = 1 << square_shift
-            if not board.is_occupied(square_mask):
-                continue
-
+        for square_mask in enumerate_mask(board.get_mask()):
             piece = board._get_piece(square_mask)
             assert piece is not None
             placement_score = cls._calculate_placement_score_endgame(
@@ -132,12 +125,9 @@ class Engine:
     @staticmethod
     def _is_in_endgame(board: Board) -> bool:
         """Return whether there are no queens left on the board."""
-        for square_shift in range(board.size**2):
-            square_mask = 1 << square_shift
-            if not board.is_occupied(square_mask):
-                continue
-
+        for square_mask in enumerate_mask(board.get_mask()):
             piece = board._get_piece(square_mask)
+            assert piece is not None
             if isinstance(piece, Queen):
                 return False
         return True
@@ -147,11 +137,9 @@ class Engine:
         piece: Piece, square_mask: int, is_in_endgame: bool
     ) -> int:
         """Return the placement score for the piece during the endgame."""
-        square_shift = calculate_shift(square_mask)
+        square_shift = get_shift(square_mask)
         placement_index = (
-            BOARD_SIZE**2 - 1 - square_shift
-            if piece.color == Color.WHITE
-            else square_shift
+            BOARD_LEN - 1 - square_shift if piece.color == Color.WHITE else square_shift
         )
         match piece:
             case Pawn():

@@ -11,7 +11,7 @@ from models.move_parser import MoveParser
 from models.move_validator import MoveValidator
 from models.piece import Bishop, Knight, Queen, Rook
 from models.rules import Rules
-from utils.board_utils import calculate_mask
+from utils.board_utils import get_mask
 from views.board_view import BoardView
 from views.game_view import GameView
 
@@ -82,8 +82,8 @@ class GameController:
             from_row_index, from_column_index, to_row_index, to_column_index = (
                 move_tuple
             )
-            from_square_mask = calculate_mask(from_row_index, from_column_index)
-            to_square_mask = calculate_mask(to_row_index, to_column_index)
+            from_square_mask = get_mask(from_row_index, from_column_index)
+            to_square_mask = get_mask(to_row_index, to_column_index)
             from_piece = self._game._board._get_piece(from_square_mask)
             to_piece = self._game._board._get_piece(to_square_mask)
             move = Move(

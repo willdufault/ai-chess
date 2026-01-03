@@ -1,7 +1,7 @@
 from enums.color import Color
 from models.board import Board
 from utils.bit_utils import intersects
-from utils.board_utils import calculate_mask
+from utils.board_utils import get_mask
 
 _SCORE_BAR_PADDING = 7
 
@@ -30,7 +30,7 @@ class BoardView:
             for column_index in column_indexes:
                 print(f" │ ", end="")
 
-                square_mask = calculate_mask(row_index, column_index)
+                square_mask = get_mask(row_index, column_index)
                 if intersects(board._white_pawn_bitboard, square_mask):
                     print(f"♙", end="")
                 elif intersects(board._white_knight_bitboard, square_mask):

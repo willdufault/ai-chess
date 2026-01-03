@@ -14,7 +14,7 @@ def board() -> Board:
 
 
 def test_generate_candidate_moves(board: Board) -> None:
-    assert MoveGenerator.generate_candidate_moves(Color.WHITE, board) == []
+    assert list(MoveGenerator.generate_candidate_moves(Color.WHITE, board)) == []
 
     board.set_up_pieces()
     # fmt: off

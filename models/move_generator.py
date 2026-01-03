@@ -1,3 +1,6 @@
+from functools import cache
+from typing import Generator
+
 from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
@@ -237,7 +240,7 @@ class MoveGenerator:
         return intermediate_squares_mask
 
     @classmethod
-    def generate_candidate_moves(cls, color: Color, board: Board) -> list[Move]:
+    def generate_candidate_moves(cls, color: Color, board: Board) -> Generator[Move]:
         if color == Color.WHITE:
             pawn_move_transforms = PAWN_MOVE_UP_TRANSFORMS
             pawn_capture_transforms = PAWN_CAPTURE_UP_TRANSFORMS
@@ -257,45 +260,31 @@ class MoveGenerator:
             queen_bitboard = board._black_queen_bitboard
             king_bitboard = board._black_king_bitboard
 
-        candidate_moves = []
-        candidate_moves.extend(
-            cls._generate_pawn_candidate_moves(
-                pawn_bitboard,
-                pawn_move_transforms,
-                pawn_capture_transforms,
-                color,
-                board,
-            )
+        yield from cls._generate_pawn_candidate_moves(
+            pawn_bitboard,
+            pawn_move_transforms,
+            pawn_capture_transforms,
+            color,
+            board,
         )
-        candidate_moves.extend(
-            cls._generate_pattern_candidate_moves(
-                knight_bitboard, KNIGHT_TRANSFORMS, color, board
-            )
+        yield from cls._generate_pattern_candidate_moves(
+            knight_bitboard, KNIGHT_TRANSFORMS, color, board
         )
-        candidate_moves.extend(
-            cls._generate_straight_candidate_moves(
-                bishop_bitboard, DIAGONAL_TRANSFORMS, color, board
-            )
+        yield from cls._generate_straight_candidate_moves(
+            bishop_bitboard, DIAGONAL_TRANSFORMS, color, board
         )
-        candidate_moves.extend(
-            cls._generate_straight_candidate_moves(
-                rook_bitboard, ORTHOGONAL_TRANSFORMS, color, board
-            )
+        yield from cls._generate_straight_candidate_moves(
+            rook_bitboard, ORTHOGONAL_TRANSFORMS, color, board
         )
-        candidate_moves.extend(
-            cls._generate_straight_candidate_moves(
-                queen_bitboard,
-                DIAGONAL_TRANSFORMS + ORTHOGONAL_TRANSFORMS,
-                color,
-                board,
-            )
+        yield from cls._generate_straight_candidate_moves(
+            queen_bitboard,
+            DIAGONAL_TRANSFORMS + ORTHOGONAL_TRANSFORMS,
+            color,
+            board,
         )
-        candidate_moves.extend(
-            cls._generate_pattern_candidate_moves(
-                king_bitboard, KING_TRANSFORMS, color, board
-            )
+        yield from cls._generate_pattern_candidate_moves(
+            king_bitboard, KING_TRANSFORMS, color, board
         )
-        return candidate_moves
 
     @staticmethod
     def _calculate_pattern_attacker_squares_mask(
@@ -342,8 +331,7 @@ class MoveGenerator:
         pawn_capture_transforms: list[tuple[int, int]],
         color: Color,
         board: Board,
-    ) -> list[Move]:
-        candidate_moves = []
+    ) -> Generator[Move]:
         for from_square_mask in enumerate_mask(pawn_bitboard):
             for transform_mask, transform_shift in pawn_move_transforms:
                 if intersects(from_square_mask, transform_mask):
@@ -352,7 +340,7 @@ class MoveGenerator:
                         move = Move(
                             from_square_mask, to_square_mask, Pawn(color), None, color
                         )
-                        candidate_moves.append(move)
+                        yield move
 
         for from_square_mask in enumerate_mask(pawn_bitboard):
             for transform_mask, transform_shift in pawn_capture_transforms:
@@ -367,8 +355,7 @@ class MoveGenerator:
                             to_piece,
                             color,
                         )
-                        candidate_moves.append(move)
-        return candidate_moves
+                        yield move
 
     @classmethod
     def _generate_pattern_candidate_moves(
@@ -377,8 +364,7 @@ class MoveGenerator:
         piece_transforms: list[tuple[int, int]],
         color: Color,
         board: Board,
-    ) -> list[Move]:
-        candidate_moves = []
+    ) -> Generator[Move]:
         for from_square_mask in enumerate_mask(piece_bitboard):
             from_piece = board._get_piece(from_square_mask)
             for transform_mask, transform_shift in piece_transforms:
@@ -393,8 +379,7 @@ class MoveGenerator:
                             to_piece,
                             color,
                         )
-                        candidate_moves.append(move)
-        return candidate_moves
+                        yield move
 
     @classmethod
     def _generate_straight_candidate_moves(
@@ -403,8 +388,7 @@ class MoveGenerator:
         piece_transforms: list[tuple[int, int]],
         color: Color,
         board: Board,
-    ) -> list[Move]:
-        candidate_moves = []
+    ) -> Generator[Move]:
         for from_square_mask in enumerate_mask(piece_bitboard):
             from_piece = board._get_piece(from_square_mask)
             for transform_mask, transform_shift in piece_transforms:
@@ -425,11 +409,10 @@ class MoveGenerator:
                         to_piece,
                         color,
                     )
-                    candidate_moves.append(move)
+                    yield move
 
                     capturing_opponent_piece = to_piece is not None
                     if capturing_opponent_piece:
                         break
 
                     current_square_mask = to_square_mask
-        return candidate_moves

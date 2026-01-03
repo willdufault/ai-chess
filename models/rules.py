@@ -1,3 +1,5 @@
+from typing import Generator
+
 from enums.color import Color
 from models.board import Board
 from models.coordinate import Coordinate
@@ -166,28 +168,22 @@ class Rules:
         return (row_delta, column_delta) in LEGAL_KING_MOVE_PATTERNS
 
     @staticmethod
-    def generate_legal_moves(color: Color, board: Board) -> list[Move]:
-        legal_moves = []
+    def generate_legal_moves(color: Color, board: Board) -> Generator[Move]:
         candidate_moves = MoveGenerator.generate_candidate_moves(color, board)
         for move in candidate_moves:
             board.make_move(move)
             is_in_check = Rules.is_in_check(color, board)
             board.undo_move(move)
             if not is_in_check:
-                legal_moves.append(move)
-        return legal_moves
+                yield move
 
     # TODO: optimize gen_legal_moves and gen_cand_moves with generators
     @classmethod
     def is_in_checkmate(cls, color: Color, board: Board) -> bool:
-        return (
-            cls.is_in_check(color, board)
-            and len(cls.generate_legal_moves(color, board)) == 0
-        )
+        has_no_legal_moves = next(cls.generate_legal_moves(color, board), None) is None
+        return cls.is_in_check(color, board) and has_no_legal_moves
 
     @classmethod
     def is_in_stalemate(cls, color: Color, board: Board) -> bool:
-        return (
-            not cls.is_in_check(color, board)
-            and len(cls.generate_legal_moves(color, board)) == 0
-        )
+        has_no_legal_moves = next(cls.generate_legal_moves(color, board), None) is None
+        return not cls.is_in_check(color, board) and has_no_legal_moves
