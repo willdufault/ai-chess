@@ -6,10 +6,9 @@ from models.move import Move
 
 class Game:
     def __init__(self, board: Board) -> None:
-        self.board = board
-        self.current_color = Color.WHITE
+        self._board = board
+        self._current_color = Color.WHITE
         self.status = GameStatus.ACTIVE
 
-    # TODO: more delegation methods?
     def make_move(self, move: Move) -> None:
-        self.board.make_move(move)
+        self._board.make_move(move)

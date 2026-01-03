@@ -29,6 +29,7 @@ LEGAL_KING_MOVE_PATTERNS = [
 ]
 
 
+# TODO: cache check/checkmate/stalemate/cand_moves/legal_moves?
 class Rules:
     @staticmethod
     def can_promote(move: Move) -> bool:

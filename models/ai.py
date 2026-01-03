@@ -2,12 +2,14 @@ from enums.color import Color
 from models.board import Board
 from models.engine import Engine
 from models.move import Move
+from models.piece import Queen
 from models.rules import Rules
 
 _MAX_SCORE = 1_000_000
 _MIN_SCORE = -1_000_000
 
 
+# TODO: ai check + checkmate + stalemate
 class Ai:
     def __init__(self, depth: int) -> None:
         self._depth = depth
@@ -52,7 +54,8 @@ class Ai:
         best_score = _MIN_SCORE if color == Color.WHITE else _MAX_SCORE
         for move in moves:
             board.make_move(move)
-            # TODO: add AI PROMO -> Queen
+            if Rules.can_promote(move):
+                board._set_piece(Queen(move.color), move.to_square_mask)
             current_score = self._minimax(color.opposite, depth - 1, alpha, beta, board)
             board.undo_move(move)
 
