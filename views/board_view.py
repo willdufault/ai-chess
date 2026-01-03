@@ -3,10 +3,12 @@ from models.board import Board
 from utils.bit_utils import intersects
 from utils.board_utils import calculate_mask
 
+_SCORE_BAR_PADDING = 7
+
 
 class BoardView:
     @staticmethod
-    def print(color: Color, board: Board) -> None:
+    def print(color: Color, board: Board, score: float | None = None) -> None:
         # Flip board based on team.
         if color == Color.WHITE:
             row_indexes = tuple(reversed(range(board.size)))
@@ -15,9 +17,13 @@ class BoardView:
             row_indexes = tuple(range(board.size))
             column_indexes = tuple(reversed(range(board.size)))
 
-        print("  ┌───┬───┬───┬───┬───┬───┬───┬───┐")
+        print("  ┌───┬───┬───┬───┬───┬───┬───┬───┐", end="")
+        if score is not None:
+            print("  ┌─┐", end="")
+        print()
 
         row_count = 0
+        score_row_index = score // 4 + board.size // 2 if score is not None else 0
         for row_index in row_indexes:
             print(row_index, end="")
 
@@ -54,10 +60,29 @@ class BoardView:
                     print(f" ", end="")
 
             print(" │", end="")
+            if score is not None:
+                if row_index >= score_row_index:
+                    print("  │ │", end="")
+                else:
+                    print("  │█│", end="")
+            print()
 
             row_count += 1
             if row_count < board.size:
-                print("\n  ├───┼───┼───┼───┼───┼───┼───┼───┤")
+                print("  ├───┼───┼───┼───┼───┼───┼───┼───┤", end="")
+                if score is not None:
+                    if row_index >= score_row_index:
+                        print("  │ │", end="")
+                    else:
+                        print("  │█│", end="")
+                print()
 
-        print("\n  └───┴───┴───┴───┴───┴───┴───┴───┘")
-        print("    " + "   ".join(map(str, column_indexes)))
+        print("  └───┴───┴───┴───┴───┴───┴───┴───┘", end="")
+        if score is not None:
+            print("  └─┘", end="")
+        print()
+
+        print("    " + "   ".join(map(str, column_indexes)), end="")
+        if score is not None:
+            score_str = str(round(score, 1))
+            print(score_str.rjust(_SCORE_BAR_PADDING))

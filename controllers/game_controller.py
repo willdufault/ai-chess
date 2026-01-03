@@ -4,6 +4,7 @@ from enums.game_status import GameStatus
 from enums.promotion_piece import PromotionPiece
 from models.ai import Ai
 from models.ai_factory import AiFactory
+from models.engine import Engine
 from models.game import Game
 from models.move import Move
 from models.move_parser import MoveParser
@@ -33,7 +34,8 @@ class GameController:
 
     def play(self) -> None:
         while self._game.status == GameStatus.ACTIVE:
-            BoardView.print(self._game._current_color, self._game._board)
+            score = Engine.evaluate(self._game._board)
+            BoardView.print(self._game._current_color, self._game._board, score)
 
             if (
                 self._game_mode == GameMode.VS_PLAYER

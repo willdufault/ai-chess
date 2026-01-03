@@ -36,8 +36,8 @@ class Ai:
         return scores
 
     def _minimax(
-        self, color: Color, depth: int, alpha: int, beta: int, board: Board
-    ) -> int:
+        self, color: Color, depth: int, alpha: float, beta: float, board: Board
+    ) -> float:
         if depth == 0:
             # TODO: cache this?
             return Engine.evaluate(board)
