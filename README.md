@@ -22,6 +22,7 @@ AI Chess is a 1300-rated (93rd percentile) Python chess engine delivering fast, 
 
 - Python 3.14
 - Pytest
+- cProfile
 
 ### Usage
 
