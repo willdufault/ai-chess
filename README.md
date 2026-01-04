@@ -13,6 +13,7 @@ AI Chess is a 1300-rated (93rd percentile) Python chess engine delivering fast, 
 - Custom engine for evaluating positions
 - Evaluation bar to display the current advantage
 - AI using Minimax with alpha-beta pruning and transposition table caching
+- Lazy move generation for efficient game tree exploration
 - Unit tests with Pytest to validate critical components
 
 > Experimented with Python 3.14 free threading for AI evaluation, but running on a single thread proved faster due to thread overhead
@@ -26,7 +27,7 @@ AI Chess is a 1300-rated (93rd percentile) Python chess engine delivering fast, 
 
 - Enter moves in coordinate format `"rcrc"` (row/column &rarr; row/column, 0-based)
 - Use `"!"` to skip legality checks (e.g., `"0077!"`)
- 
+
 <img src="https://github.com/user-attachments/assets/5fa87dcf-e63e-4ef2-8762-90c07acdf3a7" width="800" alt="AI Chess demo">
 
 ### Installation
