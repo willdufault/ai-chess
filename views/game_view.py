@@ -1,4 +1,4 @@
-from constants.ai_constants import MAX_AI_DEPTH, MIN_AI_DEPTH
+from constants.bot_constants import MAX_BOT_DEPTH, MIN_BOT_DEPTH
 from enums.color import Color
 from enums.game_mode import GameMode
 from enums.promotion_piece import PromotionPiece
@@ -10,12 +10,12 @@ class GameView:
         message = "Choose a game mode: (1) player vs. player, or (2) player vs. AI."
         choices = ["1", "2"]
         choice = cls._prompt_choice(message, choices)
-        return GameMode.VS_PLAYER if choice == "1" else GameMode.VS_AI
+        return GameMode.VS_PLAYER if choice == "1" else GameMode.VS_BOT
 
     @classmethod
-    def prompt_ai_depth(cls) -> int:
-        message = f"Choose an AI depth from {MIN_AI_DEPTH} to {MAX_AI_DEPTH} (higher = smarter but slower)."
-        choices = list(map(str, range(MIN_AI_DEPTH, MAX_AI_DEPTH + 1)))
+    def prompt_bot_depth(cls) -> int:
+        message = f"Choose an AI depth from {MIN_BOT_DEPTH} to {MAX_BOT_DEPTH} (higher = smarter but slower)."
+        choices = list(map(str, range(MIN_BOT_DEPTH, MAX_BOT_DEPTH + 1)))
         return int(cls._prompt_choice(message, choices))
 
     @classmethod

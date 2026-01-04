@@ -1,2 +1,0 @@
-MIN_AI_DEPTH = 1
-MAX_AI_DEPTH = 4

@@ -2,8 +2,8 @@ from enums.color import Color
 from enums.game_mode import GameMode
 from enums.game_status import GameStatus
 from enums.promotion_piece import PromotionPiece
-from models.ai import Ai
-from models.ai_factory import AiFactory
+from models.bot import Bot
+from models.bot_factory import BotFactory
 from models.engine import Engine
 from models.game import Game
 from models.move import Move
@@ -17,20 +17,20 @@ from views.game_view import GameView
 
 
 class GameController:
-    def __init__(self, game: Game, ai_factory: AiFactory) -> None:
+    def __init__(self, game: Game, bot_factory: BotFactory) -> None:
         self._game = game
-        self._ai_factory = ai_factory
+        self._bot_factory = bot_factory
         self._game_mode = GameMode.VS_PLAYER
-        self._ai_depth = 0
+        self._bot_depth = 0
         self._player_color = Color.WHITE
-        self._ai = None
+        self._bot = None
 
     def configure(self) -> None:
         self._game_mode = GameView.prompt_game_mode()
-        if self._game_mode == GameMode.VS_AI:
-            self._ai_depth = GameView.prompt_ai_depth()
+        if self._game_mode == GameMode.VS_BOT:
+            self._bot_depth = GameView.prompt_bot_depth()
             self._player_color = GameView.prompt_player_color()
-            self._ai = self._ai_factory.get_ai(self._ai_depth)
+            self._bot = self._bot_factory.get_bot(self._bot_depth)
 
     def play(self) -> None:
         while self._game.status == GameStatus.ACTIVE:
@@ -46,8 +46,8 @@ class GameController:
             ):
                 self._take_player_turn()
             else:
-                print("Bot thinking...")
-                self._take_ai_turn()
+                print("AI thinking...")
+                self._take_bot_turn()
 
             if Rules.is_in_checkmate(
                 self._game._current_color.opposite, self._game._board
@@ -61,13 +61,18 @@ class GameController:
 
             self._game._current_color = self._game._current_color.opposite
 
+        display_color = (
+            self._game._current_color
+            if self._game_mode == GameMode.VS_PLAYER
+            else self._player_color
+        )
         match self._game.status:
             case GameStatus.CHECKMATE:
-                BoardView.print(self._game._current_color, self._game._board)
-                print(f"🎉 {self._game._current_color} wins by checkmate!")
+                BoardView.print(display_color, self._game._board)
+                print(f"\n🎉 {self._game._current_color} wins by checkmate!")
             case GameStatus.STALEMATE:
-                BoardView.print(self._game._current_color, self._game._board)
-                print(f"🤝 Draw by stalemate.")
+                BoardView.print(display_color, self._game._board)
+                print(f"\n🤝 Draw by stalemate.")
             case _:
                 raise ValueError(f"Unknown game status: {self._game.status}")
 
@@ -134,9 +139,9 @@ class GameController:
                 raise ValueError(f"Invalid promotion piece: {promotion_piece}")
         self._game._board._set_piece(piece, move.to_square_mask)
 
-    def _take_ai_turn(self) -> None:
-        assert isinstance(self._ai, Ai)
-        move = self._ai.calculate_best_move(
+    def _take_bot_turn(self) -> None:
+        assert isinstance(self._bot, Bot)
+        move = self._bot.calculate_best_move(
             self._player_color.opposite, self._game._board
         )
         self._game.make_move(move)
