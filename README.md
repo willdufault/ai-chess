@@ -14,14 +14,14 @@ AI Chess is a 1400-rated (98th percentile) Python chess engine delivering fast, 
 - Evaluation bar to display the current advantage
 - AI using Minimax with alpha-beta pruning and transposition table caching
 - Lazy move generation for efficient game tree exploration
-- Unit tests with Pytest to validate critical components
+- Unit tests with pytest to validate critical components
 
 > Experimented with Python 3.14 free threading for AI evaluation, but running on a single thread proved faster due to thread overhead
 
 ### Technologies
 
 - Python 3.14
-- Pytest
+- pytest
 - cProfile
 
 ### Usage
