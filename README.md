@@ -1,6 +1,6 @@
 # AI Chess
 
-A highly efficient Python chess engine with advanced AI and board optimization techniques.
+A highly efficient Python chess engine.
 
 ### Overview
 
