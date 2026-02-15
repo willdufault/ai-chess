@@ -2,6 +2,8 @@
 
 A highly efficient Python chess engine.
 
+https://github.com/user-attachments/assets/6d9ccc37-927b-4db1-b783-b1291b0c7879
+
 ### Overview
 
 AI Chess is a 1400-rated (98th percentile) Python chess engine delivering fast, intelligent gameplay. It leverages bitboards for efficient board representation, Zobrist hashing for rapid state lookup, and a custom engine to evaluate positions. The AI uses minimax with alpha-beta pruning and a transposition table to cache board evaluations, producing strong, optimized moves while providing a challenging experience and showcasing advanced AI and performance techniques.
@@ -28,8 +30,6 @@ AI Chess is a 1400-rated (98th percentile) Python chess engine delivering fast, 
 
 - Enter moves in coordinate format `"rcrc"` (row/column &rarr; row/column, 0-based)
 - Use `"!"` to skip legality checks (e.g., `"0077!"`)
-
-<img src="https://github.com/user-attachments/assets/5fa87dcf-e63e-4ef2-8762-90c07acdf3a7" width="800" alt="AI Chess demo">
 
 ### Installation
 
